@@ -1,27 +1,31 @@
 GenDir     = gen
-BricksIn   = ..\..\bricks\bricks.i
+BricksIn   = ..\..\bricks\bricks.i 
+BricksHdr  = ..\..\bricks\bricks.h
 WrapperGen = $(GenDir)\bricks_java_wrap.c 
-JavaGen    = $(GenDir)\bricksJNI.java $(GenDir)\bricks.java $(GenDir)\bricksConstants.java
-AllGen     = $(JavaGen) $(WrapperGen)
-Classes    = $(GenDir)\bricksJNI.class $(GenDir)\bricks.class
-OutDir     = .	
-BricksJar  = $(GenDir)\bricks.jar     
+Classes    = $(GenDir)\bricks.class $(GenDir)\bricksConstants.class $(GenDir)\bricksJNI.class $(GenDir)\bricks_error_code_e.class $(GenDir)\SWIGTYPE_p_int.class
+Java       = $(GenDir)\bricks.java  $(GenDir)\bricksConstants.java  $(GenDir)\bricksJNI.java  $(GenDir)\bricks_error_code_e.java  $(GenDir)\SWIGTYPE_p_int.java
 
-all: gen $(BricksJar)  
+BricksJar  =   $(GenDir)\bricks.jar
 
-gen: 
-	if not exist $(GenDir) mkdir $(GenDir)
+.SUFFIXES  : .java .class
 
-$(BricksJar): $(Classes)
+all:  $(Classes) $(BricksJar)
+
+$(BricksJar): $(Java) $(Classes)
 	jar cvf $(BricksJar) $(Classes)
 
-$(Classes): $(JavaGen)
-	javac -d $(GenDir) $(JavaGen)
+{$(GenDir)\}.java{$(GenDir)\}.class::
+	javac -d $(GenDir) $<
 	
-$(JavaGen): $(BricksIn)
+$(Java):: $(GenDir) $(BricksIn) $(BricksHdr)
 	swig -java -o $(WrapperGen) -outdir $(GenDir) $(BricksIn) 
+
+$(GenDir): 
+	mkdir $(GenDir)
 
 $(BricksIn):
 
+$(BricksHdr):
+
 clean: 
-    del /Q $(BricksJar) $(AllGen) $(Classes)
+    del /Q $(GenDir)\*.*

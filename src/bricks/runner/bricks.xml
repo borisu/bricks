@@ -1,0 +1,18 @@
+<bricks>
+  <bus-providers>
+     <bus-provider name="kafka" lib="bricks-kafka.dll">
+     </bus-provider>
+     <bus-provider name="in-memory-bus" lib="bricks-im-bus.dll">
+     </bus-provider>
+  </bus-providers>
+  <discovery-providers>
+    <discovery-provider name="etcd" lib="bricks-etcd.dll"/>
+    <discovery-provider name="in-memory-dsc" lib="bricks-im-dsc.dll"/>
+  </discovery-providers>
+   <realms>
+      <realm name="orion">
+        <bus-provider name="kafka"/>
+        <discovery-provider name="direct"/>
+      </realm>
+  </realms>
+</bricks>

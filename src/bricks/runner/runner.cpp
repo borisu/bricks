@@ -2,10 +2,15 @@
 //
 
 #include <iostream>
+#include "bricks.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    std::cout << "Hello World (Runner)!\n";
+
+    bricks_handle_t h = 0;
+    bricks_open("service1", &h);
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

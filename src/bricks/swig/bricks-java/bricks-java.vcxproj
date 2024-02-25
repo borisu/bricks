@@ -138,7 +138,7 @@
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>@echo Running nmake
-nmake /E all </Command>
+nmake</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -181,7 +181,6 @@ nmake /E all </Command>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="gen\bricks.java" />
     <None Include="gen\bricksJNI.java" />
     <None Include="Makefile" />
   </ItemGroup>

@@ -19,9 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
-    <None Include="gen\bricks.java">
-      <Filter>gen</Filter>
-    </None>
     <None Include="gen\bricksJNI.java">
       <Filter>gen</Filter>
     </None>

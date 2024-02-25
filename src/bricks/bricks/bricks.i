@@ -3,7 +3,6 @@
 #include "bricks.h"
 %}
 
-#define BRICKS_INTERFACE_VERSION "0.1.0"
+%include "bricks.h"
 
-extern void bricks_register_service(void);
 
