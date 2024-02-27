@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<a a1="aone" a2="atwo">
+  <x/>
+  <b>
+    <c c1="cone">
+      cbody
+    </c>
+  </b>
+  <b>
+  </b>
+</a>

@@ -6,10 +6,20 @@
 
 int main()
 {
-    std::cout << "Hello World (Runner)!\n";
+    std::cout << "All in all it is just a brick in the wall!\n";
 
     bricks_handle_t h = 0;
-    bricks_open("service1", &h);
+    bricks_open("bricks.xml", &h);
+
+    bricks_handle_t* p = bricks_register_publisher("service1", "my.topic");
+
+    bricks_handle_t* s = bricks_register_subscriber("service1", "my.topic", my_callback);
+
+    while (true)
+    {
+        bricks_poll();
+
+    }
 
 }
 

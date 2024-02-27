@@ -15,4 +15,7 @@
         <discovery-provider name="direct"/>
       </realm>
   </realms>
+  <services>
+    <service name="srv1" realm="kafka"/>
+  </services>
 </bricks>
