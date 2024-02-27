@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "bricks.h"
 
-TEST(xtree_case, xtree_parse_xml_test) 
+TEST(xtree_case, xtree_load_xml_test) 
 {
 
 	auto h = bricks_create_xtree_from_xml_file("test1.xml");
@@ -13,4 +13,16 @@ TEST(xtree_case, xtree_parse_xml_test)
 	EXPECT_EQ(bricks_get_node_children_count(h, "/a"), 3);
 	EXPECT_EQ(bricks_get_node_children_count(h, "/a/b"), 1);
  	
+}
+
+TEST(xtree_case, xtree_parse_xml_test)
+{
+
+	auto h = bricks_create_xtree_from_xml_string("<a/>");
+
+	EXPECT_NE(h, 0);
+
+	EXPECT_EQ(bricks_get_node_children_count(h, "/a"), 0);
+	EXPECT_EQ(bricks_get_node_children_count(h, "/"), 1);
+	
 }
