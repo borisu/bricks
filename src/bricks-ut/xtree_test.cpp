@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "bricks.h"
+#include "xtree_api.h"
 
 TEST(xtree_case, xtree_load_xml_test) 
 {

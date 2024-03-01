@@ -1,5 +1,5 @@
 #pragma once
-#include "bricks.h"
+#include "bricks_api.h"
 
 using namespace tinyxml2;
 

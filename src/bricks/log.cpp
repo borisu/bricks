@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "log.h"
-#include "bricks.h"
+#include "logger_api.h"
+#include "bricks_api.h"
 
 #define MAX_LOG_LEN 2048
 
