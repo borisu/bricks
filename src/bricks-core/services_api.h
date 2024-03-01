@@ -18,7 +18,7 @@ bricks_register_service_provider(const char* name, bricks_handle_t h);
 
 
 BRICKS_API bricks_error_code_e
-bricks_service_publish(const char* name, bricks_handle_t xt);
+bricks_publish(const char* service, const char* message);
 
 
 #ifdef __cplusplus

@@ -12,6 +12,9 @@ bricks_create_xtree_from_xml_file(const char* f);
 BRICKS_API bricks_handle_t
 bricks_create_xtree_from_xml_string(const char* s);
 
+BRICKS_API void
+bricks_destroy_xtree(bricks_handle_t);
+
 BRICKS_API int
 bricks_get_node_children_count(bricks_handle_t h, const char* p);
 

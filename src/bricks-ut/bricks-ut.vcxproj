@@ -57,7 +57,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\bricks</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-kafka</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -98,6 +98,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="kafka_test.cpp" />
@@ -113,12 +114,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\bricks\bricks.vcxproj">
+    <Xml Include="test1.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\bricks-core\bricks-core.vcxproj">
       <Project>{4045a212-f1f9-467c-b2ea-9605739ec30f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\bricks-kafka\bricks-kafka.vcxproj">
+      <Project>{099e9d87-c484-4ff5-8833-cccbdd489736}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="test1.xml" />
+    <ResourceCompile Include="bricks-ut.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

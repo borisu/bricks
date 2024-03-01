@@ -34,3 +34,11 @@ bricks_get_node_children_count(bricks_handle_t h, const char* c)
 {
 	return ((xtree_t*)h)->get_node_children_count(c);
 }
+
+
+BRICKS_API void
+bricks_destroy_xtree(bricks_handle_t h)
+{
+	delete ((xtree_t*)h);
+}
+
