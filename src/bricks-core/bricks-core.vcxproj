@@ -155,7 +155,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="bricks_api.h" />
-    <ClInclude Include="log.h" />
     <ClInclude Include="logger_api.h" />
     <ClInclude Include="services_api.h" />
     <ClInclude Include="service_router.h" />
@@ -167,7 +166,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\3rdparty\modules\tinyxml2\tinyxml2.cpp" />
-    <ClCompile Include="log.cpp" />
+    <ClCompile Include="logger_impl.cpp" />
+    <ClCompile Include="services_impl.cpp" />
     <ClCompile Include="service_router.cpp" />
     <ClCompile Include="xtree_impl.cpp" />
     <ClCompile Include="xml_xtree.cpp" />

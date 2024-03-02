@@ -5,16 +5,32 @@
 extern "C" {
 #endif
 
-/* logs */
-typedef BRICKS_API void (*logger_t)
-(const char*);
+enum bricks_debug_level_e
+{
+	BRICKS_TRACE	= 1,
+	BRICKS_DEBUG	= 2,
+	BRICKS_INFO		= 3,
+	BRICKS_NONE		= 4,
+};
 
-void BRICKS_API
+
+/* logs */
+typedef  void (*logger_t)
+(bricks_debug_level_e, const char* log_str);
+
+BRICKS_API void
 brick_set_logger(logger_t);
+
+BRICKS_API void
+brick_set_log_level(bricks_debug_level_e);
+
+BRICKS_API void
+log1(bricks_debug_level_e, const char* format, ...);
 
 
 #ifdef __cplusplus
 }
 #endif
+
 
 

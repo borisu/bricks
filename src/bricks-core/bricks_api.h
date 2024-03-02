@@ -21,7 +21,6 @@ enum bricks_error_code_e
 	BRICKS_INVALID_PARAM = 2
 };
 
-
 #ifdef __cplusplus
 }
 #endif

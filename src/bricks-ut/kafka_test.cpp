@@ -10,7 +10,7 @@ TEST(kafka_case, publish_subscribe_test) {
 	bricks_handle_t kafka_config_h =
 		bricks_create_xtree_from_xml_string(
 			"<config>"
-			"<property name = \"value\" / >"
+			" <property name = \"value\" / >"
 			"</ config>"
 		);
 

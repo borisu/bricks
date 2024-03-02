@@ -9,5 +9,11 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
+#include <ctype.h>
+#include <signal.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include <time.h>
 
 #endif //PCH_H

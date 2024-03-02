@@ -7,6 +7,11 @@
 	#define BRICKSKAFKA_API __declspec(dllimport)
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 BRICKSKAFKA_API bricks_error_code_e
 bricks_kafka_init(bricks_handle_t config_xt);
 
@@ -18,3 +23,7 @@ bricks_kafka_register_service(char* svc);
 
 BRICKSKAFKA_API bricks_error_code_e
 bricks_kafka_unregister_service(char* svc);
+
+#ifdef __cplusplus
+}
+#endif
