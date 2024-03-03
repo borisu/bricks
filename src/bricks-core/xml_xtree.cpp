@@ -109,7 +109,7 @@ xml_xtree_t::get_child_value_by_index(const char* np, int i)
 	int curr_i = 0;
 	for (XMLElement* child = el->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
 		if (curr_i++ == i)		
-			return el->Value();
+			return child->Value();
 	};
 
 	return "";
