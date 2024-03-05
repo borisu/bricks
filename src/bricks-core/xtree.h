@@ -18,7 +18,7 @@ public:
 	get_node_children_count(const char* np) = 0;
 
 	virtual const char*
-	get_child_value_by_index(const char* np, int i) = 0;
+	get_child_name_by_index(const char* np, int i) = 0;
 
 	virtual const char*
 	get_node_property(const char* np, const char* pp) = 0;

@@ -13,7 +13,18 @@
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
-
 #include <time.h>
+
+#include <functional>
+#include <string>
+#include <map>
+
+#include "bricks_api.h"
+#include "bricks_api.h"
+#include "logger_api.h"
+#include "kafka_api.h"
+#include "xtree_api.h"
+#include "services_api.h"
+#include "librdkafka/rdkafka.h"
 
 #endif //PCH_H

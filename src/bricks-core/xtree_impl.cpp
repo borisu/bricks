@@ -30,7 +30,7 @@ bricks_create_xtree_from_xml_string(const char* f)
 }
 
 int
-bricks_get_node_children_count(bricks_handle_t h, const char *np)
+bricks_get_children_count(bricks_handle_t h, const char *np)
 {
 	return ((xtree_t*)h)->get_node_children_count(np);
 }
@@ -54,9 +54,9 @@ bricks_get_node_value(bricks_handle_t h, const char* np)
 }
 
 const char*
-bricks_get_child_value_by_index(bricks_handle_t h, const char* np, int i)
+bricks_get_child_name_by_index(bricks_handle_t h, const char* np, int i)
 {
-	return ((xtree_t*)h)->get_child_value_by_index(np, i);
+	return ((xtree_t*)h)->get_child_name_by_index(np, i);
 }
 
 const char*

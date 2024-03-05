@@ -17,7 +17,7 @@ public:
 	get_node_value(const char* np) override;
 
 	virtual const char*
-	get_child_value_by_index(const char* np, int i) override;
+	get_child_name_by_index(const char* np, int i) override;
 
 	virtual int
 	get_node_children_count(const char* np) override;

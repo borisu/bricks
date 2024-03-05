@@ -1,11 +1,7 @@
 #include "pch.h"
 #include "xml_xtree.h"
 
-/* lib interface bridge */
-
 xml_xtree_t::~xml_xtree_t() {};
-
-/* implementation */
 
 bricks_error_code_e
 xml_xtree_t::load(const char* f)
@@ -96,7 +92,7 @@ xml_xtree_t::get_node_value(const char* np)
 }
 
 const char*
-xml_xtree_t::get_child_value_by_index(const char* np, int i)
+xml_xtree_t::get_child_name_by_index(const char* np, int i)
 {
 	if (!check_path(np))
 		return nullptr;
@@ -289,7 +285,6 @@ xml_xtree_t::get_child_property_as_bool_by_index(const char* np, int i, const ch
 
 	return false;
 }
-
 
 double
 xml_xtree_t::get_child_property_as_double_by_index(const char* np, int i, const char* pp)

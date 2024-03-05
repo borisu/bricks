@@ -16,9 +16,10 @@ extern "C" {
 typedef uintptr_t bricks_handle_t;
 enum bricks_error_code_e
 {
-	BRICKS_SUCCESS = 0,
+	BRICKS_SUCCESS         = 0,
 	BRICKS_FAILURE_GENERIC = 1,
-	BRICKS_INVALID_PARAM = 2
+	BRICKS_INVALID_PARAM   = 2,
+	BRICKS_INVALID_STATE   = 3
 };
 
 #ifdef __cplusplus

@@ -8,6 +8,9 @@
     <Filter Include="api">
       <UniqueIdentifier>{bd5e3dd2-dcdf-4a2b-aca0-cf5e595d44c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="impl">
+      <UniqueIdentifier>{083a0f15-2ed0-467c-b9b4-1ed4e2775e59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -15,11 +18,15 @@
     <ClInclude Include="kafka_api.h">
       <Filter>api</Filter>
     </ClInclude>
+    <ClInclude Include="kafka_wrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="kafka_impl.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="kafka_impl.cpp">
+      <Filter>impl</Filter>
+    </ClCompile>
+    <ClCompile Include="kafka_wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

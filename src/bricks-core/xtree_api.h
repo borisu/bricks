@@ -16,7 +16,7 @@ BRICKS_API void
 bricks_destroy_xtree(bricks_handle_t);
 
 BRICKS_API int
-bricks_get_node_children_count(bricks_handle_t h, const char* p);
+bricks_get_children_count(bricks_handle_t h, const char* p);
 
 BRICKS_API const char*
 bricks_get_node_value(bricks_handle_t h, const char* np);
@@ -25,7 +25,7 @@ BRICKS_API const char*
 bricks_get_node_property(bricks_handle_t h, const char* np, const char* pp);
 
 BRICKS_API const char*
-bricks_get_child_value_by_index(bricks_handle_t h, const char* np, int i);
+bricks_get_child_name_by_index(bricks_handle_t h, const char* np, int i);
 
 BRICKS_API const char*
 bricks_get_child_property_by_index(bricks_handle_t h, const char* np, int i, const char* pp);
