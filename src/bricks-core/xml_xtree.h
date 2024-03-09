@@ -3,6 +3,8 @@
 
 using namespace tinyxml2;
 
+/*
+
 class xml_xtree_t : public xtree_t
 {
 public:
@@ -23,25 +25,25 @@ public:
 	get_node_children_count(const char* np) override;
 
 	virtual const char*
-	get_node_property(const char* np, const char* pp) override;
+	get_property_value_as_string(const char* np, const char* pp) override;
 
 	virtual const char*
-	get_child_property_by_index(const char* np, int i, const char* pp) override;
+	get_child_property_value_as_string(const char* np, int i, const char* pp) override;
 
 	virtual int
-	get_node_property_as_int(const char* np, const char* pp) override;
+	get_property_value_as_int(const char* np, const char* pp) override;
 
 	virtual int
-	get_child_property_as_int_by_index(const char* np, int i, const char* pp) override;
+	get_child_property_value_as_int(const char* np, int i, const char* pp) override;
 
 	virtual bool
-	get_node_property_as_bool(const char* np, const char* pp) override;
+	get_property_value_as_bool(const char* np, const char* pp) override;
 
 	virtual bool
-	get_child_property_as_bool_by_index(const char* np, int i, const char* pp) override;
+	get_child_property_value_as_bool(const char* np, int i, const char* pp) override;
 
 	virtual double
-	get_node_property_as_double(const char* np, const char* pp) override;
+	get_property_value_as_double(const char* np, const char* pp) override;
 
 	virtual double
 	get_child_property_as_double_by_index(const char* np, int i, const char* pp) override;
@@ -55,3 +57,4 @@ private:
 	XMLDocument doc;
 };
 
+*/

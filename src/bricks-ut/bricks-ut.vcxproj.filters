@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="xtree_test.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="kafka_test.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="bricks-ut.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="test1.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="tests">
+      <UniqueIdentifier>{30811994-b1ee-4e58-8f71-5ff1bcfd1526}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

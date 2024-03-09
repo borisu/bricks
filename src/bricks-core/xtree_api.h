@@ -1,54 +1,58 @@
 #pragma once
 #include "bricks_api.h"
+#include <optional>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+using namespace std;
 
-/* structured data interface */
-BRICKS_API bricks_handle_t
-bricks_create_xtree_from_xml_file(const char* f);
+class BRICKS_API xtree_t
+{
+public:
 
-BRICKS_API bricks_handle_t
-bricks_create_xtree_from_xml_string(const char* s);
+	virtual bricks_error_code_e 
+	load_from_xml(const char* str) = 0;
 
-BRICKS_API void
-bricks_destroy_xtree(bricks_handle_t);
+	// opaque node handle
+	virtual optional<bricks_handle_t>
+	get_node(const string& path) = 0;
 
-BRICKS_API int
-bricks_get_children_count(bricks_handle_t h, const char* p);
+	virtual optional<const buffer_t*>
+	get_node_value(const string& path) = 0;
 
-BRICKS_API const char*
-bricks_get_node_value(bricks_handle_t h, const char* np);
+	virtual optional<int>
+	get_node_children_count(const string& path) = 0;
 
-BRICKS_API const char*
-bricks_get_node_property(bricks_handle_t h, const char* np, const char* pp);
+	virtual optional<int>
+	get_node_children_count(bricks_handle_t node, const string& path) = 0;
 
-BRICKS_API const char*
-bricks_get_child_name_by_index(bricks_handle_t h, const char* np, int i);
+	virtual optional<string>
+	get_child_name_by_index(const string& path, int i) = 0;
 
-BRICKS_API const char*
-bricks_get_child_property_by_index(bricks_handle_t h, const char* np, int i, const char* pp);
+	virtual optional<string>
+	get_property_value_as_string(const string& path, const string& property_name) = 0;
 
-BRICKS_API int
-bricks_get_node_property_as_int(bricks_handle_t h, const char* np, const char* pp);
+	virtual optional<int>
+	get_property_value_as_int(const string& path, const string& property_name) = 0;
 
-BRICKS_API int
-bricks_get_child_property_as_int_by_index(bricks_handle_t h, const char* np, int i, const char* pp);
+	virtual optional<bool>
+	get_property_value_as_bool(const string& path, const string& property_name) = 0;
 
-BRICKS_API bool
-bricks_get_node_property_as_bool(bricks_handle_t h, const char* np, const char* pp);
+	virtual optional<double>
+	get_property_value_as_double(const string& path, const string& property_name) = 0;
 
-BRICKS_API bool
-bricks_get_child_property_as_bool_by_index(bricks_handle_t h, const char* np, int i, const char* pp);
+	virtual optional<string>
+	get_child_property_value_as_string(const string& path, int index, const string& property_name) = 0;
 
-BRICKS_API double
-bricks_get_node_property_as_double(bricks_handle_t h, const char* np, const char* pp);
+	virtual optional<int>
+	get_child_property_value_as_int(const string& path, int index, const string& property_name) = 0;
 
-BRICKS_API double
-bricks_get_child_property_as_double_by_index(bricks_handle_t h, const char* np, int i, const char* pp);
+	virtual optional<bool>
+	get_child_property_value_as_bool(const string& path, int index, const string& property_name) = 0;
 
+	virtual optional<double>
+	get_child_property_value_as_double(const string& path, int index, const string& property_name) = 0;
 
-#ifdef __cplusplus
-}
-#endif
+	virtual ~xtree_t() {};
+
+};
+
+BRICKS_API xtree_t* create_xtree();

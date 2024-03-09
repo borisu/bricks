@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "xml_xtree.h"
 
+/*
+
 xml_xtree_t::~xml_xtree_t() {};
 
 bricks_error_code_e
@@ -113,7 +115,7 @@ xml_xtree_t::get_child_name_by_index(const char* np, int i)
 }
 
 const char*
-xml_xtree_t::get_node_property(const char* p, const char* property)
+xml_xtree_t::get_property_value_as_string(const char* p, const char* property)
 {
 	if (!check_path(p))
 		return nullptr;
@@ -133,7 +135,7 @@ xml_xtree_t::get_node_property(const char* p, const char* property)
 };
 
 int
-xml_xtree_t::get_node_property_as_int(const char* np, const char* pp)
+xml_xtree_t::get_property_value_as_int(const char* np, const char* pp)
 {
 	if (!check_path(np))
 		return -1;
@@ -155,7 +157,7 @@ xml_xtree_t::get_node_property_as_int(const char* np, const char* pp)
 };
 
 bool
-xml_xtree_t::get_node_property_as_bool(const char* np, const char* pp)
+xml_xtree_t::get_property_value_as_bool(const char* np, const char* pp)
 {
 	if (!check_path(np))
 		return false;
@@ -177,7 +179,7 @@ xml_xtree_t::get_node_property_as_bool(const char* np, const char* pp)
 };
 
 double
-xml_xtree_t::get_node_property_as_double(const char* np, const char* pp)
+xml_xtree_t::get_property_value_as_double(const char* np, const char* pp)
 {
 	if (!check_path(np))
 		return -1;
@@ -199,7 +201,7 @@ xml_xtree_t::get_node_property_as_double(const char* np, const char* pp)
 };
 
 const char*
-xml_xtree_t::get_child_property_by_index(const char* np, int i, const char* pp)
+xml_xtree_t::get_child_property_value_as_string(const char* np, int i, const char* pp)
 {
 	if (!check_path(np))
 		return nullptr;
@@ -227,7 +229,7 @@ xml_xtree_t::get_child_property_by_index(const char* np, int i, const char* pp)
 }
 
 int
-xml_xtree_t::get_child_property_as_int_by_index(const char* np, int i, const char* pp)
+xml_xtree_t::get_child_property_value_as_int(const char* np, int i, const char* pp)
 {
 	if (!check_path(np))
 		return -1;
@@ -257,7 +259,7 @@ xml_xtree_t::get_child_property_as_int_by_index(const char* np, int i, const cha
 }
 
 bool
-xml_xtree_t::get_child_property_as_bool_by_index(const char* np, int i, const char* pp)
+xml_xtree_t::get_child_property_value_as_bool(const char* np, int i, const char* pp)
 {
 	if (!check_path(np))
 		return false;
@@ -315,3 +317,5 @@ xml_xtree_t::get_child_property_as_double_by_index(const char* np, int i, const 
 
 	return 0.0;
 }
+
+*/

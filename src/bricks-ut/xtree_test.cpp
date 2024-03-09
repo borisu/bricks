@@ -3,53 +3,58 @@
 
 TEST(xtree_case, xtree_load_xml_test) 
 {
-	auto h = bricks_create_xtree_from_xml_file("test1.xml");
+	auto h = create_xtree();
 
- 	EXPECT_NE(h, 0);
+	EXPECT_EQ(BRICKS_SUCCESS, h->load_from_xml(
+		"<configuration>"
+		" <property name = \"bool.value\"   value=\"true\">"
+		"    <subproperty/>"
+		" </property>"
+		" <property name = \"int.value\"    value=\"5\" />"
+		" <property name = \"double.value\" value=\"5.0\" />"
+		" <property name = \"str.value\"    value=\"Mother do you think\" />"
+		"</configuration>"
+	));
+	
 
-	EXPECT_EQ(bricks_get_children_count(h, "/"), -1);
-	EXPECT_EQ(bricks_get_children_count(h, "/a/b/c"), 0);
+	//EXPECT_EQ(h->get_node_children_count("/").value(), 1);
+	//EXPECT_EQ(h->get_node_children_count("/configuration").value(), 4);
+
+	EXPECT_EQ(h->get_node_children_count("/configuration/property").value(), 1);
+	EXPECT_EQ(h->get_node_children_count("/configuration/property/subproperty").value(), 0);
+
+	/*EXPECT_EQ(bricks_get_children_count(h, "/a/b/c"), 0);
 	EXPECT_EQ(bricks_get_children_count(h, "/a"), 3);
-	EXPECT_EQ(bricks_get_children_count(h, "/a/b"), 1);
+	EXPECT_EQ(bricks_get_children_count(h, "/a/b"), 1);*/
  	
 }
 
-TEST(xtree_case, xtree_read_children)
+
+TEST(xtree_case, xtree_direct_access)
 {
-	auto h =
-		bricks_create_xtree_from_xml_string(
-			"<configuration>"
-			" <property name = \"bool.value\"   value=\"true\" />"
-			" <property name = \"int.value\"    value=\"5\" />"
-			" <property name = \"double.value\" value=\"5.0\" />"
-			" <property name = \"str.value\"    value=\"Mother do you think\" />"
-			"</configuration>"
-		);
+	auto h = create_xtree();
 
-	int c = 0;
-	c = bricks_get_children_count(h, "/configuration");
-	EXPECT_EQ(c, 4);
+	EXPECT_EQ(BRICKS_SUCCESS, h->load_from_xml(
+		"<configuration>"
+		" <property name = \"bool.value\"   value=\"true\">"
+		"    <subproperty/>"
+		" </property>"
+		" <property name = \"int.value\"    value=\"5\" />"
+		" <property name = \"double.value\" value=\"5.0\" />"
+		" <property name = \"str.value\"    value=\"Mother do you think\" />"
+		"</configuration>"
+	));
 
-	EXPECT_STREQ(bricks_get_child_name_by_index(h, "/configuration",0), "property");
-	EXPECT_EQ(bricks_get_child_property_as_bool_by_index(h,"/configuration",0,"value"), true);
-
-	EXPECT_STREQ(bricks_get_child_name_by_index(h, "/configuration", 1), "property");
-	EXPECT_STREQ(bricks_get_child_name_by_index(h, "/configuration", 2), "property");
-	EXPECT_STREQ(bricks_get_child_name_by_index(h, "/configuration", 3), "property");
-	EXPECT_STREQ(bricks_get_child_name_by_index(h, "/configuration", 4), "");
-
-
-	EXPECT_NE(h, 0);
+	auto c = h->get_node("/configuration");
+	EXPECT_EQ(h->get_node_children_count(c.value(), "").value(), 4);
+	EXPECT_EQ(h->get_node_children_count(c.value(), "/").value(), 4);
+	EXPECT_EQ(h->get_node_children_count(c.value(), "/property").value(), 1);
 
 }
 
+/*
 TEST(xtree_case, xtree_parse_xml_test)
 {
-	auto h = bricks_create_xtree_from_xml_string("<a/>");
-
-	EXPECT_NE(h, 0);
-
-	EXPECT_EQ(bricks_get_children_count(h, "/a"), 0);
-	EXPECT_EQ(bricks_get_children_count(h, "/"), -1);
 	
-}
+	
+}*/

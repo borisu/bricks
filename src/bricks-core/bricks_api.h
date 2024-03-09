@@ -1,14 +1,13 @@
 #pragma once
 #include <cstdint>
+#include <vector>
+
+using namespace std;
 
 #ifdef BRICKS_EXPORTS
 	#define BRICKS_API __declspec(dllexport)
 #else
 	#define BRICKS_API __declspec(dllimport)
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 #define BRICKS_INTERFACE_VERSION "0.1.0"
@@ -22,6 +21,5 @@ enum bricks_error_code_e
 	BRICKS_INVALID_STATE   = 3
 };
 
-#ifdef __cplusplus
-}
-#endif
+typedef vector<char> buffer_t;
+

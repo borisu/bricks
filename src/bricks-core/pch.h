@@ -11,6 +11,15 @@
 #include "framework.h"
 #include <stdio.h>
 #include <atomic>
+#include <vector>
+#include <any>
+#include <map>
+#include <string>
+#include <list>
+#include <optional>
+#include <string_view>
+#include <iostream>
+
 #include "tinyxml2.h"
 
 
