@@ -8,7 +8,6 @@
       <Filter>3rdparty</Filter>
     </ClCompile>
     <ClCompile Include="service_router.cpp" />
-    <ClCompile Include="xml_xtree.cpp" />
     <ClCompile Include="logger_impl.cpp">
       <Filter>impl</Filter>
     </ClCompile>
@@ -36,7 +35,6 @@
       <Filter>api</Filter>
     </ClInclude>
     <ClInclude Include="service_router.h" />
-    <ClInclude Include="xml_xtree.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

@@ -17,14 +17,15 @@ const char* kafka_config_xml =
 
 TEST(kafka_case, publish_subscribe_test) {
 
-	/*bricks_handle_t kafka_config_h =
-		bricks_create_xtree_from_xml_string(kafka_config_xml);
+	service_t *kafka_config_h = service_kafka_create();
 
-	EXPECT_NE(kafka_config_h, 0);
+	auto conf = create_xtree();
+
+	EXPECT_EQ(BRICKS_SUCCESS, conf->load_from_xml(kafka_config_xml));
+	EXPECT_EQ(BRICKS_SUCCESS, kafka_config_h->init(*conf));
+
+
+	service_kafka_destroy(kafka_config_h);
 	
-	bricks_kafka_init(kafka_config_h, msg_cb);*/
-
-	//bricks_kafka_register_service("topic1");
-
-	//bricks_publish("topic1", "All in all, it's just another brick in the wall!");
+	
 }

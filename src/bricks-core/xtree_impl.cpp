@@ -8,3 +8,8 @@ xtree_t* create_xtree()
 }
 
 
+void destroy_xtree(xtree_t* tree)
+{
+	delete tree;
+}
+

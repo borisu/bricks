@@ -18,7 +18,7 @@
     <ClInclude Include="kafka_api.h">
       <Filter>api</Filter>
     </ClInclude>
-    <ClInclude Include="kafka_wrapper.h" />
+    <ClInclude Include="kafka_service.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -26,7 +26,7 @@
     <ClCompile Include="kafka_impl.cpp">
       <Filter>impl</Filter>
     </ClCompile>
-    <ClCompile Include="kafka_wrapper.cpp" />
+    <ClCompile Include="kafka_service.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

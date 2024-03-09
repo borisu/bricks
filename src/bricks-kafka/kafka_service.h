@@ -2,13 +2,13 @@
 
 using namespace std;
 
-class kafka_wrapper_t
+class kafka_service_t : public service_t
 {
 public:
 
-	kafka_wrapper_t();
+	kafka_service_t();
 
-	bricks_error_code_e init(bricks_handle_t conf_h, msg_delivered_cb_t cb);
+	bricks_error_code_e init(const xtree_t& configuration);
 
 	bricks_error_code_e register_topic(const char *topic);
 
@@ -16,7 +16,7 @@ public:
 
 	bricks_error_code_e publish(const char* topic, bricks_handle_t xtree);
 
-	virtual ~kafka_wrapper_t();
+	virtual ~kafka_service_t();
 
 	virtual void destroy();
 

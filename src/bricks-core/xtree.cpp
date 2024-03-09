@@ -31,7 +31,7 @@ xtree_impl_t::traverse_elements(const tinyxml2::XMLElement* element, xnode_t& pa
 
 	const tinyxml2::XMLAttribute* attr = element->FirstAttribute();
 	while (attr) {
-		node.properties[attr->Name()] = attr->Value();
+		node.properties[attr->Name()] = string(attr->Value());
 		attr = attr->Next();
 	}
 
@@ -44,7 +44,7 @@ xtree_impl_t::traverse_elements(const tinyxml2::XMLElement* element, xnode_t& pa
 }
 
 optional<xtree_impl_t::xnode_t*>
-xtree_impl_t::get_node(xnode_t& node, string_view&& path, bool create)
+xtree_impl_t::get_node_rec1(xnode_t& node, const string_view& path, bool create)
 {
 	if (path.length() > 0)
 	{
@@ -53,7 +53,7 @@ xtree_impl_t::get_node(xnode_t& node, string_view&& path, bool create)
 		if (end == 0)
 		{
 			//MSVC does not create string_view with zero length path so we need special handling for that
-			return get_node(node, path.length() == 1 ? "" : string_view(&path[1], path.length() - 1), create);
+			return get_node_rec1(node, path.length() == 1 ? "" : string_view(&path[1], path.length() - 1),create);
 		}
 
 		auto child_name_len = end == string_view::npos ? path.length() : end;
@@ -82,7 +82,7 @@ xtree_impl_t::get_node(xnode_t& node, string_view&& path, bool create)
 		}
 
 		//MSVC does not create string_view with zero length path so we need special handling for that
-		return get_node(*it, child_name_len == path.length() ? "" : string_view(&path[child_name_len], path.length() - child_name_len), create);
+		return get_node_rec1(*it, child_name_len == path.length() ? "" : string_view(&path[child_name_len], path.length() - child_name_len), create);
 
 	};
 
@@ -91,44 +91,52 @@ xtree_impl_t::get_node(xnode_t& node, string_view&& path, bool create)
 
 }
 
-optional<const buffer_t*>
-xtree_impl_t::get_node_value(const string& path)
+optional<xtree_impl_t::xnode_t*>
+xtree_impl_t::get_node_rec(const xnode_t& node, const string_view& path) const
 {
-	auto node = get_node(root, path, false);
+	return  const_cast<xtree_impl_t*>(this)->get_node_rec1(const_cast<xnode_t&>(node), path, false);
+
+}
+
+
+optional<const buffer_t*>
+xtree_impl_t::get_node_value(const string& path) const
+{
+	auto node = get_node_rec(root, path);
 
 	return node.has_value() ? &(node.value()->value) : optional<const buffer_t*>{};
 }
 
 optional<int>
-xtree_impl_t::get_node_children_count(const string& path) 
+xtree_impl_t::get_node_children_count(const string& path) const
 {
-	auto node = get_node(root, path, false);
+	auto node = get_node_rec(root, path);
 
 	return node.has_value() ? node.value()->children.size() : optional<int>{};
 }
 
 optional<int>
-xtree_impl_t::get_node_children_count(bricks_handle_t h, const string& path)
+xtree_impl_t::get_node_children_count(bricks_handle_t h, const string& path) const
 {
 	xnode_t* pnode = (xnode_t*)h;
 
-	auto node = get_node(*pnode, path, false);
+	auto node = get_node_rec(*pnode, path);
 
 	return node.has_value() ? node.value()->children.size() : optional<int>{};
 }
 
 // opaque node handle
 optional<bricks_handle_t>
-xtree_impl_t::get_node(const string& path)
+xtree_impl_t::get_node(const string& path) const
 {
-	auto node = get_node(root, path, false);
+	auto node = get_node_rec(root, path);
 	return node.has_value() ? optional<bricks_handle_t>{ (bricks_handle_t) node.value()} : optional<bricks_handle_t>{};
 }
 
 optional<xtree_impl_t::xnode_t*>
-xtree_impl_t::get_child(const string& path, int index)
+xtree_impl_t::get_child(const string& path, int index) const
 {
-	auto node = get_node(root, path, false);
+	auto node = get_node_rec(root, path);
 
 	if (!node.has_value())
 		return optional<xnode_t*>{};
@@ -143,7 +151,7 @@ xtree_impl_t::get_child(const string& path, int index)
 }
 
 optional<string>
-xtree_impl_t::get_child_name_by_index(const string& path, int i)
+xtree_impl_t::get_child_name_by_index(const string& path, int i) const
 {
 	auto node = get_child(path, i);
 
@@ -155,9 +163,9 @@ xtree_impl_t::get_child_name_by_index(const string& path, int i)
 
 template<typename T>
 optional<T>	
-xtree_impl_t::get_property_value_as(const string& path, const string& property_name)
+xtree_impl_t::get_property_value_as(const string& path, const string& property_name) const
 {
-	auto node = get_node(root, path, false);
+	auto node = get_node_rec(root, path);
 
 	if (!node.has_value())
 		return optional<T>{};
@@ -180,7 +188,7 @@ xtree_impl_t::get_property_value_as(const string& path, const string& property_n
 
 template<typename T>
 optional<T>
-xtree_impl_t::get_child_property_value_as(const string& path, int index, const string& property_name)
+xtree_impl_t::get_child_property_value_as(const string& path, int index, const string& property_name) const
 {
 	auto node = get_child(path, index);
 
@@ -204,50 +212,49 @@ xtree_impl_t::get_child_property_value_as(const string& path, int index, const s
 }
 
 optional<string>
-xtree_impl_t::get_property_value_as_string(const string& path, const string& property_name)
+xtree_impl_t::get_property_value_as_string(const string& path, const string& property_name) const
 {
 	return get_property_value_as<string>(path, property_name);
-
 }
 
 optional<int>
-xtree_impl_t::get_property_value_as_int(const string& path, const string& property_name)
+xtree_impl_t::get_property_value_as_int(const string& path, const string& property_name) const
 {
 	return get_property_value_as<int>(path, property_name);
 }
 
 optional<bool>
-xtree_impl_t::get_property_value_as_bool(const string& path, const string& property_name)
+xtree_impl_t::get_property_value_as_bool(const string& path, const string& property_name) const
 {
 	return get_property_value_as<bool>(path, property_name);
 }
 
 optional<double>
-xtree_impl_t::get_property_value_as_double(const string& path, const string& property_name) 
+xtree_impl_t::get_property_value_as_double(const string& path, const string& property_name) const
 {
 	return get_property_value_as<double>(path, property_name);
 }
 
 optional<string>
-xtree_impl_t::get_child_property_value_as_string(const string& path, int i, const string& property_name)
+xtree_impl_t::get_child_property_value_as_string(const string& path, int i, const string& property_name) const
 {
 	return get_child_property_value_as<string>(path, i, property_name);
 }
 
 optional<int>
-xtree_impl_t::get_child_property_value_as_int(const string& path, int i, const string& property_name)
+xtree_impl_t::get_child_property_value_as_int(const string& path, int i, const string& property_name) const
 {
 	return get_child_property_value_as<int>(path, i, property_name);
 }
 
 optional<bool>
-xtree_impl_t::get_child_property_value_as_bool(const string& path, int i, const string& property_name)
+xtree_impl_t::get_child_property_value_as_bool(const string& path, int i, const string& property_name) const
 {
 	return get_child_property_value_as<bool>(path, i, property_name);
 }
 
 optional<double>
-xtree_impl_t::get_child_property_value_as_double(const string& path, int i, const string& property_name)
+xtree_impl_t::get_child_property_value_as_double(const string& path, int i, const string& property_name) const
 {
 	return get_child_property_value_as<double>(path, i, property_name);
 }

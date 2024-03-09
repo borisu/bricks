@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "kafka_wrapper.h"
+#include "kafka_service.h"
 
 using namespace std::placeholders;
  
@@ -31,7 +31,7 @@ msg_delivered_cb_t msg_cb = nullptr;
 
 rd_kafka_t* producer = nullptr;
 
-kafka_wrapper_t::kafka_wrapper_t():
+kafka_service_t::kafka_service_t():
 	rd_conf_h(nullptr), 
 	msg_delivered_cb(nullptr),
 	initiated(false)
@@ -39,20 +39,20 @@ kafka_wrapper_t::kafka_wrapper_t():
 
 }
 
-kafka_wrapper_t::~kafka_wrapper_t()
+kafka_service_t::~kafka_service_t()
 {
 
 }
 
 void 
-kafka_wrapper_t::msg_delivered1(rd_kafka_t* rk,
+kafka_service_t::msg_delivered1(rd_kafka_t* rk,
 	const rd_kafka_message_t* rkmessage,
 	void* opaque) {
 
-	((kafka_wrapper_t*)opaque)->msg_delivered(rk, rkmessage, opaque);
+	((kafka_service_t*)opaque)->msg_delivered(rk, rkmessage, opaque);
 }
 
-void kafka_wrapper_t::msg_delivered(rd_kafka_t* rk,
+void kafka_service_t::msg_delivered(rd_kafka_t* rk,
 	const rd_kafka_message_t* rkmessage,
 	void* opaque) {
 	if (rkmessage->err)
@@ -72,36 +72,46 @@ void kafka_wrapper_t::msg_delivered(rd_kafka_t* rk,
 }
 
 bricks_error_code_e 
-kafka_wrapper_t::init(bricks_handle_t conf_h, msg_delivered_cb_t cb)
+kafka_service_t::init(const xtree_t& configuration)
 {
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	do {
 
 		rd_conf_h = rd_kafka_conf_new();
-		msg_delivered_cb = cb;
 
-		int c = 0;
-		c = bricks_get_children_count(conf_h, "/configuration");
-		for (int i = 0; i < c && err == BRICKS_SUCCESS; i++)
+	
+		try
 		{
+			int c = configuration.get_node_children_count("/configuration").value();
 
-			if (strcmp(bricks_get_child_name_by_index(conf_h, "/configuration", i), "property") != 0)
-				continue;
 
-			auto name = bricks_get_child_property_by_index(conf_h, "/configuration", i, "name");
-			auto value = bricks_get_child_property_by_index(conf_h, "/configuration", i, "value");
+			for (int i = 0; i < c && err == BRICKS_SUCCESS; i++)
+			{
+				auto prop = configuration.get_child_name_by_index("/configuration", i).value();
+				if (prop != "property")
+					continue;
 
-			char* errstr = nullptr;
-			if (rd_kafka_conf_set(rd_conf_h, name, value,
-				errstr, sizeof(errstr)) !=
-				RD_KAFKA_CONF_OK) {
-				log1(BRICKS_ALARM, "%% %s\n", errstr);
-				err = BRICKS_INVALID_PARAM;
-				break;
+				auto name = configuration.get_child_property_value_as_string("/configuration", i, "name").value();
+				auto value = configuration.get_child_property_value_as_string("/configuration", i, "value").value();
+
+				char* errstr = nullptr;
+				if (rd_kafka_conf_set(rd_conf_h, name.c_str(), value.c_str(),
+					errstr, sizeof(errstr)) !=
+					RD_KAFKA_CONF_OK) {
+					log1(BRICKS_ALARM, "%% %s\n", errstr);
+					err = BRICKS_INVALID_PARAM;
+					break;
+				}
 			}
 		}
+		catch (std::bad_optional_access&)
+		{
+			err = BRICKS_INVALID_PARAM;
+		}
 
+		if (err != BRICKS_SUCCESS)
+			break;
 
 		/* Set logger */
 		rd_kafka_conf_set_log_cb(rd_conf_h, kafka_logger);
@@ -110,8 +120,6 @@ kafka_wrapper_t::init(bricks_handle_t conf_h, msg_delivered_cb_t cb)
 		* It will be called once for each message, either on successful
 		* delivery to broker, or upon failure to deliver to broker. */
 		rd_kafka_conf_set_opaque(rd_conf_h, this);
-	
-		rd_kafka_conf_set_dr_msg_cb(rd_conf_h, msg_delivered1);
 
 		// Create Kafka producer instance
 		rd_producer_h = rd_kafka_new(RD_KAFKA_PRODUCER, rd_conf_h, NULL, 0);
@@ -131,14 +139,14 @@ kafka_wrapper_t::init(bricks_handle_t conf_h, msg_delivered_cb_t cb)
 }
 
 bricks_error_code_e 
-kafka_wrapper_t::publish(const char* topic, bricks_handle_t xtree)
+kafka_service_t::publish(const char* topic, bricks_handle_t xtree)
 { 
 	return BRICKS_SUCCESS;
 }
 
 
 void
-kafka_wrapper_t::destroy()
+kafka_service_t::destroy()
 {
 	if (rd_producer_h)
 	{
@@ -162,13 +170,13 @@ kafka_wrapper_t::destroy()
 
 
 bricks_error_code_e 
-kafka_wrapper_t::unregister_topic(const char* topic)
+kafka_service_t::unregister_topic(const char* topic)
 {
 	return BRICKS_SUCCESS;
 }
 
 bricks_error_code_e 
-kafka_wrapper_t::register_topic(const char* topic)
+kafka_service_t::register_topic(const char* topic)
 {
 	if (topics.count(topic) > 0)
 		return BRICKS_INVALID_PARAM;

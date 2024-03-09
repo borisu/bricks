@@ -6,49 +6,17 @@
 #include "xtree_api.h"
 #include "services_api.h"
 #include "librdkafka/rdkafka.h"
-#include "kafka_wrapper.h"
+#include "kafka_service.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-bricks_handle_t
-bricks_kafka_init(bricks_handle_t kafka_config_h, msg_delivered_cb_t kafka_msg_delivered_cb)
+BRICKSKAFKA_API service_t*
+service_kafka_create()
 {
-
-	kafka_wrapper_t * w  = new kafka_wrapper_t();
-	if ((w->init(kafka_config_h, kafka_msg_delivered_cb)) != BRICKS_SUCCESS)
-		delete w;
-
-	return (bricks_handle_t)w;
-
+	return new kafka_service_t();
 }
 
-
-void
-bricks_kafka_destroy(bricks_handle_t kafka_h)
+BRICKSKAFKA_API void
+service_kafka_destroy(service_t* service)
 {
-	((kafka_wrapper_t*)kafka_h)->destroy();
-	delete (kafka_wrapper_t*)kafka_h;
+	delete service;
 }
-
-bricks_error_code_e
-bricks_kafka_register_topic(bricks_handle_t kafka_h, const char* topic)
-{
-	return ((kafka_wrapper_t*)kafka_h)->register_topic(topic);
-
-}
-
-BRICKSKAFKA_API bricks_error_code_e
-bricks_kafka_unregister_topic(bricks_handle_t kafka_h, const char* topic)
-{
-	return ((kafka_wrapper_t*)kafka_h)->unregister_topic(topic);
-}
-
-
-
-#ifdef __cplusplus
-}
-#endif

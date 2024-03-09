@@ -159,7 +159,6 @@
     <ClInclude Include="logger_api.h" />
     <ClInclude Include="services_api.h" />
     <ClInclude Include="service_router.h" />
-    <ClInclude Include="xml_xtree.h" />
     <ClInclude Include="xtree.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -171,7 +170,6 @@
     <ClCompile Include="services_impl.cpp" />
     <ClCompile Include="service_router.cpp" />
     <ClCompile Include="xtree_impl.cpp" />
-    <ClCompile Include="xml_xtree.cpp" />
     <ClCompile Include="xtree.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
