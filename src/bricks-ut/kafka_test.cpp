@@ -17,15 +17,21 @@ const char* kafka_config_xml =
 
 TEST(kafka_case, publish_subscribe_test) {
 
-	service_t *kafka_config_h = service_kafka_create();
+	service_t *kafka_service_h = service_kafka_create();
 
 	auto conf = create_xtree();
 
-	EXPECT_EQ(BRICKS_SUCCESS, conf->load_from_xml(kafka_config_xml));
-	EXPECT_EQ(BRICKS_SUCCESS, kafka_config_h->init(*conf));
+	ASSERT_EQ(BRICKS_SUCCESS, conf->load_from_xml(kafka_config_xml));
+	ASSERT_EQ(BRICKS_SUCCESS, kafka_service_h->init());
 
+	const char *msg = "Another brick in the wall.";
+	buffer_t buf (msg, msg + strlen(msg));
 
-	service_kafka_destroy(kafka_config_h);
+	ASSERT_EQ(BRICKS_SUCCESS, kafka_service_h->register_publisher("bricks.test",conf));
+	ASSERT_EQ(BRICKS_SUCCESS, kafka_service_h->publish("bricks.test", buf, nullptr, conf));
+
+	ASSERT_EQ(BRICKS_SUCCESS, kafka_service_h->subscribe("bricks.test", nullptr, conf));
 	
-	
+	service_kafka_destroy(kafka_service_h);
+
 }

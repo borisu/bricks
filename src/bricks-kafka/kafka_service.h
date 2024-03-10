@@ -8,13 +8,23 @@ public:
 
 	kafka_service_t();
 
-	bricks_error_code_e init(const xtree_t& configuration);
+	virtual bricks_error_code_e init(const xtree_t* options) override;
 
-	bricks_error_code_e register_topic(const char *topic);
+	virtual bricks_error_code_e register_publisher(const string& topic, const xtree_t* options) override;
 
-	bricks_error_code_e unregister_topic(const char* topic);
+	virtual bricks_error_code_e unregister_publisher(const string& topic) override;
+	
+	virtual bricks_error_code_e publish(const string& topic, const buffer_t& buf, void* opaque, const xtree_t* options) override;
 
-	bricks_error_code_e publish(const char* topic, bricks_handle_t xtree);
+	virtual bricks_error_code_e subscribe(const string& topic, void* opaque, const xtree_t* options) override;
+
+	virtual bricks_error_code_e unsubscribe(const string& topic) override;
+
+	virtual bricks_error_code_e  poll() override;
+
+private:
+
+	bricks_error_code_e init_conf(rd_kafka_conf_t* conf, const xtree_t* options);
 
 	virtual ~kafka_service_t();
 
@@ -28,25 +38,36 @@ public:
 		const rd_kafka_message_t* rkmessage,
 		void* opaque);
 
-private:
-
-	rd_kafka_conf_t* rd_conf_h;
-
-	rd_kafka_t *rd_producer_h;
-
-	msg_delivered_cb_t msg_delivered_cb;
-
 	char errstr[512] = { '\0' };
 
 	bool initiated;
 
-	struct topic_t
+	struct producer_t
 	{
-		rd_kafka_topic_conf_t* rd_topic_conf;
+		rd_kafka_conf_t* rd_conf_h;
 
 		rd_kafka_topic_t* rd_topic_h;
+
+		rd_kafka_t* rd_producer_h;
 	};
 
-	std::map<string, topic_t> topics;
+	void destroy_producer(producer_t &c);
+
+	struct consumer_t
+	{
+		rd_kafka_conf_t* rd_conf_h;
+
+		rd_kafka_topic_partition_list_t* rd_part_list_h;
+
+		rd_kafka_t* rd_consumer_h;
+	};
+
+	void destroy_consumer(consumer_t& c);
+
+	std::map<string, producer_t> producers;
+
+	std::map<string, consumer_t> consumers;
 };
+
+
 
