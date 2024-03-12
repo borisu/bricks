@@ -21,20 +21,31 @@ public:
 
 	virtual bricks_error_code_e  init(const xtree_t *options = nullptr) = 0;
 
-	virtual bricks_error_code_e  register_publisher(const string& topic, const xtree_t* options = nullptr) = 0;
-
-	virtual bricks_error_code_e  unregister_publisher(const string& topic) = 0;
-
-	virtual bricks_error_code_e  unsubscribe(const string& topic) = 0;
-
-	virtual bricks_error_code_e  publish(const string& topic, const buffer_t &buf, void *opaque, const xtree_t *options = nullptr) = 0;
-
-	virtual bricks_error_code_e  subscribe(const string& topic, void* opaque, const xtree_t* options = nullptr) = 0;
-
-	virtual bricks_error_code_e  poll() = 0;
+	virtual bricks_error_code_e  poll(size_t timeout) = 0;
 
 };
 
+
+class publisher_service_t : public service_t
+{
+public:
+
+	virtual bricks_error_code_e  register_topic(const string& topic, const xtree_t* options = nullptr) = 0;
+
+	virtual bricks_error_code_e  publish(const string& topic, const buffer_t& buf, const xtree_t* options = nullptr) = 0;
+
+};
+
+
+class subscriber_service_t : public service_t
+{
+public:
+
+	virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) = 0;
+
+	virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options = nullptr) = 0;
+
+};
 
 
 

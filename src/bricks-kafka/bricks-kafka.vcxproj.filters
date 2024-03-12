@@ -18,6 +18,8 @@
     <ClInclude Include="kafka_api.h">
       <Filter>api</Filter>
     </ClInclude>
+    <ClInclude Include="kafka_subscriber.h" />
+    <ClInclude Include="kafka_publisher.h" />
     <ClInclude Include="kafka_service.h" />
   </ItemGroup>
   <ItemGroup>
@@ -26,6 +28,8 @@
     <ClCompile Include="kafka_impl.cpp">
       <Filter>impl</Filter>
     </ClCompile>
+    <ClCompile Include="kafka_subscriber.cpp" />
+    <ClCompile Include="kafka_publisher.cpp" />
     <ClCompile Include="kafka_service.cpp" />
   </ItemGroup>
   <ItemGroup>

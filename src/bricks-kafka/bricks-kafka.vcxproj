@@ -143,13 +143,17 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="kafka_api.h" />
+    <ClInclude Include="kafka_publisher.h" />
     <ClInclude Include="kafka_service.h" />
+    <ClInclude Include="kafka_subscriber.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="kafka_impl.cpp" />
+    <ClCompile Include="kafka_publisher.cpp" />
     <ClCompile Include="kafka_service.cpp" />
+    <ClCompile Include="kafka_subscriber.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

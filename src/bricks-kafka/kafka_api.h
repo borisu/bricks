@@ -9,9 +9,15 @@
 #endif
 
 
-BRICKSKAFKA_API service_t*
-service_kafka_create();
+BRICKSKAFKA_API publisher_service_t*
+create_kafka_publisher();
 
 BRICKSKAFKA_API void
-service_kafka_destroy(service_t *service);
+destroy_kafka_publisher(publisher_service_t *service);
+
+BRICKSKAFKA_API publisher_service_t*
+create_kafka_subscriber();
+
+BRICKSKAFKA_API void
+destroy_kafka_subscriber(publisher_service_t* service);
 

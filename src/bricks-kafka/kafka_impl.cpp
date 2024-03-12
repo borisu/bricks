@@ -12,7 +12,7 @@
 BRICKSKAFKA_API service_t*
 service_kafka_create()
 {
-	return new kafka_service_t();
+	return new kafka_subscriber_t();
 }
 
 BRICKSKAFKA_API void

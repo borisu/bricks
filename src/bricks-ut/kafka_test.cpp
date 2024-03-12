@@ -19,7 +19,7 @@ TEST(kafka_case, publish_subscribe_test) {
 		" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 		"</configuration>";
 
-	const char* kafka_conusmer_config_xml =
+	const char* kafka_consumer_config_xml =
 		"<configuration>"
 		" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 		" <property name = \"group.id\" value=\"mygroup\"/>"
@@ -31,7 +31,7 @@ TEST(kafka_case, publish_subscribe_test) {
 	auto c_conf = create_xtree();
 
 	ASSERT_EQ(BRICKS_SUCCESS, p_conf->load_from_xml(kafka_producer_config_xml));
-	ASSERT_EQ(BRICKS_SUCCESS, c_conf->load_from_xml(kafka_conusmer_config_xml));
+	ASSERT_EQ(BRICKS_SUCCESS, c_conf->load_from_xml(kafka_consumer_config_xml));
 
 	ASSERT_EQ(BRICKS_SUCCESS, kafka_service_h->init());
 

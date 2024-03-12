@@ -34,10 +34,10 @@ public:
 	virtual optional<double>
 	get_property_value_as_double(const string& path, const string &property_name) const override;
 
-	virtual optional<int>
+	virtual optional<size_t>
 	get_node_children_count(const string& path) const override;
 
-	virtual optional<int>
+	virtual optional<size_t>
 	get_node_children_count(bricks_handle_t node, const string& path) const override;
 
 	virtual optional<string>

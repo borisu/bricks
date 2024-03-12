@@ -107,22 +107,22 @@ xtree_impl_t::get_node_value(const string& path) const
 	return node.has_value() ? &(node.value()->value) : optional<const buffer_t*>{};
 }
 
-optional<int>
+optional<size_t>
 xtree_impl_t::get_node_children_count(const string& path) const
 {
 	auto node = get_node_rec(root, path);
 
-	return node.has_value() ? node.value()->children.size() : optional<int>{};
+	return node.has_value() ? node.value()->children.size() : optional<size_t>{};
 }
 
-optional<int>
+optional<size_t>
 xtree_impl_t::get_node_children_count(bricks_handle_t h, const string& path) const
 {
 	xnode_t* pnode = (xnode_t*)h;
 
 	auto node = get_node_rec(*pnode, path);
 
-	return node.has_value() ? node.value()->children.size() : optional<int>{};
+	return node.has_value() ? node.value()->children.size() : optional<size_t>{};
 }
 
 // opaque node handle

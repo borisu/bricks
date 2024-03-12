@@ -21,7 +21,6 @@
 #include <map>
 
 #include "bricks_api.h"
-#include "bricks_api.h"
 #include "logger_api.h"
 #include "kafka_api.h"
 #include "xtree_api.h"
