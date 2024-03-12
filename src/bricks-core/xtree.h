@@ -18,6 +18,12 @@ public:
 	virtual optional<const buffer_t *>
 	get_node_value(const string& path) const override;
 
+	virtual optional<bricks_handle_t>
+	set_node_value(const string& path, const buffer_t*, bool create) override;
+
+	virtual optional<bricks_handle_t>
+	set_node_value(const string& path, const char*, size_t len, bool create ) override;
+
 	// opaque node handle
 	virtual optional<bricks_handle_t>
 	get_node(const string& path) const override;

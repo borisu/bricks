@@ -7,16 +7,33 @@
 #include "services_api.h"
 #include "librdkafka/rdkafka.h"
 #include "kafka_service.h"
+#include "kafka_publisher.h"
+#include "kafka_subscriber.h"
 
 
-BRICKSKAFKA_API service_t*
-service_kafka_create()
+
+publisher_service_t*
+create_kafka_publisher()
+{
+	return new kafka_publisher_t();
+}
+
+void
+destroy_kafka_publisher(publisher_service_t* service)
+{
+	delete service;
+}
+
+subscriber_service_t*
+create_kafka_subscriber()
 {
 	return new kafka_subscriber_t();
 }
 
-BRICKSKAFKA_API void
-service_kafka_destroy(service_t* service)
+void
+destroy_kafka_subscriber(subscriber_service_t* service)
 {
 	delete service;
 }
+
+

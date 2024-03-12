@@ -13,42 +13,17 @@ kafka_subscriber_t::kafka_subscriber_t()
 
 kafka_subscriber_t::~kafka_subscriber_t()
 {
-
+	destroy();
 }
 
-void 
-kafka_subscriber_t::msg_delivered1(rd_kafka_t* rk,
-	const rd_kafka_message_t* rkmessage,
-	void* opaque) {
-
-	((kafka_subscriber_t*)opaque)->msg_delivered(rk, rkmessage, opaque);
-}
-
-void 
-kafka_subscriber_t::msg_delivered(rd_kafka_t* rk,
-	const rd_kafka_message_t* rkmessage,
-	void* opaque) {
-	if (rkmessage->err)
-		log1(BRICKS_DEBUG,
-			"%% Message delivery failed (broker %" PRId32 "): %s\n",
-			rd_kafka_message_broker_id(rkmessage),	
-			rd_kafka_err2str(rkmessage->err));
-	else
-		log1(BRICKS_DEBUG,
-			"%% Message delivered (%zd bytes, offset %" PRId64
-			", "
-			"partition %" PRId32 ", broker %" PRId32 "): %.*s\n",
-			rkmessage->len, rkmessage->offset, rkmessage->partition,
-			rd_kafka_message_broker_id(rkmessage),
-			(int)rkmessage->len, (const char*)rkmessage->payload);
-
-}
-
-bricks_error_code_e kafka_subscriber_t::init(const xtree_t* options)
+bricks_error_code_e 
+kafka_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
+
+	this->msg_cb = msg_cb;
 
 	rd_conf_h = rd_kafka_conf_new();
 
@@ -69,14 +44,7 @@ bricks_error_code_e kafka_subscriber_t::init(const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
-	rd_part_list_h = rd_kafka_topic_partition_list_new(1);
-	if (!rd_part_list_h)
-	{
-		log1(BRICKS_ALARM, "Failed to create Kafka consumer: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
-		destroy();
-		return BRICKS_3RD_PARTY_ERROR;
-	}
-
+	
 	initiated = true;
 
 	return BRICKS_SUCCESS;
@@ -87,6 +55,8 @@ bricks_error_code_e kafka_subscriber_t::init(const xtree_t* options)
 void
 kafka_subscriber_t::destroy()
 {
+	initiated = false;
+
 	if (rd_part_list_h)
 	{
 		rd_kafka_topic_partition_list_destroy(rd_part_list_h);
@@ -113,6 +83,30 @@ kafka_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
+	rd_part_list_h = rd_kafka_topic_partition_list_new(1);
+	if (!rd_part_list_h)
+	{
+		log1(BRICKS_ALARM, "Failed to create Kafka consumer: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+		destroy();
+		return BRICKS_3RD_PARTY_ERROR;
+	}
+
+
+	return BRICKS_SUCCESS;
+
+}
+
+
+bricks_error_code_e
+kafka_subscriber_t::subscribe(void* opaque,  const xtree_t* options)
+{
+	ASSERT_INITIATED;
+
+	bricks_error_code_e err = BRICKS_SUCCESS;
+
+	this->msg_cb = msg_cb;
+	this->opaque = opaque;
+
 	auto rd_err = rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
 
 	if (rd_err) {
@@ -121,9 +115,38 @@ kafka_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
-	
-
 	return BRICKS_SUCCESS;
+
+}
+
+bricks_error_code_e 
+kafka_subscriber_t::poll(size_t timeout)
+{
+	bricks_error_code_e  err = BRICKS_SUCCESS;
+
+	rd_kafka_message_t* msg = rd_kafka_consumer_poll(rd_kafka_h, (int)timeout); // Poll for messages
+
+	if (!msg)
+		return BRICKS_TIMEOUT;
+
+	if (msg->err)
+	{
+		return BRICKS_3RD_PARTY_ERROR;
+	}
+	else
+	{
+		auto xtree = create_xtree();
+
+		msg_cb(this->opaque , (const char*)msg->payload, (size_t)msg->len, *xtree);
+
+		destroy_xtree(xtree);
+	}
+
+	
+	rd_kafka_message_destroy(msg);
+
+	return err;
+	
 
 }
 

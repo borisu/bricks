@@ -19,6 +19,12 @@ public:
 	virtual optional<const buffer_t*>
 	get_node_value(const string& path) const = 0;
 
+	virtual optional<bricks_handle_t>
+	set_node_value(const string& path, const buffer_t*, bool create = true) = 0;
+
+	virtual optional<bricks_handle_t>
+	set_node_value(const string& path, const char*, size_t len, bool create = true) = 0;
+	
 	virtual optional<size_t>
 	get_node_children_count(const string& path) const = 0;
 

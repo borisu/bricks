@@ -27,14 +27,6 @@ kafka_service_t::kafka_logger(const rd_kafka_t* rk, int level, const char* fac, 
 
 kafka_service_t::kafka_service_t() {};
 
-bricks_error_code_e  
-kafka_service_t::poll(size_t timeout)
-{
-	ASSERT_INITIATED;
-
-	rd_kafka_poll(rd_kafka_h, timeout);
-}
-
 bricks_error_code_e
 kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options)
 {
@@ -42,7 +34,7 @@ kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options)
 
 	try
 	{
-		int c = options->get_node_children_count("/configuration").value();
+		size_t c = options->get_node_children_count("/configuration").value();
 
 
 		for (int i = 0; i < c && err == BRICKS_SUCCESS; i++)

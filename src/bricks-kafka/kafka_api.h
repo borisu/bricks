@@ -15,9 +15,9 @@ create_kafka_publisher();
 BRICKSKAFKA_API void
 destroy_kafka_publisher(publisher_service_t *service);
 
-BRICKSKAFKA_API publisher_service_t*
+BRICKSKAFKA_API subscriber_service_t*
 create_kafka_subscriber();
 
 BRICKSKAFKA_API void
-destroy_kafka_subscriber(publisher_service_t* service);
+destroy_kafka_subscriber(subscriber_service_t* service);
 

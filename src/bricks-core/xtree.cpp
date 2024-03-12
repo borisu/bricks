@@ -98,6 +98,30 @@ xtree_impl_t::get_node_rec(const xnode_t& node, const string_view& path) const
 
 }
 
+optional<bricks_handle_t>
+xtree_impl_t::set_node_value(const string& path, const char* buf, size_t len, bool create)
+{
+	auto node = get_node_rec1(root, path, create);
+	if (!node.has_value())
+		return {};
+
+	node.value()->value.assign(buf, buf + len);
+
+	return  (bricks_handle_t)node.value();
+}
+
+
+optional<bricks_handle_t>
+xtree_impl_t::set_node_value(const string& path, const buffer_t* buf, bool create)
+{
+	auto node = get_node_rec1(root, path, create);
+	if (!node.has_value())
+		return {};
+
+	node.value()->value = *buf;
+
+	return  (bricks_handle_t)node.value();
+}
 
 optional<const buffer_t*>
 xtree_impl_t::get_node_value(const string& path) const

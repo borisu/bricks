@@ -1,21 +1,86 @@
 #include "pch.h"
 #include "kafka_publisher.h"
 
+void
+kafka_publisher_t::msg_delivered1(rd_kafka_t* rk,
+	const rd_kafka_message_t* rkmessage,
+	void* opaque) {
 
-bricks_error_code_e
-kafka_subscriber_t::publish(const string& topic, const buffer_t& buf, void* opaque, const xtree_t* options)
-{
-	auto it = producers.find(topic);
-	if (it == producers.end())
+	((kafka_publisher_t*)opaque)->msg_delivered(rk, rkmessage, opaque);
+}
+
+void
+kafka_publisher_t::msg_delivered(rd_kafka_t* rk,
+	const rd_kafka_message_t* rkmessage,
+	void* opaque) {
+	if (rkmessage->err) 
 	{
-		return BRICKS_INVALID_PARAM;
+		log1(BRICKS_DEBUG,
+			"%% Message delivery failed (broker %" PRId32 "): %s\n",
+			rd_kafka_message_broker_id(rkmessage),
+			rd_kafka_err2str(rkmessage->err));
+	}
+	else
+	{
+		log1(BRICKS_DEBUG,
+			"%% Message delivered (%zd bytes, offset %" PRId64
+			", "
+			"partition %" PRId32 ", broker %" PRId32 "): %.*s\n",
+			rkmessage->len, rkmessage->offset, rkmessage->partition,
+			rd_kafka_message_broker_id(rkmessage),
+			(int)rkmessage->len, (const char*)rkmessage->payload);
 	}
 
-	producer_t& p = it->second;
+}
+
+kafka_publisher_t::kafka_publisher_t(){};
+
+kafka_publisher_t::~kafka_publisher_t()
+{
+	destroy();
+};
+
+bricks_error_code_e 
+kafka_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
+{
+	ASSERT_NOT_INITIATED;
+
+	bricks_error_code_e err = BRICKS_SUCCESS;
+
+	this->msg_cb = msg_cb;
+
+	rd_conf_h = rd_kafka_conf_new();
+
+	rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::kafka_logger);
+
+	if ((err = init_conf(rd_conf_h, options)) != BRICKS_SUCCESS)
+	{
+		destroy();
+		return err;
+	}
+
+	// Create producer instance
+	rd_producer_h = rd_kafka_new(RD_KAFKA_PRODUCER, rd_conf_h, NULL, 0);
+	if (!rd_producer_h) {
+		log1(BRICKS_ALARM, "Failed to create producer: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+		destroy();
+		return BRICKS_3RD_PARTY_ERROR;
+	}
+
+	initiated = true;
+
+	return BRICKS_SUCCESS;
+}
+
+
+bricks_error_code_e
+kafka_publisher_t::publish(const string& topic, const buffer_t& buf, void* opaque, const xtree_t* options)
+{
+	ASSERT_INITIATED;
 
 	auto err = rd_kafka_producev(
 		/* Producer handle */
-		p.rd_producer_h,
+		rd_producer_h,
 		/* Topic name */
 		RD_KAFKA_V_TOPIC(topic.c_str()),
 		/* Make a copy of the payload. */
@@ -40,76 +105,52 @@ kafka_subscriber_t::publish(const string& topic, const buffer_t& buf, void* opaq
 }
 
 void
-kafka_subscriber_t::destroy_producer(producer_t& p)
+kafka_publisher_t::destroy()
 {
-	if (p.rd_topic_h)
+	for (auto p : rd_topics)
 	{
-		rd_kafka_topic_destroy(p.rd_topic_h);
-		p.rd_topic_h = nullptr;
+		rd_kafka_topic_destroy(p.second);
+	}
+	if (rd_producer_h)
+	{
+		rd_kafka_destroy(rd_producer_h);
+		rd_producer_h = nullptr;
 	}
 
-	if (p.rd_producer_h)
+	if (rd_conf_h)
 	{
-		rd_kafka_destroy(p.rd_producer_h);
-		p.rd_producer_h = nullptr;
-	}
-
-	if (p.rd_conf_h)
-	{
-		rd_kafka_conf_destroy(p.rd_conf_h);
-		p.rd_conf_h = nullptr;
+		rd_kafka_conf_destroy(rd_conf_h);
+		rd_conf_h = nullptr;
 	}
 }
 
 bricks_error_code_e
-kafka_subscriber_t::register_topic(const string& topic, const xtree_t* options)
+kafka_publisher_t::register_topic(const string& topic, const xtree_t* options)
 {
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	auto it = producers.find(topic);
-	if (it != producers.end())
+	auto it = rd_topics.find(topic);
+	if (it != rd_topics.end())
 	{
 		return BRICKS_INVALID_STATE;
-	}
-
-	producer_t p;
-	memset(&p, 0, sizeof(p));
-
-
-
-
-
-	// Create producer instance
-	p.rd_producer_h = rd_kafka_new(RD_KAFKA_PRODUCER, p.rd_conf_h, NULL, 0);
-	if (!p.rd_producer_h) {
-		log1(BRICKS_ALARM, "Failed to create producer: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
-		destroy_producer(p);
-		return BRICKS_3RD_PARTY_ERROR;
 	}
 
 	/* Create topic */
-	p.rd_topic_h = rd_kafka_topic_new(p.rd_producer_h, topic.c_str(), nullptr);
-	if (!p.rd_topic_h) {
+	auto rd_topic_h = rd_kafka_topic_new(rd_producer_h, topic.c_str(), nullptr);
+	if (rd_topic_h) {
 		log1(BRICKS_ALARM, "Failed to create topic: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
-		destroy_producer(p);
+		destroy();
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
-	producers[topic] = p;
+	rd_topics[topic] = rd_topic_h;
+
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e
-kafka_subscriber_t::unregister_publisher(const string& topic)
+bricks_error_code_e 
+kafka_publisher_t::poll(size_t timeout)
 {
-	auto it = producers.find(topic);
-	if (it == producers.end())
-	{
-		return BRICKS_INVALID_STATE;
-	}
-
-	destroy_producer(it->second);
-	producers.erase(it);
-
+	rd_kafka_poll(rd_producer_h, (int)timeout);
 	return BRICKS_SUCCESS;
 }

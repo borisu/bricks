@@ -3,9 +3,8 @@
 #define ASSERT_INITIATED if (!this->initiated) return BRICKS_INVALID_STATE
 #define ASSERT_NOT_INITIATED if (this->initiated) return BRICKS_INVALID_STATE
 
-class kafka_service_t : public service_t
+class kafka_service_t 
 {
-	virtual bricks_error_code_e poll(size_t timeout) override;
 
 protected:
 

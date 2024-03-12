@@ -12,33 +12,29 @@ public:
 
 	kafka_subscriber_t();
 
-	virtual bricks_error_code_e init(const xtree_t* options) override;
+	virtual bricks_error_code_e init(msg_cb_t msg_cb, const xtree_t* options) override;
 
-	virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) = 0;
+	virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
-	virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options) = 0;
+	virtual bricks_error_code_e subscribe(void* opaque, const xtree_t* options ) override;
+
+	virtual bricks_error_code_e poll(size_t timeout) override;
 
 private:
 
 	virtual ~kafka_subscriber_t();
 
 	virtual void destroy();
+	
+	rd_kafka_conf_t* rd_conf_h = nullptr;
 
-	static void msg_delivered1(rd_kafka_t* rk,
-		const rd_kafka_message_t* rkmessage,
-		void* opaque);
+	rd_kafka_t* rd_kafka_h = nullptr;
 
-	void msg_delivered(rd_kafka_t* rk,
-		const rd_kafka_message_t* rkmessage,
-		void* opaque);
+	rd_kafka_topic_partition_list_t* rd_part_list_h = nullptr;
 
-	char errstr[512] = { '\0' };
+	msg_cb_t msg_cb;
 
-	rd_kafka_conf_t* rd_conf_h;
-
-	rd_kafka_t* rd_kafka_h;
-
-	rd_kafka_topic_partition_list_t* rd_part_list_h;
+	void* opaque = nullptr;
 	
 };
 

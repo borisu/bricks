@@ -20,6 +20,7 @@ enum bricks_error_code_e
 	BRICKS_INVALID_PARAM   = 2,
 	BRICKS_INVALID_STATE   = 3,
 	BRICKS_3RD_PARTY_ERROR = 4,
+	BRICKS_TIMEOUT         = 5
 };
 
 typedef vector<char> buffer_t;
