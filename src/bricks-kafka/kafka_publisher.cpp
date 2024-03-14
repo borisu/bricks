@@ -59,6 +59,10 @@ kafka_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
 		return err;
 	}
 
+	rd_kafka_conf_set_opaque(rd_conf_h, (void*)this);
+
+	rd_kafka_conf_set_dr_msg_cb(rd_conf_h, msg_delivered1);
+
 	// Create producer instance
 	rd_producer_h = rd_kafka_new(RD_KAFKA_PRODUCER, rd_conf_h, NULL, 0);
 	if (!rd_producer_h) {
@@ -78,21 +82,24 @@ kafka_publisher_t::publish(const string& topic, const buffer_t& buf, void* opaqu
 {
 	ASSERT_INITIATED;
 
-	auto err = rd_kafka_producev(
-		/* Producer handle */
-		rd_producer_h,
-		/* Topic name */
-		RD_KAFKA_V_TOPIC(topic.c_str()),
-		/* Make a copy of the payload. */
-		RD_KAFKA_V_MSGFLAGS(RD_KAFKA_MSG_F_COPY),
-		/* Message value and length */
-		RD_KAFKA_V_VALUE(&buf[0], buf.size()),
-		/* Per-Message opaque, provided in
+	auto it = rd_topics.find(topic);
+	if (it == rd_topics.end())
+	{
+		return BRICKS_INVALID_PARAM;
+	}
+
+	auto err = rd_kafka_produce(
+		it->second, 
+		RD_KAFKA_PARTITION_UA,
+		RD_KAFKA_MSG_F_COPY,
+		/* Payload and length */
+		(void*) & buf[0], buf.size(),
+		/* Optional key and its length */
+		NULL, 0,
+		/* Message opaque, provided in
 		 * delivery report callback as
 		 * msg_opaque. */
-		RD_KAFKA_V_OPAQUE(opaque),
-		/* End sentinel */
-		RD_KAFKA_V_END);
+		NULL);
 
 	if (err != RD_KAFKA_RESP_ERR_NO_ERROR)
 	{
@@ -137,7 +144,7 @@ kafka_publisher_t::register_topic(const string& topic, const xtree_t* options)
 
 	/* Create topic */
 	auto rd_topic_h = rd_kafka_topic_new(rd_producer_h, topic.c_str(), nullptr);
-	if (rd_topic_h) {
+	if (!rd_topic_h) {
 		log1(BRICKS_ALARM, "Failed to create topic: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
 		destroy();
 		return BRICKS_3RD_PARTY_ERROR;

@@ -35,6 +35,14 @@ kafka_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
 		return err;
 	}
 
+	rd_part_list_h = rd_kafka_topic_partition_list_new(1);
+	if (!rd_part_list_h)
+	{
+		log1(BRICKS_ALARM, "Failed to create Kafka consumer topics list: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+		destroy();
+		return BRICKS_3RD_PARTY_ERROR;
+	}
+
 	// Create Kafka consumer instance
 	rd_kafka_h = rd_kafka_new(RD_KAFKA_CONSUMER, rd_conf_h, NULL, 0);
 	if (!rd_kafka_h)
@@ -43,6 +51,8 @@ kafka_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
 		destroy();
 		return BRICKS_3RD_PARTY_ERROR;
 	}
+
+	rd_kafka_poll_set_consumer(rd_kafka_h);
 
 	
 	initiated = true;
@@ -57,6 +67,11 @@ kafka_subscriber_t::destroy()
 {
 	initiated = false;
 
+	if (rd_kafka_h)
+	{
+		rd_kafka_consumer_close(rd_kafka_h);
+	}
+		
 	if (rd_part_list_h)
 	{
 		rd_kafka_topic_partition_list_destroy(rd_part_list_h);
@@ -83,14 +98,10 @@ kafka_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	rd_part_list_h = rd_kafka_topic_partition_list_new(1);
-	if (!rd_part_list_h)
-	{
-		log1(BRICKS_ALARM, "Failed to create Kafka consumer: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
-		destroy();
-		return BRICKS_3RD_PARTY_ERROR;
-	}
-
+	rd_kafka_topic_partition_list_add(rd_part_list_h, topic.c_str(),
+		/* the partition is ignored
+		 * by subscribe() */
+		0);
 
 	return BRICKS_SUCCESS;
 
@@ -104,7 +115,6 @@ kafka_subscriber_t::subscribe(void* opaque,  const xtree_t* options)
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	this->msg_cb = msg_cb;
 	this->opaque = opaque;
 
 	auto rd_err = rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
