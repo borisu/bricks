@@ -2,3 +2,7 @@
 	path = 3rdparty/modules/tinyxml2
 	url = https://github.com/leethomason/tinyxml2.git
 	branch = v10.0.0
+[submodule "3rdparty\\modules\\zeromq"]
+	path = 3rdparty\\modules\\zeromq
+	url = https://github.com/zeromq/libzmq.git
+	branch = v4.3.5
