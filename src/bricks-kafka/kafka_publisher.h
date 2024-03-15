@@ -19,11 +19,9 @@ public:
 
 	virtual bricks_error_code_e poll(size_t timeout) override;
 
-	
+	virtual ~kafka_publisher_t();
 
 private:
-
-	virtual ~kafka_publisher_t();
 
 	virtual void destroy();
 

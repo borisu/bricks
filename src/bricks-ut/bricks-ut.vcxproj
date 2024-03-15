@@ -57,7 +57,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-kafka</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-kafka;..\bricks-zeromq</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -110,6 +110,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zeromq_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -123,6 +124,9 @@
     </ProjectReference>
     <ProjectReference Include="..\bricks-kafka\bricks-kafka.vcxproj">
       <Project>{099e9d87-c484-4ff5-8833-cccbdd489736}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\bricks-zeromq\bricks-zeromq.vcxproj">
+      <Project>{9b88480f-48a0-442c-a0b5-3dfb10d8fa69}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

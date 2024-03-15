@@ -20,9 +20,9 @@ public:
 
 	virtual bricks_error_code_e poll(size_t timeout) override;
 
-private:
-
 	virtual ~kafka_subscriber_t();
+
+private:
 
 	virtual void destroy();
 	
