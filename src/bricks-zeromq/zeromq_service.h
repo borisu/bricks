@@ -17,5 +17,7 @@ protected:
 
 	bool started = false;
 
+	request_cb_t req_cb = nullptr;
+
 };
 

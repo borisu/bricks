@@ -21,6 +21,8 @@
     <ClInclude Include="zeromq_service.h" />
     <ClInclude Include="zeromq_publisher.h" />
     <ClInclude Include="zeromq_subscriber.h" />
+    <ClInclude Include="zeromq_router_server.h" />
+    <ClInclude Include="zeromq_router_client.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -31,5 +33,7 @@
     <ClCompile Include="zeromq_service.cpp" />
     <ClCompile Include="zeromq_publisher.cpp" />
     <ClCompile Include="zeromq_subscriber.cpp" />
+    <ClCompile Include="zeromq_router_server.cpp" />
+    <ClCompile Include="zeromq_router_client.cpp" />
   </ItemGroup>
 </Project>

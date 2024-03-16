@@ -73,3 +73,4 @@ TEST(kafka_case, publish_subscribe_test) {
 	destroy_xtree(p_conf);
 	destroy_xtree(c_conf);
 }
+

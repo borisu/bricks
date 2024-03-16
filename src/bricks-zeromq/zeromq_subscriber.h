@@ -31,7 +31,7 @@ private:
 
 	void* subscriber = nullptr;
 
-	zmq_pollitem_t items[1];
+	zmq_pollitem_t items[1] = { 0 };
 
 	void* opaque = nullptr;
 

@@ -60,3 +60,44 @@ TEST(zeromq_case, publish_subscribe_test) {
 	destroy_xtree(consumer_conf);
   
 }
+
+TEST(zeromq_case, request_reply_test) {
+
+	/* prepare producer */
+	auto server_config_xml =
+		"<configuration>"
+		" <server url = \"tcp://localhost:5555\"/>"
+		"</configuration>";
+	auto server = create_zeromq_router_server();
+	auto server_config = create_xtree();
+	ASSERT_EQ(BRICKS_SUCCESS, server_config->load_from_xml(server_config_xml));
+	ASSERT_EQ(BRICKS_SUCCESS, server->init(server_config));
+
+	int delivered_counter = 0;
+	ASSERT_EQ(BRICKS_SUCCESS, server->register_request_handler(nullptr, 
+		[&delivered_counter](void*, bricks_error_code_e, bricks_handle_t, const char*, size_t, const xtree_t*)
+		{
+			delivered_counter++;
+		}, nullptr));
+
+
+	/* prepare consumer */
+	auto client_config_xml =
+		"<configuration>"
+		" <client url = \"tcp://localhost:5555\"/>"
+		"</configuration>";
+
+	auto client_config = create_xtree();
+	auto client = create_zeromq_router_client();
+	
+	ASSERT_EQ(BRICKS_SUCCESS, client_config->load_from_xml(client_config_xml));
+
+	int received_counter = 0;
+	ASSERT_EQ(BRICKS_SUCCESS, client->init(client_config));
+	
+
+
+	destroy_xtree(server_config);
+	destroy_xtree(client_config);
+
+}
