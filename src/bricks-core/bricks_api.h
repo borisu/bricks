@@ -26,4 +26,11 @@ enum bricks_error_code_e
 
 typedef vector<char> buffer_t;
 
+#define BRICKS_GUID_SIZE 16
+
+typedef char guid_t[BRICKS_GUID_SIZE];
+
+BRICKS_API void
+create_guid(guid_t buf);
+
 

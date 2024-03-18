@@ -16,7 +16,7 @@ public:
 
     virtual bricks_error_code_e register_request_handler(void* opaque, request_cb_t request, const xtree_t* options) override;
 
-    virtual bricks_error_code_e send_response(bricks_handle_t, const char*, size_t, const xtree_t* options) override;
+    virtual bricks_error_code_e send_response(guid_t guid, const char*, size_t, const xtree_t* options) override;
 
     virtual bricks_error_code_e poll(size_t timeout);
 
@@ -33,16 +33,6 @@ private:
     void* opaque = nullptr;
 
     zmq_pollitem_t items[1] = { 0 };
-
-    enum RCV_STATE
-    {
-        NEXT_IS_IDENTITY,
-        NEXT_IS_MESSAGE
-    } rcv_state = NEXT_IS_IDENTITY;
-
-    zmq_msg_t *identity = nullptr;
-
-    zmq_msg_t *request = nullptr;
 
     request_cb_t req_cb;
 

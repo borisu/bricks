@@ -61,6 +61,8 @@ zeromq_router_server_t::register_request_handler(void* opaque, request_cb_t requ
 	this->opaque = opaque;
 	this->req_cb = request;
 
+	started = true;
+
 	return BRICKS_SUCCESS;
 
 }
@@ -90,17 +92,20 @@ zeromq_router_server_t::destroy()
 }
 
 bricks_error_code_e 
-zeromq_router_server_t::send_response(bricks_handle_t identity, const char* response, size_t size, const xtree_t* options )
+zeromq_router_server_t::send_response(guid_t guid, const char* buf, size_t size, const xtree_t* options)
 {
-	zmq_msg_t response_msg;
-	zmq_msg_init_size(&response_msg, size);
-	memcpy(zmq_msg_data(&response_msg), response, size);
+	zmq_msg_t identity;
+	zmq_msg_init_size(&identity, sizeof(guid));
+	memcpy(zmq_msg_data(&identity), guid, sizeof(guid));
 
-	zmq_msg_send((zmq_msg_t*)identity, router, ZMQ_SNDMORE);
-	zmq_msg_send(&response_msg, router, 0);
+	zmq_msg_send(&identity, router, ZMQ_SNDMORE);
 
-	zmq_msg_close((zmq_msg_t*)identity);
-	zmq_msg_close(&response_msg);
+	zmq_msg_t app_message;
+	zmq_msg_init_size(&app_message, size);
+	zmq_msg_send(&app_message, router, 0);
+
+	zmq_msg_close(&identity);
+	zmq_msg_close(&app_message);
 
 	return BRICKS_SUCCESS;
 
@@ -117,57 +122,38 @@ zeromq_router_server_t::poll(size_t timeout)
 
 	auto err = BRICKS_TIMEOUT;
 
-	while (leftover > 0)
+	zmq_poll(items, 1, (long)timeout);
+
+	// If there's data available, receive it
+	if (items[0].revents & ZMQ_POLLIN)
 	{
-		// Poll for incoming data
-		auto start = std::chrono::steady_clock::now();
-		zmq_poll(items, 1, (long)timeout);
-		auto end = std::chrono::steady_clock::now();
+		auto identity = new zmq_msg_t();
+		zmq_msg_init(identity);
+		zmq_msg_recv(identity, router, 0);
 
-		leftover = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		int more_parts;
+		size_t more_parts_size = sizeof(more_parts);
+		zmq_getsockopt(router, ZMQ_RCVMORE, &more_parts, &more_parts_size);
 
-		// If there's data available, receive it
-		if (items[0].revents & ZMQ_POLLIN)
-		{
-			if (rcv_state == NEXT_IS_IDENTITY)
-			{
-				identity = new zmq_msg_t();
-				zmq_msg_init(identity);
-				zmq_msg_recv(identity, router, 0);
-				rcv_state = NEXT_IS_MESSAGE;
-			}
-			else
-			{
-				request = new zmq_msg_t();
-				zmq_msg_init(request);
-				zmq_msg_recv(request, router, 0);
+		guid_t guid;
+		memcpy(&guid, zmq_msg_data(identity), sizeof(guid_t));
 
-				auto xt = create_xtree();
-				
 
-				req_cb(opaque, BRICKS_SUCCESS, (bricks_handle_t) identity, (const char*)zmq_msg_data(request), zmq_msg_size(request), xt);
+		auto app_message = new zmq_msg_t();
+		zmq_msg_init(app_message);
+		zmq_msg_recv(app_message, router, 0);
 
-				destroy_xtree(xt);
+		auto xt = create_xtree();
 
-				zmq_msg_close(request);
+		req_cb(opaque, guid, (const char*)zmq_msg_data(app_message), zmq_msg_size(app_message), *xt);
 
-				delete request;
+		destroy_xtree(xt);
 
-				rcv_state = NEXT_IS_IDENTITY;
-				identity = nullptr;
-				request = nullptr;
+		zmq_msg_close(identity);
+		zmq_msg_close(app_message);
 
-				err = BRICKS_SUCCESS;
-				break;
+		err = BRICKS_SUCCESS;
 
-			}
-
-		}
-		else
-		{
-			err = BRICKS_TIMEOUT;
-			break;
-		}
 	}
 
 	return err;

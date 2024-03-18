@@ -10,8 +10,9 @@ enum bricks_debug_level_e
 	BRICKS_TRACE	= 1,
 	BRICKS_DEBUG	= 2,
 	BRICKS_INFO		= 3,
-	BRICKS_ALARM	= 3,
-	BRICKS_LOG_OFF	= 4,
+	BRICKS_ALARM	= 4,
+	BRICKS_FATAL    = 5,
+	BRICKS_LOG_OFF	= 6,
 };
 
 

@@ -10,13 +10,13 @@ public:
 
     zeromq_router_client_t();
 
-	virtual bricks_error_code_e init(const xtree_t* options);
+	virtual bricks_error_code_e init(const xtree_t* options) override;
 
-	virtual bricks_error_code_e register_client(response_cb_t request, const xtree_t* options) ;
+	virtual bricks_error_code_e register_client(void* opaque, response_cb_t request, const xtree_t* options) override;
 
-	virtual bricks_error_code_e issue_request(const string& request_id, void* opaque, const char*, size_t, const xtree_t* options);
+	virtual bricks_error_code_e issue_request(guid_t guid, const char*, size_t, const xtree_t* options) override;
 
-    virtual bricks_error_code_e  poll(size_t timeout);
+    virtual bricks_error_code_e poll(size_t timeout);
 
     virtual ~zeromq_router_client_t();
 
@@ -32,7 +32,7 @@ private:
 
     zmq_pollitem_t items[1] = { 0 };
 
-    response_cb_t req_cb;
+    response_cb_t rsp_cb;
 
 };
 

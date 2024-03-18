@@ -68,17 +68,24 @@ TEST(zeromq_case, request_reply_test) {
 		"<configuration>"
 		" <server url = \"tcp://localhost:5555\"/>"
 		"</configuration>";
-	auto server = create_zeromq_router_server();
-	auto server_config = create_xtree();
+	auto server			= create_zeromq_router_server();
+	auto server_config	= create_xtree();
 	ASSERT_EQ(BRICKS_SUCCESS, server_config->load_from_xml(server_config_xml));
 	ASSERT_EQ(BRICKS_SUCCESS, server->init(server_config));
 
+	
 	int delivered_counter = 0;
-	ASSERT_EQ(BRICKS_SUCCESS, server->register_request_handler(nullptr, 
-		[&delivered_counter](void*, bricks_error_code_e, bricks_handle_t, const char*, size_t, const xtree_t*)
+	
+	ASSERT_EQ(BRICKS_SUCCESS, server->register_request_handler(
+		&delivered_counter,
+		[server](void* opaque, guid_t guid, const char*, size_t, const xtree_t&)
 		{
-			delivered_counter++;
-		}, nullptr));
+			const char* req_str = "pong";
+			++*((int*)opaque);
+			server->send_response(guid, req_str, strlen(req_str) + 1, nullptr);
+
+		}, 
+		nullptr));
 
 
 	/* prepare consumer */
@@ -93,8 +100,26 @@ TEST(zeromq_case, request_reply_test) {
 	ASSERT_EQ(BRICKS_SUCCESS, client_config->load_from_xml(client_config_xml));
 
 	int received_counter = 0;
+
+	guid_t guid;
+	create_guid(guid);
 	ASSERT_EQ(BRICKS_SUCCESS, client->init(client_config));
-	
+	ASSERT_EQ(BRICKS_SUCCESS, client->register_client(&received_counter, [](void* opaque, guid_t guid, const char*, size_t, xtree_t&) {
+
+		++*((int*)opaque);
+			
+	}, nullptr));
+
+	const char *buf = "ping";
+	ASSERT_EQ(BRICKS_SUCCESS, client->issue_request(guid, buf, strlen(buf) + 1, nullptr));
+
+	int poll_counter = 0;
+	while (poll_counter < 2 && received_counter == 0)
+	{
+		poll_counter++;
+		client->poll(1000);
+		server->poll(1000);
+	}
 
 
 	destroy_xtree(server_config);

@@ -17,13 +17,15 @@ zeromq_router_client_t::init(const xtree_t* options)
 
 	router = zmq_socket(context, ZMQ_ROUTER);
 
+	int rc = 0;
+
 	try
 	{
 		do {
 
 			string url = options->get_property_value_as_string("/configuration/client", "url").value();
 
-			auto rc = zmq_connect(router, url.c_str());
+			rc = zmq_connect(router, url.c_str());
 
 			if (rc != 0)
 			{
@@ -46,6 +48,9 @@ zeromq_router_client_t::init(const xtree_t* options)
 
 	if (err != BRICKS_SUCCESS)
 	{
+		if (err != 0)
+			log1(BRICKS_DEBUG, "zmq error(%d): %s", rc, zmq_strerror(rc));
+
 		destroy();
 	}
 
@@ -53,31 +58,65 @@ zeromq_router_client_t::init(const xtree_t* options)
 }
 
 bricks_error_code_e 
-zeromq_router_client_t::issue_request(const string& request_id, void* opaque, const char*, size_t, const xtree_t* options)
+zeromq_router_client_t::issue_request(guid_t guid, const char*, size_t size, const xtree_t* options)
 {
-	return BRICKS_SUCCESS;
+	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	/*zmq_msg_t response_msg;
-	zmq_msg_init_size(&response_msg, size);
-	memcpy(zmq_msg_data(&response_msg), response, size);
+	zmq_msg_t identity;
+	zmq_msg_t app_message;
+	zmq_msg_init(&identity);
+	zmq_msg_init(&app_message);
 
-	zmq_msg_send((zmq_msg_t*)identity, router, ZMQ_SNDMORE);
-	zmq_msg_send(&response_msg, router, 0);
+	int rc = 0;
 
-	zmq_msg_close((zmq_msg_t*)identity);
-	zmq_msg_close(&response_msg);*/
+	do {
 
-	return BRICKS_SUCCESS;
+		zmq_msg_close(&identity);
+		rc = zmq_msg_init_size(&identity, sizeof(guid));
+		if (rc != 0) {
+			err = BRICKS_3RD_PARTY_ERROR; break;
+		};
+
+		memcpy(zmq_msg_data(&identity), guid, sizeof(guid));
+
+		rc = zmq_msg_send(&identity, router, ZMQ_SNDMORE);
+		if (rc  <=0 ) {
+			err = BRICKS_3RD_PARTY_ERROR; 
+			break;
+		};
+
+		zmq_msg_close(&app_message);
+		rc = zmq_msg_init_size(&app_message, size);
+		if (rc != 0) {
+			err = BRICKS_3RD_PARTY_ERROR; break;
+		};
+
+		rc = zmq_msg_send(&app_message, router, 0);
+		if (rc <= 0) {
+			err = BRICKS_3RD_PARTY_ERROR; break;
+		};
+
+	} while (false);
+
+	if (err != 0)
+		log1(BRICKS_DEBUG, "zmq error(%d): %s", zmq_errno(), zmq_strerror(rc));
+
+	zmq_msg_close(&identity);
+	zmq_msg_close(&app_message);
+
+	return err;
 }
 
 bricks_error_code_e
-zeromq_router_client_t::register_client(response_cb_t request, const xtree_t* options)
+zeromq_router_client_t::register_client(void* opaque, response_cb_t request, const xtree_t* options)
 {
 	ZMQ_ASSERT_INITIATED;
 	ZMQ_ASSERT_NOT_STARTED;
 
 	this->opaque = opaque;
-	this->req_cb = request;
+	this->rsp_cb = request;
+
+	started = true;
 
 	return BRICKS_SUCCESS;
 
@@ -110,67 +149,57 @@ zeromq_router_client_t::destroy()
 bricks_error_code_e
 zeromq_router_client_t::poll(size_t timeout)
 {
-	return BRICKS_SUCCESS;
-
-	/*ZMQ_ASSERT_INITIATED;
+	ZMQ_ASSERT_INITIATED;
 	ZMQ_ASSERT_STARTED;
 
 	auto leftover = timeout;
 
 	auto err = BRICKS_TIMEOUT;
 
-	while (leftover > 0)
-	{
-		// Poll for incoming data
-		auto start = std::chrono::steady_clock::now();
-		zmq_poll(items, 1, (long)timeout);
-		auto end = std::chrono::steady_clock::now();
+	int rc = 0;
 
-		leftover = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+	do {
+
+		zmq_poll(items, 1, (long)timeout);
 
 		// If there's data available, receive it
 		if (items[0].revents & ZMQ_POLLIN)
 		{
-			if (rcv_state == NEXT_IS_IDENTITY)
-			{
-				identity = new zmq_msg_t();
-				zmq_msg_init(identity);
-				zmq_msg_recv(identity, router, 0);
-				rcv_state = NEXT_IS_MESSAGE;
-			}
-			else
-			{
-				request = new zmq_msg_t();
-				zmq_msg_init(request);
-				zmq_msg_recv(request, router, 0);
+			auto identity = new zmq_msg_t();
+			zmq_msg_init(identity);
+			zmq_msg_recv(identity, router, 0);
 
-				auto xt = create_xtree();
+			int more_parts;
+			size_t more_parts_size = sizeof(more_parts);
+			zmq_getsockopt(router, ZMQ_RCVMORE, &more_parts, &more_parts_size);
 
-				req_cb(opaque, BRICKS_SUCCESS, (bricks_handle_t)identity, (const char*)zmq_msg_data(request), zmq_msg_size(request), *xt);
+			guid_t guid;
+			memcpy(&guid, zmq_msg_data(identity), sizeof(guid_t));
 
-				destroy_xtree(xt);
 
-				zmq_msg_close(request);
+			auto app_message = new zmq_msg_t();
+			zmq_msg_init(app_message);
+			zmq_msg_recv(app_message, router, 0);
 
-				delete request;
+			auto xt = create_xtree();
 
-				rcv_state = NEXT_IS_IDENTITY;
-				identity = nullptr;
-				request = nullptr;
+			rsp_cb(opaque, guid, (const char*)zmq_msg_data(app_message), zmq_msg_size(app_message), *xt);
 
-				err = BRICKS_SUCCESS;
-				break;
+			destroy_xtree(xt);
 
-			}
+			zmq_msg_close(identity);
+			zmq_msg_close(app_message);
+
+			err = BRICKS_SUCCESS;
 
 		}
-		else
-		{
-			err = BRICKS_TIMEOUT;
-			break;
-		}
-	}
+	} while (false);
 
-	return err;*/
+
+	if (err != 0)
+		log1(BRICKS_DEBUG, "zmq error(%d): %s", zmq_errno(), zmq_strerror(rc));
+
+	return err;
 
 }

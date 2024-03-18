@@ -5,19 +5,18 @@
 
 using namespace std;
 
-class service_t
+class polling_service_t
 {
 public:
-
 	virtual bricks_error_code_e  poll(size_t timeout) = 0;
+
 };
 
 
 typedef
 function<void(void*, bricks_error_code_e, xtree_t&)> delivery_cb_t;
 
-
-class publisher_service_t : public service_t
+class publisher_service_t : public polling_service_t
 {
 public:
 
@@ -32,7 +31,7 @@ public:
 typedef
 function<void(void*, const char*, size_t, xtree_t&)> msg_cb_t;
 
-class subscriber_service_t : public service_t
+class subscriber_service_t : public polling_service_t
 {
 public:
 
@@ -45,10 +44,9 @@ public:
 };
 
 typedef
-function<void(void*, bricks_error_code_e, bricks_handle_t, const char*, size_t, const xtree_t*)> request_cb_t;
+function<void(void*, guid_t, const char*, size_t, const xtree_t&)> request_cb_t;
 
-
-class server_service_t
+class server_service_t : public polling_service_t
 {
 public:
 
@@ -56,23 +54,22 @@ public:
 
 	virtual bricks_error_code_e register_request_handler(void *opaque, request_cb_t request, const xtree_t* options = nullptr) = 0;
 
-	virtual bricks_error_code_e send_response(bricks_handle_t, const char*, size_t, const xtree_t* options = nullptr) = 0;
+	virtual bricks_error_code_e send_response(guid_t guid, const char*, size_t, const xtree_t* options = nullptr) = 0;
 
 };
 
 typedef
-function<void(void*, bricks_error_code_e, const char*, size_t, xtree_t&)> response_cb_t;
+function<void(void*, guid_t, const char*, size_t, xtree_t&)> response_cb_t;
 
-
-class client_service_t
+class client_service_t : public polling_service_t
 {
 public:
 
 	virtual bricks_error_code_e init(const xtree_t* options = nullptr) = 0;
 
-	virtual bricks_error_code_e register_client(response_cb_t rsp_cb, const xtree_t* options = nullptr) = 0;
+	virtual bricks_error_code_e register_client(void *opaque, response_cb_t rsp_cb, const xtree_t* options = nullptr) = 0;
 
-	virtual bricks_error_code_e issue_request(const string &request_id, void* opaque, const char*, size_t, const xtree_t* options = nullptr) = 0;
+	virtual bricks_error_code_e issue_request(guid_t guid, const char*, size_t, const xtree_t* options = nullptr) = 0;
 };
 
 

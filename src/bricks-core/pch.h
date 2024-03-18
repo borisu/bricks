@@ -19,8 +19,15 @@
 #include <optional>
 #include <string_view>
 #include <iostream>
+#include <algorithm>
 
 #include "tinyxml2.h"
+
+#ifdef WIN32
+#include <objbase.h> // For CoCreateGuid
+#else
+
+#endif
 
 
 

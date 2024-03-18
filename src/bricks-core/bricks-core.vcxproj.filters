@@ -17,6 +17,9 @@
     <ClCompile Include="xtree_impl.cpp">
       <Filter>impl</Filter>
     </ClCompile>
+    <ClCompile Include="bricks_impl.cpp">
+      <Filter>impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xtree.h" />
