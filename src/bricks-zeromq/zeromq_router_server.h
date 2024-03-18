@@ -16,7 +16,7 @@ public:
 
     virtual bricks_error_code_e register_request_handler(void* opaque, request_cb_t request, const xtree_t* options) override;
 
-    virtual bricks_error_code_e send_response(guid_t guid, const char*, size_t, const xtree_t* options) override;
+    virtual bricks_error_code_e send_response(bricks_handle_t ctx , const char*, size_t, const xtree_t* options) override;
 
     virtual bricks_error_code_e poll(size_t timeout);
 

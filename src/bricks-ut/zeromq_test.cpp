@@ -78,11 +78,11 @@ TEST(zeromq_case, request_reply_test) {
 	
 	ASSERT_EQ(BRICKS_SUCCESS, server->register_request_handler(
 		&delivered_counter,
-		[server](void* opaque, guid_t guid, const char*, size_t, const xtree_t&)
+		[server](void* opaque, bricks_handle_t ctx, const char*, size_t, const xtree_t&)
 		{
 			const char* req_str = "pong";
 			++*((int*)opaque);
-			server->send_response(guid, req_str, strlen(req_str) + 1, nullptr);
+			server->send_response(ctx, req_str, strlen(req_str) + 1, nullptr);
 
 		}, 
 		nullptr));
@@ -101,25 +101,27 @@ TEST(zeromq_case, request_reply_test) {
 
 	int received_counter = 0;
 
-	guid_t guid;
-	create_guid(guid);
 	ASSERT_EQ(BRICKS_SUCCESS, client->init(client_config));
-	ASSERT_EQ(BRICKS_SUCCESS, client->register_client(&received_counter, [](void* opaque, guid_t guid, const char*, size_t, xtree_t&) {
+	ASSERT_EQ(BRICKS_SUCCESS, client->register_client(&received_counter, [](void* opaque, const char*, size_t, xtree_t&) {
 
 		++*((int*)opaque);
 			
 	}, nullptr));
 
 	const char *buf = "ping";
-	ASSERT_EQ(BRICKS_SUCCESS, client->issue_request(guid, buf, strlen(buf) + 1, nullptr));
+	ASSERT_EQ(BRICKS_SUCCESS, client->issue_request(buf, strlen(buf) + 1, nullptr));
 
 	int poll_counter = 0;
-	while (poll_counter < 2 && received_counter == 0)
+	while (poll_counter < 2 &&  received_counter == 0 )
 	{
 		poll_counter++;
 		client->poll(1000);
 		server->poll(1000);
 	}
+
+	ASSERT_EQ(1, received_counter);
+	destroy_zeromq_router_client(client);
+	destroy_zeromq_router_server(server);
 
 
 	destroy_xtree(server_config);

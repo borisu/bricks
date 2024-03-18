@@ -13,6 +13,8 @@ protected:
 
 	zeromq_service_t();
 
+	static void monitor_callback(void* arg, int event, int value, void* socket);
+
 	bool initiated = false;
 
 	bool started = false;

@@ -92,19 +92,17 @@ zeromq_router_server_t::destroy()
 }
 
 bricks_error_code_e 
-zeromq_router_server_t::send_response(guid_t guid, const char* buf, size_t size, const xtree_t* options)
+zeromq_router_server_t::send_response(bricks_handle_t ctx , const char* buf, size_t size, const xtree_t* options)
 {
-	zmq_msg_t identity;
-	zmq_msg_init_size(&identity, sizeof(guid));
-	memcpy(zmq_msg_data(&identity), guid, sizeof(guid));
 
-	zmq_msg_send(&identity, router, ZMQ_SNDMORE);
+	zmq_msg_send((zmq_msg_t*)ctx, router, ZMQ_SNDMORE);
 
 	zmq_msg_t app_message;
 	zmq_msg_init_size(&app_message, size);
+	memcpy(zmq_msg_data(&app_message), buf, sizeof(size));
 	zmq_msg_send(&app_message, router, 0);
 
-	zmq_msg_close(&identity);
+	zmq_msg_close((zmq_msg_t*)ctx);
 	zmq_msg_close(&app_message);
 
 	return BRICKS_SUCCESS;
@@ -122,39 +120,38 @@ zeromq_router_server_t::poll(size_t timeout)
 
 	auto err = BRICKS_TIMEOUT;
 
+	zmq_msg_t *cnx_identity = new zmq_msg_t();
+	zmq_msg_init(cnx_identity);
+
+	zmq_msg_t req_data;
+	zmq_msg_init(&req_data);
+
+	int more_parts = 0;
+	size_t more_parts_size = sizeof(more_parts);
+
 	zmq_poll(items, 1, (long)timeout);
 
 	// If there's data available, receive it
 	if (items[0].revents & ZMQ_POLLIN)
 	{
-		auto identity = new zmq_msg_t();
-		zmq_msg_init(identity);
-		zmq_msg_recv(identity, router, 0);
-
-		int more_parts;
-		size_t more_parts_size = sizeof(more_parts);
+		zmq_msg_recv(cnx_identity, router, 0);
+		
 		zmq_getsockopt(router, ZMQ_RCVMORE, &more_parts, &more_parts_size);
 
-		guid_t guid;
-		memcpy(&guid, zmq_msg_data(identity), sizeof(guid_t));
+		zmq_msg_recv(&req_data, router, 0);
 
-
-		auto app_message = new zmq_msg_t();
-		zmq_msg_init(app_message);
-		zmq_msg_recv(app_message, router, 0);
+		auto temp = (const char*)zmq_msg_data(&req_data);
 
 		auto xt = create_xtree();
 
-		req_cb(opaque, guid, (const char*)zmq_msg_data(app_message), zmq_msg_size(app_message), *xt);
+		req_cb(opaque, (bricks_handle_t)cnx_identity, (const char*)zmq_msg_data(&req_data), zmq_msg_size(&req_data), *xt);
 
 		destroy_xtree(xt);
 
-		zmq_msg_close(identity);
-		zmq_msg_close(app_message);
-
-		err = BRICKS_SUCCESS;
 
 	}
+
+	zmq_msg_close(&req_data);
 
 	return err;
 	

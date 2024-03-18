@@ -14,7 +14,7 @@ public:
 
 	virtual bricks_error_code_e register_client(void* opaque, response_cb_t request, const xtree_t* options) override;
 
-	virtual bricks_error_code_e issue_request(guid_t guid, const char*, size_t, const xtree_t* options) override;
+	virtual bricks_error_code_e issue_request(const char*, size_t, const xtree_t* options) override;
 
     virtual bricks_error_code_e poll(size_t timeout);
 
