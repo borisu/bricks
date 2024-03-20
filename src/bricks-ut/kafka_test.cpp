@@ -53,12 +53,11 @@ TEST(kafka_case, publish_subscribe_test) {
 
 
 	const char* msg = "Another brick in the wall.";
-	buffer_t buf(msg, msg + strlen(msg));
 
 	ASSERT_EQ(BRICKS_SUCCESS, kafka_subscriber_h->subscribe(nullptr));
 	kafka_subscriber_h->poll(1000);
 
-	ASSERT_EQ(BRICKS_SUCCESS, kafka_producer_h->publish("bricks.test", buf, nullptr ));
+	ASSERT_EQ(BRICKS_SUCCESS, kafka_producer_h->publish("bricks.test", msg, strlen(msg), nullptr ));
 
 	int poll_counter = 0;
 	while (poll_counter < 10)

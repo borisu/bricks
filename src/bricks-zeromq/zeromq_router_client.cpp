@@ -57,7 +57,7 @@ zeromq_router_client_t::init(const xtree_t* options)
 }
 
 bricks_error_code_e 
-zeromq_router_client_t::issue_request(const char* buf, size_t size, const xtree_t* options)
+zeromq_router_client_t::send_event(const char* buf, size_t size, const xtree_t* options)
 {
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -93,7 +93,7 @@ zeromq_router_client_t::issue_request(const char* buf, size_t size, const xtree_
 }
 
 bricks_error_code_e
-zeromq_router_client_t::register_client(void* opaque, response_cb_t request, const xtree_t* options)
+zeromq_router_client_t::register_event_handler(void* opaque, event_cb_t request, const xtree_t* options)
 {
 	ZMQ_ASSERT_INITIATED;
 	ZMQ_ASSERT_NOT_STARTED;

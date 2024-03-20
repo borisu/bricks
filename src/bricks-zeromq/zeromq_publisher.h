@@ -15,7 +15,7 @@ public:
 
 	virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
-	virtual bricks_error_code_e publish(const string& topic, const buffer_t& buf, void* opaque, const xtree_t* options)  override;
+	virtual bricks_error_code_e publish(const string& topic, const char*, size_t, void* opaque, const xtree_t* options)  override;
 
 	virtual bricks_error_code_e poll(size_t timeout) override;
 

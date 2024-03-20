@@ -24,7 +24,7 @@ public:
 
 	virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options = nullptr) = 0;
 
-	virtual bricks_error_code_e publish(const string& topic, const buffer_t& buf, void* opaque, const xtree_t* options = nullptr) = 0;
+	virtual bricks_error_code_e publish(const string& topic, const char*, size_t, void* opaque, const xtree_t* options = nullptr) = 0;
 
 };
 
@@ -59,17 +59,17 @@ public:
 };
 
 typedef
-function<void(void*, const char*, size_t, xtree_t&)> response_cb_t;
+function<void(void*, const char*, size_t, xtree_t&)> event_cb_t;
 
-class client_service_t : public polling_service_t
+class bidi_service_t : public polling_service_t
 {
 public:
 
 	virtual bricks_error_code_e init(const xtree_t* options = nullptr) = 0;
 
-	virtual bricks_error_code_e register_client(void *opaque, response_cb_t rsp_cb, const xtree_t* options = nullptr) = 0;
+	virtual bricks_error_code_e register_event_handler(void *opaque, event_cb_t rsp_cb, const xtree_t* options = nullptr) = 0;
 
-	virtual bricks_error_code_e issue_request(const char*, size_t, const xtree_t* options = nullptr) = 0;
+	virtual bricks_error_code_e send_event(const char*, size_t, const xtree_t* options = nullptr) = 0;
 };
 
 

@@ -78,7 +78,7 @@ kafka_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
 
 
 bricks_error_code_e
-kafka_publisher_t::publish(const string& topic, const buffer_t& buf, void* opaque, const xtree_t* options)
+kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, void* opaque, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 
@@ -93,7 +93,7 @@ kafka_publisher_t::publish(const string& topic, const buffer_t& buf, void* opaqu
 		RD_KAFKA_PARTITION_UA,
 		RD_KAFKA_MSG_F_COPY,
 		/* Payload and length */
-		(void*) & buf[0], buf.size(),
+		(void*)buf, size,
 		/* Optional key and its length */
 		NULL, 0,
 		/* Message opaque, provided in

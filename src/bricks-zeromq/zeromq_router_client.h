@@ -12,9 +12,9 @@ public:
 
 	virtual bricks_error_code_e init(const xtree_t* options) override;
 
-	virtual bricks_error_code_e register_client(void* opaque, response_cb_t request, const xtree_t* options) override;
+	virtual bricks_error_code_e register_event_handler(void* opaque, event_cb_t request, const xtree_t* options) override;
 
-	virtual bricks_error_code_e issue_request(const char*, size_t, const xtree_t* options) override;
+	virtual bricks_error_code_e send_event(const char*, size_t, const xtree_t* options) override;
 
     virtual bricks_error_code_e poll(size_t timeout);
 
@@ -32,7 +32,7 @@ private:
 
     zmq_pollitem_t items[1] = { 0 };
 
-    response_cb_t rsp_cb;
+    event_cb_t rsp_cb;
 
 };
 

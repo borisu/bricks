@@ -39,12 +39,12 @@ TEST(zeromq_case, publish_subscribe_test) {
 
 
 	const char* msg = "Another brick in the wall.";
-	buffer_t buf(msg, msg + strlen(msg));
+	
 
 	ASSERT_EQ(BRICKS_SUCCESS, consumer->subscribe(nullptr));
 	consumer->poll(1000);
 
-	ASSERT_EQ(BRICKS_SUCCESS, producer->publish("bricks.test", buf, nullptr));
+	ASSERT_EQ(BRICKS_SUCCESS, producer->publish("bricks.test", msg, strlen(msg), nullptr));
 
 	int poll_counter = 0;
 	while (poll_counter < 10 && received_counter == 0)
@@ -102,14 +102,14 @@ TEST(zeromq_case, request_reply_test) {
 	int received_counter = 0;
 
 	ASSERT_EQ(BRICKS_SUCCESS, client->init(client_config));
-	ASSERT_EQ(BRICKS_SUCCESS, client->register_client(&received_counter, [](void* opaque, const char*, size_t, xtree_t&) {
+	ASSERT_EQ(BRICKS_SUCCESS, client->register_event_handler(&received_counter, [](void* opaque, const char*, size_t, xtree_t&) {
 
 		++*((int*)opaque);
 			
 	}, nullptr));
 
 	const char *buf = "ping";
-	ASSERT_EQ(BRICKS_SUCCESS, client->issue_request(buf, strlen(buf) + 1, nullptr));
+	ASSERT_EQ(BRICKS_SUCCESS, client->send_event(buf, strlen(buf) + 1, nullptr));
 
 	int poll_counter = 0;
 	while (poll_counter < 2 &&  received_counter == 0 )

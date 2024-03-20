@@ -76,9 +76,9 @@ zeromq_publisher_t::register_topic(const string& topic, const xtree_t* options)
 }
 
 bricks_error_code_e 
-zeromq_publisher_t::publish(const string& topic, const buffer_t& buf, void* opaque, const xtree_t* options)
+zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size, void* opaque, const xtree_t* options)
 {
-	auto rc = zmq_send(publisher, &buf[0], buf.size(), 0);
+	auto rc = zmq_send(publisher, buf, size, 0);
 
 	auto xt = create_xtree();
 
