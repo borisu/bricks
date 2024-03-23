@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "kafka_publisher.h"
 
+using namespace bricks;
+
 void
 kafka_publisher_t::msg_delivered1(rd_kafka_t* rk,
 	const rd_kafka_message_t* rkmessage,
@@ -31,6 +33,12 @@ kafka_publisher_t::msg_delivered(rd_kafka_t* rk,
 			(int)rkmessage->len, (const char*)rkmessage->payload);
 	}
 
+	
+
+	auto xt = create_xtree();
+
+	cb_queue.push(std::bind(msg_cb, opaque, rkmessage->err ? BRICKS_3RD_PARTY_ERROR :  BRICKS_SUCCESS, xt));
+
 }
 
 kafka_publisher_t::kafka_publisher_t(){};
@@ -51,7 +59,7 @@ kafka_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
 
 	rd_conf_h = rd_kafka_conf_new();
 
-	rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::kafka_logger);
+	rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::rd_log);
 
 	if ((err = init_conf(rd_conf_h, options)) != BRICKS_SUCCESS)
 	{
@@ -155,9 +163,18 @@ kafka_publisher_t::register_topic(const string& topic, const xtree_t* options)
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e 
-kafka_publisher_t::poll(size_t timeout)
+
+bricks_error_code_e
+kafka_publisher_t::rd_poll(int milliseconds)
 {
-	rd_kafka_poll(rd_producer_h, (int)timeout);
+	rd_kafka_poll(rd_producer_h, (int)milliseconds);
+
 	return BRICKS_SUCCESS;
+
+}
+
+bricks_error_code_e
+kafka_publisher_t::poll(int milliseconds)
+{
+	return kafka_service_t::poll(milliseconds);
 }

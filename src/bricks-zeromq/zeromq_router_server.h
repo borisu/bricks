@@ -5,7 +5,7 @@
 using namespace std;
 
 class zeromq_router_server_t :
-    public server_service_t,
+    public server_plugin_t,
     public zeromq_service_t
 {
 public:

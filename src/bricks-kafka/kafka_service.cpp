@@ -1,10 +1,14 @@
 #include "pch.h"
 #include "kafka_service.h"
 
+using namespace bricks;
 
-// https://github.com/confluentinc/librdkafka/blob/master/examples/rdkafka_example.c
+//https://github.com/confluentinc/librdkafka/blob/master/examples/rdkafka_example.c
+
+#define KAFKA_POLL_TIMEOUT 500
+
 void
-kafka_service_t::kafka_logger(const rd_kafka_t* rk, int level, const char* fac, const char* buf) {
+kafka_service_t::rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf) {
 
 	bricks_debug_level_e log_level = BRICKS_DEBUG;
 
@@ -25,7 +29,51 @@ kafka_service_t::kafka_logger(const rd_kafka_t* rk, int level, const char* fac, 
 		rk ? rd_kafka_name(rk) : NULL, buf);
 }
 
-kafka_service_t::kafka_service_t() {};
+kafka_service_t::kafka_service_t() 
+{
+	
+};
+
+
+bricks_error_code_e
+kafka_service_t::start_rd_poll_loop()
+{
+	ASSERT_NOT_STARTED;
+
+	rd_poll_thread = new thread(&kafka_service_t::rd_poll_loop, this);
+
+	return BRICKS_SUCCESS;
+}
+
+void
+kafka_service_t::stop_rd_poll_loop()
+{
+	if (rd_poll_thread)
+	{
+		shutdown = true;
+		rd_poll_thread->join();
+		rd_poll_thread = nullptr;
+	}
+}
+
+void
+kafka_service_t::rd_poll_loop()
+{
+	while (shutdown != true)
+	{
+		auto err = rd_poll(KAFKA_POLL_TIMEOUT);
+		switch (err)
+		{
+		case BRICKS_TIMEOUT:
+		case BRICKS_SUCCESS:
+			continue;
+		default:
+			break;
+
+		}
+
+	}
+}
 
 bricks_error_code_e
 kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options)
@@ -62,4 +110,30 @@ kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options)
 
 	return err;
 
+}
+
+kafka_service_t::~kafka_service_t()
+{
+	stop_rd_poll_loop();
+}
+
+bricks_error_code_e
+kafka_service_t::poll(int milliseconds)
+{
+	bound_callback_t cb = nullptr;
+	if (!cb_queue.tryWaitAndPop(cb, milliseconds))
+	{
+		return BRICKS_TIMEOUT;
+	}
+
+	try
+	{
+		cb();
+	}
+	catch (std::exception&)
+	{
+
+	}
+
+	return BRICKS_SUCCESS;
 }

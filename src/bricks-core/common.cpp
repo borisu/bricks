@@ -1,6 +1,8 @@
 #include "pch.h"
-#include "bricks_api.h"
-#include "logger_api.h"
+#include "bricks.h"
+#include "locking_queue.h"
+
+using namespace bricks;
 
 void
 create_guid(guid_t buf)

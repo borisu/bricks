@@ -2,7 +2,8 @@
 #include "kafka_subscriber.h"
 
 using namespace std::placeholders;
- 
+
+using namespace bricks;
 
 msg_cb_t msg_cb = nullptr;
 
@@ -27,7 +28,7 @@ kafka_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
 
 	rd_conf_h = rd_kafka_conf_new();
 
-	rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::kafka_logger);
+	rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::rd_log);
 
 	if ((err = init_conf(rd_conf_h, options)) != BRICKS_SUCCESS)
 	{
@@ -60,12 +61,14 @@ kafka_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
 	return BRICKS_SUCCESS;
 }
 
-
-
 void
 kafka_subscriber_t::destroy()
 {
 	initiated = false;
+
+	started = false;
+
+	stop_rd_poll_loop();
 
 	if (rd_kafka_h)
 	{
@@ -95,6 +98,7 @@ bricks_error_code_e
 kafka_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 {
 	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -112,6 +116,7 @@ bricks_error_code_e
 kafka_subscriber_t::subscribe(void* opaque,  const xtree_t* options)
 {
 	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -129,27 +134,26 @@ kafka_subscriber_t::subscribe(void* opaque,  const xtree_t* options)
 
 }
 
-bricks_error_code_e 
-kafka_subscriber_t::poll(size_t timeout)
+bricks_error_code_e
+kafka_subscriber_t::rd_poll(int milliseconds)
 {
 	bricks_error_code_e  err = BRICKS_SUCCESS;
 
-	rd_kafka_message_t* msg = rd_kafka_consumer_poll(rd_kafka_h, (int)timeout); // Poll for messages
+	rd_kafka_message_t* msg = rd_kafka_consumer_poll(rd_kafka_h, (int)milliseconds); // Poll for messages
 
 	if (!msg)
 		return BRICKS_TIMEOUT;
 
 	if (msg->err)
 	{
+		log1(BRICKS_ALARM, "error consuming messages:%s", rd_kafka_err2str(rd_kafka_last_error()));
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 	else
 	{
 		auto xtree = create_xtree();
 
-		msg_cb(this->opaque , (const char*)msg->payload, (size_t)msg->len, *xtree);
-
-		destroy_xtree(xtree);
+		cb_queue.push(std::bind(msg_cb, this->opaque, (const char*)msg->payload, (size_t)msg->len, xtree));
 	}
 
 	
@@ -159,5 +163,12 @@ kafka_subscriber_t::poll(size_t timeout)
 	
 
 }
+
+bricks_error_code_e 
+kafka_subscriber_t::poll(int milliseconds)
+{
+	return kafka_service_t::poll(milliseconds);
+}
+
 
 

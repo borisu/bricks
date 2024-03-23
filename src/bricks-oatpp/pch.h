@@ -9,19 +9,14 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
-#include <ctype.h>
-#include <signal.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
-
-#include <functional>
-#include <string>
-#include <map>
-
-#include "bricks.h"
-#include "utils.h"
-#include "librdkafka/rdkafka.h"
 
 #endif //PCH_H
+
+
+#include "oatpp/web/server/AsyncHttpConnectionHandler.hpp"
+#include "oatpp/web/server/HttpRouter.hpp"
+#include "oatpp/network/tcp/server/ConnectionProvider.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include "oatpp/core/macro/component.hpp"
+
+#pragma comment(lib,"WS2_32")

@@ -9,7 +9,7 @@ TEST(zeromq_case, publish_subscribe_test) {
 		"<configuration>"
 		" <publisher url = \"tcp://localhost:5555\"/>"
 		"</configuration>";
-	publisher_service_t* producer = create_zeromq_publisher();
+	publisher_plugin_t* producer = create_zeromq_publisher();
 	auto producer_config = create_xtree();
 	ASSERT_EQ(BRICKS_SUCCESS, producer_config->load_from_xml(producer_config_xml));
 	int delivered_counter = 0;
@@ -26,7 +26,7 @@ TEST(zeromq_case, publish_subscribe_test) {
 		"<configuration>"
 		" <subscriber url = \"tcp://localhost:5555\"/>"
 		"</configuration>";
-	subscriber_service_t* consumer = create_zeromq_subscriber();
+	subscriber_plugin_t* consumer = create_zeromq_subscriber();
 	auto consumer_conf = create_xtree();
 	ASSERT_EQ(BRICKS_SUCCESS, consumer_conf->load_from_xml(consumer_config_xml));
 	int received_counter = 0;
@@ -95,7 +95,7 @@ TEST(zeromq_case, request_reply_test) {
 		"</configuration>";
 
 	auto client_config = create_xtree();
-	auto client = create_zeromq_router_client();
+	auto client = create_zeromq_dealer_bidi();
 	
 	ASSERT_EQ(BRICKS_SUCCESS, client_config->load_from_xml(client_config_xml));
 

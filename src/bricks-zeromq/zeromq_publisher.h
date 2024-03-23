@@ -5,7 +5,7 @@ using namespace std;
 
 class zeromq_publisher_t :
 	public zeromq_service_t,
-	public publisher_service_t
+	public publisher_plugin_t
 {
 public:
 

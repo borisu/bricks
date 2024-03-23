@@ -1,8 +1,10 @@
 #include "pch.h"
-#include "logger_api.h"
-#include "bricks_api.h"
+#include "logger.h"
 
 #define MAX_LOG_LEN 2048
+
+using namespace std;
+using namespace bricks;
 
 thread_local char log_buf[MAX_LOG_LEN];
 
@@ -15,11 +17,9 @@ logger_t ext_logger = nullptr;
 
 std::atomic<bricks_debug_level_e> curr_log_level = BRICKS_TRACE;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-void log1(bricks_debug_level_e log_level, const char* format, ...)
+void 
+bricks::log1(bricks_debug_level_e log_level, const char* format, ...)
 {
 	if (log_level < curr_log_level)
 		return;
@@ -41,7 +41,8 @@ brick_get_log_level()
 #define MAX_BYTES_PER_LINE 64
 #define MAX_LINE_LEN MAX_BYTES_PER_LINE*4+1
 
-void hex_dump(
+void 
+bricks::hex_dump1(
     bricks_debug_level_e log_level,
     const char* desc,
     const void* addr,
@@ -132,7 +133,3 @@ void brick_set_log_level(bricks_debug_level_e l)
 }
 
 
-
-#ifdef __cplusplus
-}
-#endif

@@ -1,13 +1,13 @@
 #include "pch.h"
-#include "zeromq_router_client.h"
+#include "zeromq_dealer_bidi.h"
 
-zeromq_router_client_t::zeromq_router_client_t()
+zeromq_dealer_bidi_t::zeromq_dealer_bidi_t()
 {
 
 }
 
 bricks_error_code_e
-zeromq_router_client_t::init(const xtree_t* options)
+zeromq_dealer_bidi_t::init(const xtree_t* options)
 {
 	ZMQ_ASSERT_NOT_INITIATED;
 
@@ -57,7 +57,7 @@ zeromq_router_client_t::init(const xtree_t* options)
 }
 
 bricks_error_code_e 
-zeromq_router_client_t::send_event(const char* buf, size_t size, const xtree_t* options)
+zeromq_dealer_bidi_t::send_event(const char* buf, size_t size, const xtree_t* options)
 {
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -93,7 +93,7 @@ zeromq_router_client_t::send_event(const char* buf, size_t size, const xtree_t* 
 }
 
 bricks_error_code_e
-zeromq_router_client_t::register_event_handler(void* opaque, event_cb_t request, const xtree_t* options)
+zeromq_dealer_bidi_t::register_event_handler(void* opaque, event_cb_t request, const xtree_t* options)
 {
 	ZMQ_ASSERT_INITIATED;
 	ZMQ_ASSERT_NOT_STARTED;
@@ -107,13 +107,13 @@ zeromq_router_client_t::register_event_handler(void* opaque, event_cb_t request,
 
 }
 
-zeromq_router_client_t::~zeromq_router_client_t()
+zeromq_dealer_bidi_t::~zeromq_dealer_bidi_t()
 {
 	destroy();
 }
 
 void
-zeromq_router_client_t::destroy()
+zeromq_dealer_bidi_t::destroy()
 {
 	initiated = false;
 	started = false;
@@ -132,7 +132,7 @@ zeromq_router_client_t::destroy()
 }
 
 bricks_error_code_e
-zeromq_router_client_t::poll(size_t timeout)
+zeromq_dealer_bidi_t::poll(size_t timeout)
 {
 	ZMQ_ASSERT_INITIATED;
 	ZMQ_ASSERT_STARTED;

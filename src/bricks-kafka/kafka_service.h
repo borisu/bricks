@@ -1,23 +1,43 @@
 #pragma once
+#include "locking_queue.h"
+#include "rdkafka_common.h"
 
-#define ASSERT_INITIATED if (!this->initiated) return BRICKS_INVALID_STATE
-#define ASSERT_NOT_INITIATED if (this->initiated) return BRICKS_INVALID_STATE
+namespace bricks {
 
-class kafka_service_t 
-{
+	class kafka_service_t 
+	{
+	public:
 
-protected:
+		kafka_service_t();
 
-	kafka_service_t();
+		virtual bricks_error_code_e poll(int milliseconds);
 
-	bool initiated = false;
+		virtual ~kafka_service_t();
 
-	rd_kafka_t* rd_kafka_h = nullptr;
+	protected:
 
-	bricks_error_code_e init_conf(rd_kafka_conf_t* conf, const xtree_t* options);
+		virtual bricks_error_code_e init_conf(rd_kafka_conf_t* conf, const xtree_t* options);
 
-	static void	kafka_logger(const rd_kafka_t* rk, int level, const char* fac, const char* buf);
-	
+		virtual void rd_poll_loop();
 
-};
+		virtual bricks_error_code_e rd_poll(int milliseconds) = 0;
+
+		virtual bricks_error_code_e start_rd_poll_loop();
+
+		virtual void stop_rd_poll_loop();
+
+		static void	rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf);
+
+		bool initiated = false;
+
+		bool started = false;
+
+		atomic<bool> shutdown = false;
+		
+		LockingQueue<bound_callback_t> cb_queue;
+
+		thread *rd_poll_thread = nullptr;
+
+	};
+}
 

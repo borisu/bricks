@@ -122,11 +122,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;BRICKS_EXPORTS;NOMINMAX;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;BRICKS_EXPORTS;ASIO_STANDALONE;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\3rdparty\modules\tinyxml2</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\3rdparty\modules\tinyxml2;..\..\3rdparty\asio\asio-1.28.0\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -155,23 +155,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="bricks_api.h" />
-    <ClInclude Include="logger_api.h" />
-    <ClInclude Include="services_api.h" />
+    <ClInclude Include="bricks.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="locking_queue.h" />
+    <ClInclude Include="logger.h" />
+    <ClInclude Include="plugin.h" />
     <ClInclude Include="service_router.h" />
-    <ClInclude Include="xtree.h" />
+    <ClInclude Include="utils.h" />
+    <ClInclude Include="xtree_impl.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="xtree_api.h" />
+    <ClInclude Include="xtree.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\3rdparty\modules\tinyxml2\tinyxml2.cpp" />
-    <ClCompile Include="bricks_impl.cpp" />
-    <ClCompile Include="logger_impl.cpp" />
-    <ClCompile Include="services_impl.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="service_router.cpp" />
     <ClCompile Include="xtree_impl.cpp" />
-    <ClCompile Include="xtree.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

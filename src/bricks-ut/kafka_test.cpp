@@ -21,7 +21,7 @@ TEST(kafka_case, publish_subscribe_test) {
 		"<configuration>"
 		" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 		"</configuration>";
-	publisher_service_t *kafka_producer_h = create_kafka_publisher();
+	publisher_plugin_t *kafka_producer_h = create_kafka_publisher();
 	auto p_conf = create_xtree();
 	ASSERT_EQ(BRICKS_SUCCESS, p_conf->load_from_xml(kafka_producer_config_xml));
 	int delivered_counter = 0;
@@ -40,7 +40,7 @@ TEST(kafka_case, publish_subscribe_test) {
 		" <property name = \"group.id\" value=\"mygroup\"/>"
 		" <property name = \"auto.offset.reset\" value=\"earliest\"/>"
 		"</configuration>";
-	subscriber_service_t* kafka_subscriber_h = create_kafka_subscriber();
+	subscriber_plugin_t* kafka_subscriber_h = create_kafka_subscriber();
 	auto c_conf = create_xtree();
 	ASSERT_EQ(BRICKS_SUCCESS, c_conf->load_from_xml(kafka_consumer_config_xml));
 	int received_counter = 0;

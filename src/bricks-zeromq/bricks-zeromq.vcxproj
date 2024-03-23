@@ -146,7 +146,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="zeromq_api.h" />
-    <ClInclude Include="zeromq_router_client.h" />
+    <ClInclude Include="zeromq_dealer_bidi.h" />
     <ClInclude Include="zeromq_publisher.h" />
     <ClInclude Include="zeromq_router_server.h" />
     <ClInclude Include="zeromq_service.h" />
@@ -160,7 +160,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="zeromq_router_client.cpp" />
+    <ClCompile Include="zeromq_dealer_bidi.cpp" />
     <ClCompile Include="zeromq_impl.cpp" />
     <ClCompile Include="zeromq_publisher.cpp" />
     <ClCompile Include="zeromq_router_server.cpp" />

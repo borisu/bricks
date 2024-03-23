@@ -2,13 +2,13 @@
 #include "services_api.h"
 #include "zeromq_service.h"
 
-class zeromq_router_client_t: 
-	public client_service_t,
+class zeromq_dealer_bidi_t: 
+	public bidi_plugin_t,
 	public zeromq_service_t
 {
 public:
 
-    zeromq_router_client_t();
+    zeromq_dealer_bidi_t();
 
 	virtual bricks_error_code_e init(const xtree_t* options) override;
 
@@ -18,7 +18,7 @@ public:
 
     virtual bricks_error_code_e poll(size_t timeout);
 
-    virtual ~zeromq_router_client_t();
+    virtual ~zeromq_dealer_bidi_t();
 
 private:
 

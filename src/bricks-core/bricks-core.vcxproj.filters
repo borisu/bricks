@@ -1,43 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="xtree.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="..\..\3rdparty\modules\tinyxml2\tinyxml2.cpp">
       <Filter>3rdparty</Filter>
     </ClCompile>
     <ClCompile Include="service_router.cpp" />
-    <ClCompile Include="logger_impl.cpp">
-      <Filter>impl</Filter>
-    </ClCompile>
-    <ClCompile Include="services_impl.cpp">
-      <Filter>impl</Filter>
-    </ClCompile>
-    <ClCompile Include="xtree_impl.cpp">
-      <Filter>impl</Filter>
-    </ClCompile>
-    <ClCompile Include="bricks_impl.cpp">
-      <Filter>impl</Filter>
-    </ClCompile>
+    <ClCompile Include="xtree_impl.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="logger.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="xtree.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="xtree_api.h">
+    <ClInclude Include="xtree.h">
       <Filter>api</Filter>
     </ClInclude>
-    <ClInclude Include="bricks_api.h">
+    <ClInclude Include="common.h">
       <Filter>api</Filter>
     </ClInclude>
-    <ClInclude Include="services_api.h">
+    <ClInclude Include="plugin.h">
       <Filter>api</Filter>
     </ClInclude>
-    <ClInclude Include="logger_api.h">
+    <ClInclude Include="logger.h">
       <Filter>api</Filter>
     </ClInclude>
     <ClInclude Include="service_router.h" />
+    <ClInclude Include="xtree_impl.h" />
+    <ClInclude Include="bricks.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="locking_queue.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">
@@ -45,9 +40,6 @@
     </Filter>
     <Filter Include="api">
       <UniqueIdentifier>{9a643695-87f6-4d5d-a5ea-f09ad2462596}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="impl">
-      <UniqueIdentifier>{74f494de-375d-4638-a10b-909d5d89d3c7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

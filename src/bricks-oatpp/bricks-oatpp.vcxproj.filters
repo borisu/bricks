@@ -6,31 +6,26 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="api">
-      <UniqueIdentifier>{bd5e3dd2-dcdf-4a2b-aca0-cf5e595d44c6}</UniqueIdentifier>
+      <UniqueIdentifier>{974e669f-d267-449f-970e-04c081ba187d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="impl">
+      <UniqueIdentifier>{f09cfbf9-5fe7-4760-a2f1-a73e62a125fd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="rdkafka_plugin.h">
-      <Filter>api</Filter>
-    </ClInclude>
-    <ClInclude Include="kafka_subscriber.h" />
-    <ClInclude Include="kafka_publisher.h" />
-    <ClInclude Include="kafka_service.h" />
-    <ClInclude Include="rdkafka_common.h">
+    <ClInclude Include="oatpp_server.h" />
+    <ClInclude Include="oatpp_api.h">
       <Filter>api</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="kafka_subscriber.cpp" />
-    <ClCompile Include="kafka_publisher.cpp" />
-    <ClCompile Include="kafka_service.cpp" />
-    <ClCompile Include="rdkafka_plugin.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="oatpp_server.cpp" />
+    <ClCompile Include="oatpp_impl.cpp">
+      <Filter>impl</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

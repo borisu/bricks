@@ -5,7 +5,7 @@ using namespace std;
 
 class zeromq_subscriber_t:
 	public zeromq_service_t,
-	public subscriber_service_t
+	public subscriber_plugin_t
 {
 public:
 
