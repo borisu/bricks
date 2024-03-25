@@ -1,6 +1,8 @@
 #pragma once
-#include "locking_queue.h"
 #include "rdkafka_common.h"
+#include "queue.h"
+
+using namespace std;
 
 namespace bricks {
 
@@ -10,8 +12,6 @@ namespace bricks {
 
 		kafka_service_t();
 
-		virtual bricks_error_code_e poll(int milliseconds);
-
 		virtual ~kafka_service_t();
 
 	protected:
@@ -20,7 +20,7 @@ namespace bricks {
 
 		virtual void rd_poll_loop();
 
-		virtual bricks_error_code_e rd_poll(int milliseconds) = 0;
+		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) = 0;
 
 		virtual bricks_error_code_e start_rd_poll_loop();
 
@@ -34,7 +34,7 @@ namespace bricks {
 
 		atomic<bool> shutdown = false;
 		
-		LockingQueue<bound_callback_t> cb_queue;
+		cb_queue_t* cb_queue = nullptr;
 
 		thread *rd_poll_thread = nullptr;
 

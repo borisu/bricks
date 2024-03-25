@@ -156,11 +156,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="bricks.h" />
+    <ClInclude Include="queue.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="locking_queue.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="plugin.h" />
-    <ClInclude Include="service_router.h" />
+    <ClInclude Include="queue_impl.h" />
+    <ClInclude Include="selector.h" />
+    <ClInclude Include="selector_impl.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="xtree_impl.h" />
     <ClInclude Include="framework.h" />
@@ -171,7 +174,8 @@
     <ClCompile Include="..\..\3rdparty\modules\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="logger.cpp" />
-    <ClCompile Include="service_router.cpp" />
+    <ClCompile Include="queue_impl.cpp" />
+    <ClCompile Include="selector_impl.cpp" />
     <ClCompile Include="xtree_impl.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">

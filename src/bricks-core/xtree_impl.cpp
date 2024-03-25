@@ -9,12 +9,20 @@ bricks::create_xtree()
 	return new xtree_impl_t();
 }
 
-
-void 
-bricks::destroy_xtree(xtree_t* tree)
+xtree_t* 
+bricks::create_xtree_from_xml(const char* xml)
 {
-	delete tree;
+	auto xt = new xtree_impl_t();
+	
+	if (BRICKS_SUCCESS != xt->load_from_xml(xml))
+	{
+		delete xt;
+		xt = nullptr;
+	}
+
+	return xt;
 }
+
 
 
 xtree_impl_t::xtree_impl_t() 

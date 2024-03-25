@@ -61,7 +61,7 @@ kafka_service_t::rd_poll_loop()
 {
 	while (shutdown != true)
 	{
-		auto err = rd_poll(KAFKA_POLL_TIMEOUT);
+		auto err = rd_poll(KAFKA_POLL_TIMEOUT,false);
 		switch (err)
 		{
 		case BRICKS_TIMEOUT:
@@ -71,8 +71,9 @@ kafka_service_t::rd_poll_loop()
 			break;
 
 		}
-
 	}
+
+	rd_poll(KAFKA_POLL_TIMEOUT, true);
 }
 
 bricks_error_code_e
@@ -117,23 +118,3 @@ kafka_service_t::~kafka_service_t()
 	stop_rd_poll_loop();
 }
 
-bricks_error_code_e
-kafka_service_t::poll(int milliseconds)
-{
-	bound_callback_t cb = nullptr;
-	if (!cb_queue.tryWaitAndPop(cb, milliseconds))
-	{
-		return BRICKS_TIMEOUT;
-	}
-
-	try
-	{
-		cb();
-	}
-	catch (std::exception&)
-	{
-
-	}
-
-	return BRICKS_SUCCESS;
-}

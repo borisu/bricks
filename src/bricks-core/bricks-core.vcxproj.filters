@@ -6,10 +6,11 @@
     <ClCompile Include="..\..\3rdparty\modules\tinyxml2\tinyxml2.cpp">
       <Filter>3rdparty</Filter>
     </ClCompile>
-    <ClCompile Include="service_router.cpp" />
     <ClCompile Include="xtree_impl.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="logger.cpp" />
+    <ClCompile Include="selector_impl.cpp" />
+    <ClCompile Include="queue_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -26,13 +27,20 @@
     <ClInclude Include="logger.h">
       <Filter>api</Filter>
     </ClInclude>
-    <ClInclude Include="service_router.h" />
     <ClInclude Include="xtree_impl.h" />
     <ClInclude Include="bricks.h">
       <Filter>api</Filter>
     </ClInclude>
     <ClInclude Include="locking_queue.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="selector_impl.h" />
+    <ClInclude Include="queue.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="queue_impl.h" />
+    <ClInclude Include="selector.h">
+      <Filter>api</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

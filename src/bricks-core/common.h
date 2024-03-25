@@ -29,13 +29,19 @@ namespace bricks
 
 	typedef vector<char> buffer_t;
 
-#define BRICKS_GUID_SIZE 16
+	class brick_t
+	{
+	public:
+		virtual void release() = 0;
+	};
 
-	typedef char guid_t[BRICKS_GUID_SIZE];
+	struct bricks_destroyer
+	{
+		void operator()(brick_t* ptr) const { ptr->release(); };
+	};
 
-	BRICKS_API void	create_guid(guid_t buf);
 
-	typedef function<void()> bound_callback_t;
+	
 }
 
 

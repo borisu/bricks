@@ -19,6 +19,8 @@
 #include <functional>
 #include <string>
 #include <map>
+#include <atomic>
+#include <thread>
 
 #include "bricks.h"
 #include "utils.h"

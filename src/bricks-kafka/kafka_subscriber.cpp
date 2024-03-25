@@ -2,7 +2,6 @@
 #include "kafka_subscriber.h"
 
 using namespace std::placeholders;
-
 using namespace bricks;
 
 msg_cb_t msg_cb = nullptr;
@@ -18,7 +17,7 @@ kafka_subscriber_t::~kafka_subscriber_t()
 }
 
 bricks_error_code_e 
-kafka_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
+kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 
@@ -86,12 +85,7 @@ kafka_subscriber_t::destroy()
 		rd_kafka_destroy(rd_kafka_h);
 		rd_kafka_h = nullptr;
 	}
-
-	if (rd_conf_h)
-	{
-		rd_kafka_conf_destroy(rd_conf_h);
-		rd_conf_h = nullptr;
-	}
+	
 }
 
 bricks_error_code_e  
@@ -130,12 +124,14 @@ kafka_subscriber_t::subscribe(void* opaque,  const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
+	start_rd_poll_loop();
+
 	return BRICKS_SUCCESS;
 
 }
 
 bricks_error_code_e
-kafka_subscriber_t::rd_poll(int milliseconds)
+kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 {
 	bricks_error_code_e  err = BRICKS_SUCCESS;
 
@@ -152,22 +148,20 @@ kafka_subscriber_t::rd_poll(int milliseconds)
 	else
 	{
 		auto xtree = create_xtree();
-
-		cb_queue.push(std::bind(msg_cb, this->opaque, (const char*)msg->payload, (size_t)msg->len, xtree));
+		if (cb_queue)
+		{
+			cb_queue->enqueue(std::bind(msg_cb, this->opaque, (const char*)msg->payload, (size_t)msg->len, xtree));
+		}
+		else
+		{
+			msg_cb(this->opaque, (const char*)msg->payload, (size_t)msg->len, xtree);
+		}
+		
 	}
 
-	
 	rd_kafka_message_destroy(msg);
 
 	return err;
-	
-
-}
-
-bricks_error_code_e 
-kafka_subscriber_t::poll(int milliseconds)
-{
-	return kafka_service_t::poll(milliseconds);
 }
 
 

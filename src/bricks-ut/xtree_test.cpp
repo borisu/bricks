@@ -1,5 +1,7 @@
 #include "pch.h"
-#include "xtree_api.h"
+#include "xtree.h"
+
+using namespace bricks;
 
 TEST(xtree_case, xtree_load_xml_test) 
 {
@@ -48,10 +50,3 @@ TEST(xtree_case, xtree_direct_access)
 	EXPECT_EQ(h->get_node_children_count(c.value(), "/property").value(), 1);
 
 }
-
-/*
-TEST(xtree_case, xtree_parse_xml_test)
-{
-	
-	
-}*/

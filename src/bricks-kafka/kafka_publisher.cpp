@@ -37,7 +37,15 @@ kafka_publisher_t::msg_delivered(rd_kafka_t* rk,
 
 	auto xt = create_xtree();
 
-	cb_queue.push(std::bind(msg_cb, opaque, rkmessage->err ? BRICKS_3RD_PARTY_ERROR :  BRICKS_SUCCESS, xt));
+	if (cb_queue)
+	{
+		cb_queue->enqueue(std::bind(msg_cb, opaque, rkmessage->err ? BRICKS_3RD_PARTY_ERROR : BRICKS_SUCCESS, xt));
+	}
+	else
+	{
+		msg_cb(opaque, rkmessage->err ? BRICKS_3RD_PARTY_ERROR : BRICKS_SUCCESS, xt);
+	}
+
 
 }
 
@@ -49,11 +57,13 @@ kafka_publisher_t::~kafka_publisher_t()
 };
 
 bricks_error_code_e 
-kafka_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
+kafka_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
+
+	this->cb_queue = queue;
 
 	this->msg_cb = msg_cb;
 
@@ -85,11 +95,22 @@ kafka_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
 }
 
 
+bricks_error_code_e 
+kafka_publisher_t::start()
+{
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
+
+	return start_rd_poll_loop();
+
+}
+
 bricks_error_code_e
 kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, void* opaque, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 
+	
 	auto it = rd_topics.find(topic);
 	if (it == rd_topics.end())
 	{
@@ -122,6 +143,8 @@ kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, vo
 void
 kafka_publisher_t::destroy()
 {
+	stop_rd_poll_loop();
+
 	for (auto p : rd_topics)
 	{
 		rd_kafka_topic_destroy(p.second);
@@ -130,12 +153,6 @@ kafka_publisher_t::destroy()
 	{
 		rd_kafka_destroy(rd_producer_h);
 		rd_producer_h = nullptr;
-	}
-
-	if (rd_conf_h)
-	{
-		rd_kafka_conf_destroy(rd_conf_h);
-		rd_conf_h = nullptr;
 	}
 }
 
@@ -163,18 +180,19 @@ kafka_publisher_t::register_topic(const string& topic, const xtree_t* options)
 	return BRICKS_SUCCESS;
 }
 
-
 bricks_error_code_e
-kafka_publisher_t::rd_poll(int milliseconds)
+kafka_publisher_t::rd_poll(int milliseconds, bool last_call)
 {
-	rd_kafka_poll(rd_producer_h, (int)milliseconds);
+	if (last_call)
+	{
+		rd_kafka_flush(rd_producer_h, milliseconds);
+	}
+	else
+	{
+		rd_kafka_poll(rd_producer_h, (int)milliseconds);
+	}
 
 	return BRICKS_SUCCESS;
 
 }
 
-bricks_error_code_e
-kafka_publisher_t::poll(int milliseconds)
-{
-	return kafka_service_t::poll(milliseconds);
-}

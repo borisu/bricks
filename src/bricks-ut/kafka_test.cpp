@@ -1,75 +1,42 @@
-#include "gtest/gtest.h"
 #include "pch.h"
+#include "generic_tests.h"
 
-#include "xtree_api.h"
-#include "kafka_api.h"
-#include "services_api.h"
+using namespace std;
+using namespace bricks;
 
-void msg_cb(bricks_error_code_e e, const char* msg)
-{
-
-}
 
 
 
 TEST(kafka_case, publish_subscribe_test) {
 
-	return;
+	unique_ptr<xtree_t, bricks_destroyer> p_xt (
+		create_xtree_from_xml(
+			"<configuration>"
+			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+			"</configuration>"
+		));
 
-	/* prepare producer */
-	const char* kafka_producer_config_xml =
-		"<configuration>"
-		" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
-		"</configuration>";
-	publisher_plugin_t *kafka_producer_h = create_kafka_publisher();
-	auto p_conf = create_xtree();
-	ASSERT_EQ(BRICKS_SUCCESS, p_conf->load_from_xml(kafka_producer_config_xml));
-	int delivered_counter = 0;
-	ASSERT_EQ(BRICKS_SUCCESS, kafka_producer_h->init([&delivered_counter](void*, bricks_error_code_e, xtree_t&) 
-		{
-			printf("SENT");
-			delivered_counter++;
-		}, p_conf));
-	ASSERT_EQ(BRICKS_SUCCESS, kafka_producer_h->register_topic("bricks.test"));
+	unique_ptr<xtree_t, bricks_destroyer> s_xt ( 
+		create_xtree_from_xml(
+			"<configuration>"
+			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+			" <property name = \"group.id\" value=\"mygroup\"/>"
+			" <property name = \"auto.offset.reset\" value=\"latest\"/>"
+			"</configuration>"
+		));
 
 
-	/* prepare consumer */
-	const char* kafka_consumer_config_xml =
-		"<configuration>"
-		" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
-		" <property name = \"group.id\" value=\"mygroup\"/>"
-		" <property name = \"auto.offset.reset\" value=\"earliest\"/>"
-		"</configuration>";
-	subscriber_plugin_t* kafka_subscriber_h = create_kafka_subscriber();
-	auto c_conf = create_xtree();
-	ASSERT_EQ(BRICKS_SUCCESS, c_conf->load_from_xml(kafka_consumer_config_xml));
-	int received_counter = 0;
-	ASSERT_EQ(BRICKS_SUCCESS, kafka_subscriber_h->init([&received_counter](void*, const char*, size_t, xtree_t&)
-		{
-			printf("RECEIVED");
-			received_counter++;
-		}, c_conf));
-	ASSERT_EQ(BRICKS_SUCCESS, kafka_subscriber_h->register_topic("bricks.test"));
+	unique_ptr<publisher_plugin_t, bricks_destroyer>  publisher(create_kafka_publisher());
 
+	unique_ptr<subscriber_plugin_t, bricks_destroyer>  subscriber(create_kafka_subscriber());
 
-	const char* msg = "Another brick in the wall.";
+	unique_ptr<cb_queue_t, bricks_destroyer>  cb_q(create_callback_queue());
 
-	ASSERT_EQ(BRICKS_SUCCESS, kafka_subscriber_h->subscribe(nullptr));
-	kafka_subscriber_h->poll(1000);
+	unique_ptr<selector_t, bricks_destroyer>  selector(create_selector());
 
-	ASSERT_EQ(BRICKS_SUCCESS, kafka_producer_h->publish("bricks.test", msg, strlen(msg), nullptr ));
-
-	int poll_counter = 0;
-	while (poll_counter < 10)
-	{
-		kafka_producer_h->poll(1000);
-		kafka_subscriber_h->poll(1000);
-	}
+	selector->init(cb_q.get());
 	
-	destroy_kafka_publisher(kafka_producer_h);
-	destroy_kafka_subscriber(kafka_subscriber_h);
+	publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());
 
-	destroy_xtree(p_conf);
-	destroy_xtree(c_conf);
 }
 

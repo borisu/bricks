@@ -14,15 +14,17 @@ namespace bricks
 
 		kafka_publisher_t();
 
-		virtual bricks_error_code_e init(delivery_cb_t msg_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options) override;
 
 		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
 		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, void* opaque, const xtree_t* options)  override;
 
-		virtual bricks_error_code_e rd_poll(int milliseconds) override;
+		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
 
-		virtual bricks_error_code_e poll(int milliseconds) override;
+		virtual bricks_error_code_e start()  override;
+
+		virtual void release() override { delete this; };
 
 		virtual ~kafka_publisher_t();
 
@@ -49,7 +51,6 @@ namespace bricks
 		map<string, rd_kafka_topic_t*> rd_topics;
 
 		delivery_cb_t msg_cb;
-
 
 	};
 

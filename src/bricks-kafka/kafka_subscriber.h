@@ -1,4 +1,5 @@
 #pragma once
+#include "bricks.h"
 #include "kafka_service.h"
 
 
@@ -14,15 +15,15 @@ namespace bricks {
 
 		kafka_subscriber_t();
 
-		virtual bricks_error_code_e init(msg_cb_t msg_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options) override;
 
 		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
 		virtual bricks_error_code_e subscribe(void* opaque, const xtree_t* options) override;
 
-		virtual bricks_error_code_e rd_poll(int milliseconds) override;
+		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
 
-		virtual bricks_error_code_e poll(int milliseconds) override;
+		virtual void release() override { delete this; };
 
 		virtual ~kafka_subscriber_t();
 

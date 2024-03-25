@@ -11,10 +11,16 @@
     <ClCompile Include="zeromq_test.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="publish_subsribe_tests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="generic_tests.h">
+      <Filter>tests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="bricks-ut.rc" />

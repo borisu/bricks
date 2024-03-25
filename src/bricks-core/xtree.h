@@ -5,7 +5,7 @@ using namespace std;
 
 namespace bricks
 {
-	class BRICKS_API xtree_t
+	class BRICKS_API xtree_t : public brick_t
 	{
 	public:
 
@@ -64,5 +64,6 @@ namespace bricks
 
 	BRICKS_API xtree_t* create_xtree();
 
-	BRICKS_API void destroy_xtree(xtree_t* tree);
+	BRICKS_API xtree_t* create_xtree_from_xml(const char* xml);
+	
 }

@@ -62,6 +62,8 @@ namespace bricks {
 		virtual optional<double>
 			get_child_property_value_as_double(const string& path, int index, const string& property_name) const override;
 
+		virtual void release() override { delete this; };
+
 		virtual ~xtree_impl_t();
 
 	protected:
