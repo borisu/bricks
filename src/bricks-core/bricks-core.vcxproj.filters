@@ -11,6 +11,7 @@
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="selector_impl.cpp" />
     <ClCompile Include="queue_impl.cpp" />
+    <ClCompile Include="xtree_xml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="selector.h">
       <Filter>api</Filter>
     </ClInclude>
+    <ClInclude Include="xtree_xml.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

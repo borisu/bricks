@@ -9,60 +9,29 @@ bricks::create_xtree()
 	return new xtree_impl_t();
 }
 
-xtree_t* 
-bricks::create_xtree_from_xml(const char* xml)
-{
-	auto xt = new xtree_impl_t();
-	
-	if (BRICKS_SUCCESS != xt->load_from_xml(xml))
-	{
-		delete xt;
-		xt = nullptr;
-	}
-
-	return xt;
-}
-
-
 
 xtree_impl_t::xtree_impl_t() 
 {
 	root.name = "/";
 };
 
-bricks_error_code_e
-xtree_impl_t::load_from_xml(const char* str)
-{
-	if (doc.Parse(str) != tinyxml2::XML_SUCCESS) {
-		return BRICKS_INVALID_PARAM;
-	}
 
-	// Get the root element
-	return traverse_elements(doc.RootElement(), root);
+void
+xtree_impl_t::traverse(xtree_visitor_t* v) const
+{
+	traverse(v, root);
 }
 
-bricks_error_code_e
-xtree_impl_t::traverse_elements(const tinyxml2::XMLElement* element, xnode_t& parent_node)
+void 
+xtree_impl_t::traverse(xtree_visitor_t* v, const xnode_t& e) const
 {
-
-	parent_node.children.push_back(xnode_t{});
-
-	auto& node = parent_node.children.back();
-
-	node.name = element->Name();
-
-	const tinyxml2::XMLAttribute* attr = element->FirstAttribute();
-	while (attr) {
-		node.properties[attr->Name()] = string(attr->Value());
-		attr = attr->Next();
+	v->start_element(e.name, e.properties, e.value);
+	for (auto& child : e.children)
+	{
+		traverse(v, child);
 	}
+	v->end_element(e.name);
 
-
-	// Recursively traverse child elements
-	for (const tinyxml2::XMLElement* child = element->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
-		traverse_elements(child, node);
-	}
-	return  BRICKS_SUCCESS;
 }
 
 optional<xtree_impl_t::xnode_t*>
@@ -117,13 +86,12 @@ optional<xtree_impl_t::xnode_t*>
 xtree_impl_t::get_node_rec(const xnode_t& node, const string_view& path) const
 {
 	return  const_cast<xtree_impl_t*>(this)->get_node_rec1(const_cast<xnode_t&>(node), path, false);
-
 }
 
+
 optional<bricks_handle_t>
-xtree_impl_t::set_node_value(const string& path, const char* buf, size_t len, bool create)
+xtree_impl_t::set_node_value(optional<xtree_impl_t::xnode_t*> node, const char* buf, int len)
 {
-	auto node = get_node_rec1(root, path, create);
 	if (!node.has_value())
 		return {};
 
@@ -132,18 +100,18 @@ xtree_impl_t::set_node_value(const string& path, const char* buf, size_t len, bo
 	return  (bricks_handle_t)node.value();
 }
 
+optional<bricks_handle_t>
+xtree_impl_t::set_node_value(const string& path, const char* buf, int len, bool create)
+{
+	return set_node_value(get_node_rec1(root, path, create), buf, len);
+}
 
 optional<bricks_handle_t>
-xtree_impl_t::set_node_value(const string& path, const buffer_t* buf, bool create)
+xtree_impl_t::set_node_value(bricks_handle_t h, const string& path, const char* buf, int len, bool create )
 {
-	auto node = get_node_rec1(root, path, create);
-	if (!node.has_value())
-		return {};
-
-	node.value()->value = *buf;
-
-	return  (bricks_handle_t)node.value();
+	return set_node_value(get_node_rec1(*((xnode_t*)h), path, create), buf, len);
 }
+
 
 optional<const buffer_t*>
 xtree_impl_t::get_node_value(const string& path) const
@@ -161,14 +129,14 @@ xtree_impl_t::get_node_children_count(const string& path) const
 	return node.has_value() ? node.value()->children.size() : optional<size_t>{};
 }
 
-optional<size_t>
-xtree_impl_t::get_node_children_count(bricks_handle_t h, const string& path) const
+optional<bricks_handle_t>
+xtree_impl_t::add_node(bricks_handle_t h, const string& path) 
 {
 	xnode_t* pnode = (xnode_t*)h;
 
-	auto node = get_node_rec(*pnode, path);
+	auto node = get_node_rec1(*pnode, path, true);
 
-	return node.has_value() ? node.value()->children.size() : optional<size_t>{};
+	return node.has_value() ? (bricks_handle_t)node.value() : optional<bricks_handle_t>{};
 }
 
 // opaque node handle
@@ -179,11 +147,16 @@ xtree_impl_t::get_node(const string& path) const
 	return node.has_value() ? optional<bricks_handle_t>{ (bricks_handle_t) node.value()} : optional<bricks_handle_t>{};
 }
 
-optional<xtree_impl_t::xnode_t*>
-xtree_impl_t::get_child(const string& path, int index) const
+optional<bricks_handle_t>
+xtree_impl_t::add_node(const string& path) 
 {
-	auto node = get_node_rec(root, path);
+	auto node = get_node_rec1(root, path,true);
+	return node.has_value() ? optional<bricks_handle_t>{ (bricks_handle_t)node.value()} : optional<bricks_handle_t>{};
+}
 
+optional<xtree_impl_t::xnode_t*>
+xtree_impl_t::get_child(optional<xnode_t*> node, int index) const
+{
 	if (!node.has_value())
 		return optional<xnode_t*>{};
 
@@ -196,6 +169,39 @@ xtree_impl_t::get_child(const string& path, int index) const
 	return &(*it);
 }
 
+optional<xtree_impl_t::xnode_t*>
+xtree_impl_t::get_child(const string& path, int index) const
+{
+	return get_child(get_node_rec(root, path), index);
+}
+
+optional<xtree_impl_t::xnode_t*>
+xtree_impl_t::get_child(bricks_handle_t h, const string& path, int index) const
+{
+	return get_child(get_node_rec(*(xnode_t*)h, path), index);
+}
+
+optional<size_t>
+xtree_impl_t::get_node_children_count(bricks_handle_t h, const string& path) const
+{
+	xnode_t* pnode = (xnode_t*)h;
+
+	auto node = get_node_rec(*pnode, path);
+
+	return node.has_value() ? node.value()->children.size() : optional<size_t>{};
+}
+
+optional<bricks_handle_t>
+xtree_impl_t::get_node(bricks_handle_t h, const string& path) const
+{
+	xnode_t* pnode = (xnode_t*)h;
+
+	auto node = get_node_rec(*pnode, path);
+
+	return node.has_value() ? (bricks_handle_t)node.value() : optional<bricks_handle_t>{};
+
+}
+
 optional<string>
 xtree_impl_t::get_child_name_by_index(const string& path, int i) const
 {
@@ -205,6 +211,42 @@ xtree_impl_t::get_child_name_by_index(const string& path, int i) const
 		return optional<string>{};
 
 	return node.value()->name;
+}
+
+optional<string>
+xtree_impl_t::get_child_name_by_index(bricks_handle_t h, const string& path, int i) const
+{
+	auto node = get_child(h, path, i);
+
+	if (!node.has_value())
+		return optional<string>{};
+
+	return node.value()->name;
+}
+
+template<typename T>
+optional<T>
+xtree_impl_t::get_child_property_value_as(const string& path, int index, const string& property_name) const
+{
+	auto node = get_child(path, index);
+
+	if (!node.has_value())
+		return optional<T>{};
+
+	auto it = node.value()->properties.find(property_name);
+	if (it == node.value()->properties.end())
+	{
+		return optional<T>{};
+	}
+
+	try
+	{
+		return optional<T>{std::any_cast<T>(it->second)};
+	}
+	catch (const std::bad_any_cast&)
+	{
+		return optional<T>{};
+	}
 }
 
 template<typename T>
@@ -232,30 +274,65 @@ xtree_impl_t::get_property_value_as(const string& path, const string& property_n
 	}
 }
 
-template<typename T>
-optional<T>
-xtree_impl_t::get_child_property_value_as(const string& path, int index, const string& property_name) const
+bool
+xtree_impl_t::set_property_value(optional<xtree_impl_t::xnode_t*> node, const string& property_name, std::any v)
 {
-	auto node = get_child(path, index);
-
 	if (!node.has_value())
-		return optional<T>{};
+		return false;
 
-	auto it = node.value()->properties.find(property_name);
-	if (it == node.value()->properties.end())
-	{
-		return optional<T>{};
-	}
+	node.value()->properties[property_name] = v;
 
-	try
-	{
-		return optional<T>{std::any_cast<T>(it->second)};
-	}
-	catch (const std::bad_any_cast& )
-	{
-		return optional<T>{};
-	}
+	return true;
 }
+
+bool
+xtree_impl_t::set_property_value(const string& path, const string& property_name, int v, bool create)
+{
+	return set_property_value(get_node_rec1(root, path, create), property_name, v);
+}
+
+bool
+xtree_impl_t::set_property_value(const string& path, const string& property_name, bool v, bool create)
+{
+	return set_property_value(get_node_rec1(root, path, create), property_name, v);
+}
+
+bool
+xtree_impl_t::set_property_value(const string& path, const string& property_name, double v, bool create)
+{
+	return set_property_value(get_node_rec1(root, path, create), property_name, v);
+}
+
+bool
+xtree_impl_t::set_property_value(const string& path, const string& property_name, const string& v, bool create)
+{
+	return set_property_value(get_node_rec1(root, path, create), property_name, v);
+}
+
+bool
+xtree_impl_t::set_property_value(bricks_handle_t node, const string& path, const string& property_name, int v, bool create)
+{
+	return set_property_value(get_node_rec1(root, path, create), property_name, v);
+}
+
+bool
+xtree_impl_t::set_property_value(bricks_handle_t node, const string& path, const string& property_name, bool v, bool create)
+{
+	return set_property_value(get_node_rec1(*(xnode_t*)node, path, create), property_name, v);
+}
+
+bool
+xtree_impl_t::set_property_value(bricks_handle_t node, const string& path, const string& property_name, double v, bool create)
+{
+	return set_property_value(get_node_rec1(*(xnode_t*)node, path, create), property_name, v);
+}
+
+bool
+xtree_impl_t::set_property_value(bricks_handle_t node, const string& path, const string& property_name, const string& v, bool create)
+{
+	return set_property_value(get_node_rec1(*(xnode_t*)node, path, create), property_name, v);
+}
+
 
 optional<string>
 xtree_impl_t::get_property_value_as_string(const string& path, const string& property_name) const
