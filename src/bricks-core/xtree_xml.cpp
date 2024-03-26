@@ -18,58 +18,65 @@ xml_visitor_t::xml_visitor_t(const xtree_t* xt):xt(xt)
 string
 xml_visitor_t::serialize() 
 {
+    tinyxml2::XMLDeclaration* decl = doc.NewDeclaration("1.0");
+    doc.InsertFirstChild(decl);
+
     xt->traverse(this);
+
+    // Create a printer
+    tinyxml2::XMLPrinter printer;
+    // Print the XML document to the printer
+    doc.Print(&printer);
+
+    // Get the string representation from the printer
+    std::string xmlString = printer.CStr();
+
+    return xmlString;
 }
 
 void 
 xml_visitor_t::start_element(const string& name, const map<string, any>& properties, const buffer_t& value)
 {
     tinyxml2::XMLElement* child = doc.NewElement(name.c_str());
-    
-
+   
     for (auto& a : properties)
     {
-        switch (a.second.type())
+        if (a.second.type() == typeid(int))
         {
-            case typeid(int) : { child2->SetAttribute( return std::to_string<int>(value); }
-
+            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<int>(value)).c_str());
+        }
+        else if (a.second.type() == typeid(double))
+        {
+            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<double>(value)).c_str());
+        }
+        else if (a.second.type() == typeid(bool))
+        {
+            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<bool>(value)).c_str());
+        }
+        else if (a.second.type() == typeid(string))
+        {
+            child->SetAttribute(a.first.c_str(), std::any_cast<string>(value).c_str());
         }
             
     }
-
-    doc.InsertEndChild(root);
+    if (nodes_stack.empty())
+    {
+        doc.InsertEndChild(child);
+    }
+    else
+    {
+        nodes_stack.front()->InsertEndChild(child);
+    }
+    
+    nodes_stack.push_front(child);
 }
 
 void 
 xml_visitor_t::end_element(const string& name)
 {
-
+    nodes_stack.pop_front();
 }
 
-
-bricks_error_code_e
-xtree_impl_t::traverse_elements(const tinyxml2::XMLElement* element, xnode_t& parent_node)
-{
-
-    parent_node.children.push_back(xnode_t{});
-
-    auto& node = parent_node.children.back();
-
-    node.name = element->Name();
-
-    const tinyxml2::XMLAttribute* attr = element->FirstAttribute();
-    while (attr) {
-        node.properties[attr->Name()] = string(attr->Value());
-        attr = attr->Next();
-    }
-
-
-    // Recursively traverse child elements
-    for (const tinyxml2::XMLElement* child = element->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
-        traverse_elements(child, node);
-    }
-    return  BRICKS_SUCCESS;
-}
 
 
 BRICKS_API xtree_t*

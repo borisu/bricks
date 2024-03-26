@@ -31,6 +31,8 @@ TEST(xtree_case, xtree_load_xml_test)
 TEST(xtree_case, xtree_create)
 {
 	auto xt = create_xtree();
+
+	cout << serialize_xtree_to_xml(xt) << "\n";
 }
 
 
