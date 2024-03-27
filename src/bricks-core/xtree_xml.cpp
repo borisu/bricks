@@ -18,7 +18,7 @@ xml_visitor_t::xml_visitor_t(const xtree_t* xt):xt(xt)
 string
 xml_visitor_t::serialize() 
 {
-    tinyxml2::XMLDeclaration* decl = doc.NewDeclaration("1.0");
+    tinyxml2::XMLDeclaration* decl = doc.NewDeclaration();
     doc.InsertFirstChild(decl);
 
     xt->traverse(this);
@@ -34,8 +34,22 @@ xml_visitor_t::serialize()
     return xmlString;
 }
 
+std::string removeTrailingZeros(double value) {
+    std::string str = std::to_string(value);
+    size_t dotPos = str.find('.');
+    size_t curr_pos = str.length() - 1;
+
+    while (curr_pos > dotPos + 1 && str[curr_pos] == '0') {
+        str.pop_back();
+        curr_pos--;
+    }
+    
+    return str;
+}
+
+
 void 
-xml_visitor_t::start_element(const string& name, const map<string, any>& properties, const buffer_t& value)
+xml_visitor_t::start_element(const string& name, const properties_list_t& properties, const buffer_t& value)
 {
     tinyxml2::XMLElement* child = doc.NewElement(name.c_str());
    
@@ -43,19 +57,19 @@ xml_visitor_t::start_element(const string& name, const map<string, any>& propert
     {
         if (a.second.type() == typeid(int))
         {
-            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<int>(value)).c_str());
+            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<int>(a.second)).c_str());
         }
         else if (a.second.type() == typeid(double))
         {
-            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<double>(value)).c_str());
+            child->SetAttribute(a.first.c_str(), removeTrailingZeros(std::any_cast<double>(a.second)).c_str());
         }
         else if (a.second.type() == typeid(bool))
         {
-            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<bool>(value)).c_str());
+            child->SetAttribute(a.first.c_str(), std::any_cast<bool>(a.second) ? "true" : "false");
         }
         else if (a.second.type() == typeid(string))
         {
-            child->SetAttribute(a.first.c_str(), std::any_cast<string>(value).c_str());
+            child->SetAttribute(a.first.c_str(), std::any_cast<string>(a.second).c_str());
         }
             
     }
