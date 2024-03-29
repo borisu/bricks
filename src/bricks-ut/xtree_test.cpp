@@ -36,6 +36,24 @@ TEST(xtree_case, xtree_create_empty_xml)
 
 }
 
+TEST(xtree_case, xtree_create_1_level_replicate_root)
+{
+	auto xt = create_xtree();
+
+	auto n1 = xt->add_node("root");
+
+	auto n11 = xt->add_node("root");
+
+	EXPECT_EQ(n1, n11);
+
+	EXPECT_EQ(false, xt->add_node("root",true).has_value());
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		"<root/>\n",
+		serialize_xtree_to_xml(xt));
+
+}
+
 TEST(xtree_case, xtree_create_1_level)
 {
 	auto xt = create_xtree();
@@ -79,6 +97,13 @@ TEST(xtree_case, xtree_create_1_level)
 
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<root double=\"2.2\" double1=\"1.0\" int=\"1\" bool=\"false\" string=\"the wall\"/>\n",
+		serialize_xtree_to_xml(xt));
+
+	xt->remove_property("root","double1");
+	xt->remove_property("root", "double1");
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		"<root double=\"2.2\" int=\"1\" bool=\"false\" string=\"the wall\"/>\n",
 		serialize_xtree_to_xml(xt));
 
 }

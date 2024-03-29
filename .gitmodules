@@ -12,3 +12,7 @@
 	path = 3rdparty/modules/oatpp
 	url = https://github.com/oatpp/oatpp.git
 	branch = 1.3.0
+[submodule "3rdparty\\modules\\base64"]
+	path = 3rdparty\\modules\\base64
+	url = https://github.com/tobiaslocker/base64
+	branch = 387b32f

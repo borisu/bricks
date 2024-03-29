@@ -28,13 +28,13 @@ namespace bricks
 			get_node(const string_view& path) const = 0;
 
 		virtual optional<bricks_handle_t>
-			add_node(const string_view& path) = 0;
-
-		virtual optional<bricks_handle_t>
 			get_node(bricks_handle_t node, const string_view& path) const = 0;
 
 		virtual optional<bricks_handle_t>
-			add_node(bricks_handle_t node, const string_view& path) = 0;
+			add_node(const string_view& path, bool replicate_leaf = false) = 0;
+
+		virtual optional<bricks_handle_t>
+			add_node(bricks_handle_t node, const string_view& path, bool replicate_leaf = false) = 0;
 
 		//
 		// Node value accessors.
@@ -87,6 +87,12 @@ namespace bricks
 		virtual bool
 			set_property_value(bricks_handle_t node, const string_view& path, const string_view& property_name, const string_view&, bool create = true) = 0;
 
+		virtual void 
+			remove_property(const string_view& path, const string_view& property_name) = 0;
+
+		virtual void 
+			remove_property(bricks_handle_t node, const string_view& path, const string_view& property_name) = 0;
+		
 		//
 		// Children accessors.
 		//

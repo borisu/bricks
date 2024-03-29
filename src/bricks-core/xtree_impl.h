@@ -20,13 +20,13 @@ namespace bricks {
 			get_node(const string_view& path) const override;
 
 		virtual optional<bricks_handle_t>
-			add_node(const string_view& path) override;
-
-		virtual optional<bricks_handle_t>
 			get_node(bricks_handle_t node, const string_view& path) const;
 
 		virtual optional<bricks_handle_t>
-			add_node(bricks_handle_t node, const string_view& path);
+			add_node(const string_view& path, bool replicate_leaf) override;
+
+		virtual optional<bricks_handle_t>
+			add_node(bricks_handle_t node, const string_view& path, bool replicate_leaf);
 
 		//
 		// Node value accessors.
@@ -78,6 +78,12 @@ namespace bricks {
 
 		virtual bool
 			set_property_value(bricks_handle_t node, const string_view& path, const string_view& property_name, const string_view& value, bool create) override;
+
+		virtual void
+			remove_property(const string_view& path, const string_view& property_name) override;
+
+		virtual void
+			remove_property(bricks_handle_t node, const string_view& path, const string_view& property_name) override;
 		
 
 		//
@@ -127,6 +133,7 @@ namespace bricks {
 			list<pair<string, any>> properties;
 			buffer_t value;
 			list<xnode_t> children;
+			xnode_t* parent = nullptr;
 		};
 
 		virtual optional<xnode_t*>
@@ -134,7 +141,7 @@ namespace bricks {
 
 		// non const variant
 		virtual optional<xnode_t*>
-			get_node_rec1(xnode_t& node, const string_view& path, bool create);
+			get_node_rec1(xnode_t& node, const string_view& path, bool create, bool replicate_leaf = false);
 
 		virtual optional<xnode_t*>
 			get_child(const string_view& path, int index) const;
@@ -148,7 +155,12 @@ namespace bricks {
 		virtual optional<bricks_handle_t> 
 			set_node_value(optional<xtree_impl_t::xnode_t*>, const char* buf, int len);
 
-		virtual bool set_property_value(optional<xtree_impl_t::xnode_t*>, const string_view& property_name, std::any);
+		virtual bool 
+			set_property_value(optional<xtree_impl_t::xnode_t*>, const string_view& property_name, std::any);
+
+		virtual void
+			remove_property(optional<xtree_impl_t::xnode_t*>, const string_view& property_name);
+
 
 	private:
 

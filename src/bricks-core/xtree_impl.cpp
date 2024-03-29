@@ -3,6 +3,8 @@
 
 using namespace bricks;
 
+#define CONVERT_TO_OPAQUE
+
 xtree_t* 
 bricks::create_xtree()
 {
@@ -39,50 +41,80 @@ xtree_impl_t::traverse(xtree_visitor_t* v, const xnode_t& e) const
 }
 
 optional<xtree_impl_t::xnode_t*>
-xtree_impl_t::get_node_rec1(xnode_t& node, const string_view& path, bool create)
+xtree_impl_t::get_node_rec1(xnode_t& node, const string_view& path, bool create, bool replicate_leaf)
 {
-	if (path.length() > 0)
+	auto start = path.find_first_not_of('/'); // no more valid node name characters
+	if (start == string_view::npos)
 	{
-		// we are at leaf?
-		size_t end = path.find_first_of('/');
-		if (end == 0)
+		return &node;
+	}
+
+	auto end = path.find_first_of('/', start);
+	if (end == string_view::npos)
+	{
+		end = path.length();
+	}
+	
+
+	// get view on child name
+	string_view child_name = string_view(&path[start], end - start);
+
+	auto it = find_if(node.children.begin(), node.children.end(),
+		[&](const xnode_t &child) { return child.name == child_name; });
+
+	xtree_impl_t::xnode_t* child = nullptr;
+
+	bool already_created = false;
+	if (it == node.children.end())
+	{
+		if (create)
 		{
-			//MSVC does not create string_view with zero length path so we need special handling for that
-			return get_node_rec1(node, path.length() == 1 ? "" : string_view(&path[1], path.length() - 1),create);
+			xnode_t new_child;
+
+			new_child.name = child_name;
+			new_child.parent = &node;
+
+			node.children.push_back(new_child);
+			child = &node.children.back();
+			already_created = true;
+		}
+		else
+		{
+			return optional<xtree_impl_t::xnode_t*> {};
 		}
 
-		auto child_name_len = end == string_view::npos ? path.length() : end;
+	}
+	else
+	{
+		child = &(*it);
+	}
 
-		// get view on child name
-		string_view child_name_view = string_view(&path[0], child_name_len);
 
+	//MSVC does not create string_view with zero length path so we need special handling for that
+	auto ret = get_node_rec1(*child, end == path.length() ? "" : string_view(&path[end], path.length() - end), create);
 
-		auto it = find_if(node.children.begin(), node.children.end(),
-			[&child_name_view](const xnode_t child) { return child.name == child_name_view; });
-
-		if (it == node.children.end())
+	if (ret.has_value() && ret.value() == child) // same value means child is a leaf
+	{
+		if (replicate_leaf && !already_created)
 		{
-			if (create)
+			if (&node == &root)
 			{
-				xnode_t new_child;
-				new_child.name = child_name_view;
-				node.children.push_back(new_child);
-				it = --node.children.end();
-			}
-			else
-			{
-				return optional<xtree_impl_t::xnode_t*> {};
-			}
+				return optional<xtree_impl_t::xnode_t*>{}; // cannot add more than one child to root node
+			};
 
+			// otherwise replicate the child
+			xnode_t new_child;
+
+			new_child.name = child_name;
+			new_child.parent = &node;
+
+			node.children.push_back(new_child);
+			return optional<xtree_impl_t::xnode_t*> {&node.children.back()};
 		}
 
-		//MSVC does not create string_view with zero length path so we need special handling for that
-		return get_node_rec1(*it, child_name_len == path.length() ? "" : string_view(&path[child_name_len], path.length() - child_name_len), create);
+	}
 
-	};
-
-	// we are at destination node
-	return &node;
+	return ret;
 
 }
 
@@ -91,7 +123,6 @@ xtree_impl_t::get_node_rec(const xnode_t& node, const string_view& path) const
 {
 	return  const_cast<xtree_impl_t*>(this)->get_node_rec1(const_cast<xnode_t&>(node), path, false);
 }
-
 
 optional<bricks_handle_t>
 xtree_impl_t::set_node_value(optional<xtree_impl_t::xnode_t*> node, const char* buf, int len)
@@ -116,7 +147,6 @@ xtree_impl_t::set_node_value(bricks_handle_t h, const string_view& path, const c
 	return set_node_value(get_node_rec1(*((xnode_t*)h), path, create), buf, len);
 }
 
-
 optional<const buffer_t*>
 xtree_impl_t::get_node_value(const string_view& path) const
 {
@@ -134,11 +164,11 @@ xtree_impl_t::get_node_children_count(const string_view& path) const
 }
 
 optional<bricks_handle_t>
-xtree_impl_t::add_node(bricks_handle_t h, const string_view& path) 
+xtree_impl_t::add_node(bricks_handle_t h, const string_view& path, bool leaf_replicator)
 {
 	xnode_t* pnode = (xnode_t*)h;
 
-	auto node = get_node_rec1(*pnode, path, true);
+	auto node = get_node_rec1(*pnode, path, true, leaf_replicator);
 
 	return node.has_value() ? (bricks_handle_t)node.value() : optional<bricks_handle_t>{};
 }
@@ -152,9 +182,9 @@ xtree_impl_t::get_node(const string_view& path) const
 }
 
 optional<bricks_handle_t>
-xtree_impl_t::add_node(const string_view& path) 
+xtree_impl_t::add_node(const string_view& path, bool leaf_replicator)
 {
-	auto node = get_node_rec1(root, path,true);
+	auto node = get_node_rec1(root, path,true, leaf_replicator);
 	return node.has_value() ? optional<bricks_handle_t>{ (bricks_handle_t)node.value()} : optional<bricks_handle_t>{};
 }
 
@@ -334,7 +364,6 @@ xtree_impl_t::set_property_value(bricks_handle_t node, const string_view& path, 
 	return set_property_value(get_node_rec1(*(xnode_t*)node, path, create), property_name, string(v));
 }
 
-
 optional<string>
 xtree_impl_t::get_property_value_as_string(const string_view& path, const string_view& property_name) const
 {
@@ -386,6 +415,33 @@ xtree_impl_t::get_child_property_value_as_double(const string_view& path, int i,
 xtree_impl_t::~xtree_impl_t()
 {
 
+}
+
+void
+xtree_impl_t::remove_property(optional<xtree_impl_t::xnode_t*> node, const string_view& property_name)
+{
+	if (!node.has_value())
+		return;
+
+	auto it = find_if(node.value()->properties.begin(), node.value()->properties.end(),
+		[&](const property_t& p) { return p.first == property_name; });
+
+	if (it == node.value()->properties.end())
+		return;
+
+	node.value()->properties.erase(it);
+}
+
+void
+xtree_impl_t::remove_property(const string_view& path, const string_view& property_name)
+{
+	remove_property(get_node_rec1(root, path, false), property_name);
+}
+
+void
+xtree_impl_t::remove_property(bricks_handle_t h, const string_view& path, const string_view& property_name)
+{
+	remove_property(get_node_rec1(*((xnode_t*)h), path, false), property_name);
 }
 
 

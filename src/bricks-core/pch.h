@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <thread>
 #include <mutex>
+#include <deque>
 
 
 #include "tinyxml2.h"
