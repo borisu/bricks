@@ -57,6 +57,33 @@ TEST(xtree_case, xtree_create_1_level_replicate_root)
 
 }
 
+TEST(xtree_case, xtree_create_2_level_with_clone)
+{
+	auto xt = create_xtree();
+
+	xt->add_node("root");
+	xt->add_node("root/child", true);
+	xt->add_node("root/child", true);
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		"<root>\n"
+		"    <child/>\n"
+		"    <child/>\n"
+		"</root>\n",
+		serialize_xtree_to_xml(xt));
+
+	auto dst = create_xtree();
+	clone_xtree(xt, xt->get_root(), "", dst, {});
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		"<root>\n"
+		"    <child/>\n"
+		"    <child/>\n"
+		"</root>\n",
+		serialize_xtree_to_xml(dst));
+
+}
+
 TEST(xtree_case, xtree_create_1_level_remove_subtree)
 {
 	auto xt = create_xtree();
@@ -64,6 +91,7 @@ TEST(xtree_case, xtree_create_1_level_remove_subtree)
 	char abc[] = { 1,2,3,4,5 };
 
 	xt->set_node_value("root", abc, 5);
+
 
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<root>AQIDBAU=</root>\n",
@@ -179,4 +207,5 @@ TEST(xtree_case, xtree_direct_access)
 	EXPECT_EQ(h->get_node_children_count(c.value(), "/property").value(), 1);*/
 
 }
+
 

@@ -48,7 +48,7 @@ std::string removeTrailingZeros(double value) {
 }
 
 
-void 
+bool 
 xml_visitor_t::start_element(const string& name, const properties_list_t& properties, const buffer_t& value)
 {
     tinyxml2::XMLElement* child = doc.NewElement(name.c_str());
@@ -93,12 +93,14 @@ xml_visitor_t::start_element(const string& name, const properties_list_t& proper
     }
     
     nodes_stack.push_front(child);
+    return true;
 }
 
-void 
+bool 
 xml_visitor_t::end_element(const string& name)
 {
     nodes_stack.pop_front();
+    return true;
 }
 
 

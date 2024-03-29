@@ -18,6 +18,17 @@ xtree_impl_t::xtree_impl_t()
 };
 
 
+optional<bricks_handle_t>
+xtree_impl_t::get_root() const
+{
+	if (root.children.size() == 0)
+		return {};
+
+	return  optional<bricks_handle_t> ((bricks_handle_t) &root.children.back());
+}
+
+
+
 optional<xtree_impl_t::xnode_t*>
 xtree_impl_t::get_node_rec1(xnode_t& node, const string_view& path, bool create, bool replicate_leaf)
 {
@@ -69,7 +80,7 @@ xtree_impl_t::get_node_rec1(xnode_t& node, const string_view& path, bool create,
 
 
 	//MSVC does not create string_view with zero length path so we need special handling for that
-	auto ret = get_node_rec1(*child, end == path.length() ? "" : string_view(&path[end], path.length() - end), create);
+	auto ret = get_node_rec1(*child, end == path.length() ? "" : string_view(&path[end], path.length() - end), create, replicate_leaf);
 
 	if (ret.has_value() && ret.value() == child) // same value means child is a leaf
 	{
@@ -477,44 +488,50 @@ xtree_impl_t::remove_subtree(bricks_handle_t h, const string_view& path)
 	remove_subtree(get_node_rec1(*((xnode_t*)h), path, false));
 }
 
-void
+bool
 xtree_impl_t::traverse(xtree_visitor_t* v) const
 {
 	if (root.children.size() == 0)
-		return;
+		return true;
 
-	traverse(v, root.children.front());
+	return traverse(v, root.children.front());
 }
 
-void
+bool
 xtree_impl_t::traverse(const string_view& path, xtree_visitor_t* v) const
 {
-	traverse(get_node_rec(root, path),v);
+	return traverse(get_node_rec(root, path),v);
 }
 
-void
+bool
 xtree_impl_t::traverse(bricks_handle_t h, const string_view& path, xtree_visitor_t *v) const
 {
-	traverse(get_node_rec(*((xnode_t*)h), path), v);
+	return traverse(get_node_rec(*((xnode_t*)h), path), v);
 }
 
-void
+bool
 xtree_impl_t::traverse(optional<xtree_impl_t::xnode_t*> node, xtree_visitor_t* v) const
 {
 	if (!node.has_value())
-		return;
+		return true;
 
-	traverse(v, *node.value());
+	return traverse(v, *node.value());
 }
 
-void
+bool
 xtree_impl_t::traverse(xtree_visitor_t* v, const xnode_t& e) const
 {
-	v->start_element(e.name, e.properties, e.value);
+	if (!v->start_element(e.name, e.properties, e.value))
+		return false;
+
 	for (auto& child : e.children)
 	{
-		traverse(v, child);
+		if (!traverse(v, child))
+			return false;
 	}
-	v->end_element(e.name);
+	if (!v->end_element(e.name))
+		return false;
+
+	return true;
 
 }

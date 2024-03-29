@@ -16,6 +16,7 @@ namespace bricks {
 		//
 		// Tree acceessors
 		//
+	
 		virtual void
 			remove_subtree(const string_view& path) override;
 
@@ -25,6 +26,9 @@ namespace bricks {
 		//
 		// Node accessors.
 		//
+		virtual optional<bricks_handle_t>
+			get_root() const;
+
 		virtual optional<bricks_handle_t>
 			get_node(const string_view& path) const override;
 
@@ -99,7 +103,7 @@ namespace bricks {
 
 		virtual void
 			remove_property(bricks_handle_t node, const string_view& path, const string_view& property_name) override;
-		
+
 		//
 		// Children accessors.
 		//
@@ -133,11 +137,11 @@ namespace bricks {
 		//
 		// Utils.
 		//
-		virtual void traverse(xtree_visitor_t*) const override;
+		virtual bool traverse(xtree_visitor_t*) const override;
 
-		virtual void traverse(const string_view& path, xtree_visitor_t*) const override;
+		virtual bool traverse(const string_view& path, xtree_visitor_t*) const override;
 
-		virtual void traverse(bricks_handle_t node, const string_view& path, xtree_visitor_t*) const override;
+		virtual bool traverse(bricks_handle_t node, const string_view& path, xtree_visitor_t*) const override;
 
 		virtual void release() override { delete this; };
 
@@ -170,10 +174,10 @@ namespace bricks {
 		virtual optional<xnode_t*>
 			get_child(optional<xnode_t*> node, int index) const;
 
-		virtual optional<bricks_handle_t> 
+		virtual optional<bricks_handle_t>
 			set_node_value(optional<xtree_impl_t::xnode_t*>, const char* buf, int len);
 
-		virtual bool 
+		virtual bool
 			set_property_value(optional<xtree_impl_t::xnode_t*>, const string_view& property_name, std::any);
 
 		virtual void
@@ -185,12 +189,11 @@ namespace bricks {
 		virtual void
 			remove_subtree(optional<xtree_impl_t::xnode_t*>);
 
-		virtual void
+		virtual bool
 			traverse(optional<xtree_impl_t::xnode_t*>, xtree_visitor_t*) const;
 
-		virtual void 
+		virtual bool
 			traverse(xtree_visitor_t*, const xnode_t&) const;
-
 
 	private:
 
@@ -207,6 +210,8 @@ namespace bricks {
 
 	};
 }
+
+	
 
 
 

@@ -12,9 +12,9 @@ namespace bricks
 	class xtree_visitor_t
 	{
 	public:
-		virtual void start_element(const string& name, const properties_list_t& properties, const buffer_t& value) = 0;
+		virtual bool start_element(const string& name, const properties_list_t& properties, const buffer_t& value) = 0;
 
-		virtual void end_element(const string& name) = 0;
+		virtual bool end_element(const string& name) = 0;
 	};
 
 	class BRICKS_API xtree_t : public brick_t
@@ -24,11 +24,6 @@ namespace bricks
 		//
 		// Subtree accessors
 		// 
-		/*virtual xtree_t*
-			clone_subtree(const string_view& path) = 0;
-
-		virtual xtree_t* 
-			clone_subtree(bricks_handle_t node, const string_view& path) = 0;*/
 
 		virtual void
 			remove_subtree(const string_view& path) = 0;
@@ -39,6 +34,9 @@ namespace bricks
 		//
 		// Node accessors.
 		//
+		virtual optional<bricks_handle_t> 
+			get_root() const = 0;
+
 		virtual optional<bricks_handle_t>
 			get_node(const string_view& path) const = 0;
 
@@ -147,13 +145,13 @@ namespace bricks
 		//
 		// Utils.
 		//
-		virtual void 
+		virtual bool 
 			traverse(xtree_visitor_t*) const = 0;
 
-		virtual void 
+		virtual bool
 			traverse(const string_view& path, xtree_visitor_t*) const = 0;
 
-		virtual void 
+		virtual bool
 			traverse(bricks_handle_t node, const string_view& path, xtree_visitor_t*) const = 0;
 
 		virtual ~xtree_t() {};
@@ -165,5 +163,7 @@ namespace bricks
 	BRICKS_API xtree_t* create_xtree_from_xml(const char* xml);
 
 	BRICKS_API string   serialize_xtree_to_xml(const xtree_t*);
+
+	BRICKS_API bool clone_xtree(xtree_t* src, optional<bricks_handle_t> src_h, const string_view &path, xtree_t* dst, optional<bricks_handle_t> dst_h);
 	
 }
