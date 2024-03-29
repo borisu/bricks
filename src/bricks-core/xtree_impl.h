@@ -14,6 +14,15 @@ namespace bricks {
 		xtree_impl_t();
 
 		//
+		// Tree acceessors
+		//
+		virtual void
+			remove_subtree(const string_view& path) override;
+
+		virtual void
+			remove_subtree(bricks_handle_t node, const string_view& path) override;
+
+		//
 		// Node accessors.
 		//
 		virtual optional<bricks_handle_t>
@@ -39,6 +48,12 @@ namespace bricks {
 
 		virtual optional<bricks_handle_t>
 			set_node_value(bricks_handle_t node, const string_view& path, const char*, int len, bool create) override;
+
+		virtual void
+			remove_node_value(const string_view& path) override;
+
+		virtual void
+			remove_node_value(bricks_handle_t node, const string_view& path) override;
 
 		//
 		// Node property accessors.
@@ -85,7 +100,6 @@ namespace bricks {
 		virtual void
 			remove_property(bricks_handle_t node, const string_view& path, const string_view& property_name) override;
 		
-
 		//
 		// Children accessors.
 		//
@@ -120,6 +134,10 @@ namespace bricks {
 		// Utils.
 		//
 		virtual void traverse(xtree_visitor_t*) const override;
+
+		virtual void traverse(const string_view& path, xtree_visitor_t*) const override;
+
+		virtual void traverse(bricks_handle_t node, const string_view& path, xtree_visitor_t*) const override;
 
 		virtual void release() override { delete this; };
 
@@ -161,6 +179,18 @@ namespace bricks {
 		virtual void
 			remove_property(optional<xtree_impl_t::xnode_t*>, const string_view& property_name);
 
+		virtual void
+			remove_value(optional<xtree_impl_t::xnode_t*>);
+
+		virtual void
+			remove_subtree(optional<xtree_impl_t::xnode_t*>);
+
+		virtual void
+			traverse(optional<xtree_impl_t::xnode_t*>, xtree_visitor_t*) const;
+
+		virtual void 
+			traverse(xtree_visitor_t*, const xnode_t&) const;
+
 
 	private:
 
@@ -172,8 +202,6 @@ namespace bricks {
 
 		template<typename T>
 		optional<T>	get_child_property_value_as(const string_view& path, int indexndex, const string_view& property_name) const;
-
-		void traverse(xtree_visitor_t*, const xnode_t &) const;
 
 		xnode_t root;
 

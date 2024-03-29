@@ -18,35 +18,13 @@ xtree_impl_t::xtree_impl_t()
 };
 
 
-void
-xtree_impl_t::traverse(xtree_visitor_t* v) const
-{
-	// do not invoke callback on true root - '/'
-	if (root.children.size() == 0)
-		return;
-
-	traverse(v, root.children.front());
-}
-
-void 
-xtree_impl_t::traverse(xtree_visitor_t* v, const xnode_t& e) const
-{
-	v->start_element(e.name, e.properties, e.value);
-	for (auto& child : e.children)
-	{
-		traverse(v, child);
-	}
-	v->end_element(e.name);
-
-}
-
 optional<xtree_impl_t::xnode_t*>
 xtree_impl_t::get_node_rec1(xnode_t& node, const string_view& path, bool create, bool replicate_leaf)
 {
 	auto start = path.find_first_not_of('/'); // no more valid node name characters
 	if (start == string_view::npos)
 	{
-		return &node;
+		return &node == &root ? optional<xtree_impl_t::xnode_t*>{} : &node ; // never return hidden root as valid path query result 
 	}
 
 	auto end = path.find_first_of('/', start);
@@ -130,6 +108,8 @@ xtree_impl_t::set_node_value(optional<xtree_impl_t::xnode_t*> node, const char* 
 	if (!node.has_value())
 		return {};
 
+
+	node.value()->value.resize(len);
 	node.value()->value.assign(buf, buf + len);
 
 	return  (bricks_handle_t)node.value();
@@ -444,6 +424,97 @@ xtree_impl_t::remove_property(bricks_handle_t h, const string_view& path, const 
 	remove_property(get_node_rec1(*((xnode_t*)h), path, false), property_name);
 }
 
+void
+xtree_impl_t::remove_value(optional<xtree_impl_t::xnode_t*> node)
+{
+	if (!node.has_value())
+		return;
 
+	node.value()->value.resize(0);
 
+}
+
+void
+xtree_impl_t::remove_node_value(const string_view& path)
+{
+	remove_value(get_node_rec1(root, path, false));
+}
+
+void
+xtree_impl_t::remove_node_value(bricks_handle_t h, const string_view& path)
+{
+	remove_value(get_node_rec1(*((xnode_t*)h), path, false));
+}
+
+void
+xtree_impl_t::remove_subtree(optional<xtree_impl_t::xnode_t*> node)
+{
+	if (!node.has_value())
+		return;
+
+	if (node.value() == &root)
+		return;
+
+	for (auto it = node.value()->parent->children.begin(); it != node.value()->parent->children.end(); ++it)
+	{
+		if (&(*it) == node.value())
+		{
+			node.value()->parent->children.erase(it);
+			break;
+		}
+	}
+}
  
+void
+xtree_impl_t::remove_subtree(const string_view& path)
+{
+	remove_subtree(get_node_rec1(root, path, false));
+}
+
+void
+xtree_impl_t::remove_subtree(bricks_handle_t h, const string_view& path)
+{
+	remove_subtree(get_node_rec1(*((xnode_t*)h), path, false));
+}
+
+void
+xtree_impl_t::traverse(xtree_visitor_t* v) const
+{
+	if (root.children.size() == 0)
+		return;
+
+	traverse(v, root.children.front());
+}
+
+void
+xtree_impl_t::traverse(const string_view& path, xtree_visitor_t* v) const
+{
+	traverse(get_node_rec(root, path),v);
+}
+
+void
+xtree_impl_t::traverse(bricks_handle_t h, const string_view& path, xtree_visitor_t *v) const
+{
+	traverse(get_node_rec(*((xnode_t*)h), path), v);
+}
+
+void
+xtree_impl_t::traverse(optional<xtree_impl_t::xnode_t*> node, xtree_visitor_t* v) const
+{
+	if (!node.has_value())
+		return;
+
+	traverse(v, *node.value());
+}
+
+void
+xtree_impl_t::traverse(xtree_visitor_t* v, const xnode_t& e) const
+{
+	v->start_element(e.name, e.properties, e.value);
+	for (auto& child : e.children)
+	{
+		traverse(v, child);
+	}
+	v->end_element(e.name);
+
+}

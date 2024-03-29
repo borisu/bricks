@@ -26,6 +26,7 @@
 
 
 #include "tinyxml2.h"
+#include "../../modules/base64/include/base64.hpp"
 
 #ifdef WIN32
 #include <objbase.h> // For CoCreateGuid

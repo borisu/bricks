@@ -52,6 +52,16 @@ void
 xml_visitor_t::start_element(const string& name, const properties_list_t& properties, const buffer_t& value)
 {
     tinyxml2::XMLElement* child = doc.NewElement(name.c_str());
+
+    if (value.size())
+    {
+        std::string_view sv(value.data(), value.size());
+
+        string s = base64::to_base64(sv).c_str();
+
+        child->SetText(s.c_str());
+    }
+
    
     for (auto& a : properties)
     {

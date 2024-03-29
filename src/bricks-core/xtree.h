@@ -22,6 +22,21 @@ namespace bricks
 	public:
 
 		//
+		// Subtree accessors
+		// 
+		/*virtual xtree_t*
+			clone_subtree(const string_view& path) = 0;
+
+		virtual xtree_t* 
+			clone_subtree(bricks_handle_t node, const string_view& path) = 0;*/
+
+		virtual void
+			remove_subtree(const string_view& path) = 0;
+
+		virtual void 
+			remove_subtree(bricks_handle_t node, const string_view& path) = 0;
+
+		//
 		// Node accessors.
 		//
 		virtual optional<bricks_handle_t>
@@ -47,6 +62,12 @@ namespace bricks
 
 		virtual optional<bricks_handle_t>
 			set_node_value(bricks_handle_t node, const string_view& path, const char*, int len, bool create = true) = 0;
+
+		virtual void
+			remove_node_value(const string_view& path) = 0;
+
+		virtual void
+			remove_node_value(bricks_handle_t node, const string_view& path)  = 0;
 
 		//
 		// Node property accessors.
@@ -126,7 +147,14 @@ namespace bricks
 		//
 		// Utils.
 		//
-		virtual void traverse(xtree_visitor_t*) const = 0;
+		virtual void 
+			traverse(xtree_visitor_t*) const = 0;
+
+		virtual void 
+			traverse(const string_view& path, xtree_visitor_t*) const = 0;
+
+		virtual void 
+			traverse(bricks_handle_t node, const string_view& path, xtree_visitor_t*) const = 0;
 
 		virtual ~xtree_t() {};
 

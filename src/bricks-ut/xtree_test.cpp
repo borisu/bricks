@@ -34,6 +34,9 @@ TEST(xtree_case, xtree_create_empty_xml)
 
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", serialize_xtree_to_xml(xt));
 
+	EXPECT_EQ(false, xt->get_node("").has_value());
+	EXPECT_EQ(false, xt->get_node("ufo").has_value());
+
 }
 
 TEST(xtree_case, xtree_create_1_level_replicate_root)
@@ -54,6 +57,48 @@ TEST(xtree_case, xtree_create_1_level_replicate_root)
 
 }
 
+TEST(xtree_case, xtree_create_1_level_remove_subtree)
+{
+	auto xt = create_xtree();
+
+	char abc[] = { 1,2,3,4,5 };
+
+	xt->set_node_value("root", abc, 5);
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		"<root>AQIDBAU=</root>\n",
+		serialize_xtree_to_xml(xt));
+
+	xt->remove_subtree("root");
+
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+		serialize_xtree_to_xml(xt));
+
+}
+
+
+TEST(xtree_case, xtree_create_1_level_value_test)
+{
+	auto xt = create_xtree();
+
+	char abc[] = {1,2,3,4,5};
+
+	xt->set_node_value("root", abc , 5);
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		      "<root>AQIDBAU=</root>\n",
+		serialize_xtree_to_xml(xt));
+
+	xt->remove_node_value("root");
+
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		      "<root/>\n",
+		serialize_xtree_to_xml(xt));
+
+}
+
 TEST(xtree_case, xtree_create_1_level)
 {
 	auto xt = create_xtree();
@@ -63,6 +108,11 @@ TEST(xtree_case, xtree_create_1_level)
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		      "<root/>\n",
 		serialize_xtree_to_xml(xt));
+
+	EXPECT_EQ(false, xt->add_node("").has_value());
+	EXPECT_EQ(false, xt->add_node("",true).has_value());
+	EXPECT_EQ(false, xt->get_node("").has_value());
+	
 
 	auto n11 = xt->get_node("/root").value();
 
@@ -105,7 +155,6 @@ TEST(xtree_case, xtree_create_1_level)
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<root double=\"2.2\" int=\"1\" bool=\"false\" string=\"the wall\"/>\n",
 		serialize_xtree_to_xml(xt));
-
 }
 
 
@@ -130,3 +179,4 @@ TEST(xtree_case, xtree_direct_access)
 	EXPECT_EQ(h->get_node_children_count(c.value(), "/property").value(), 1);*/
 
 }
+
