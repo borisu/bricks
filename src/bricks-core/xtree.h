@@ -20,11 +20,9 @@ namespace bricks
 	class BRICKS_API xtree_t : public brick_t
 	{
 	public:
-
 		//
 		// Subtree accessors
 		// 
-
 		virtual void
 			remove_subtree(const string_view& path) = 0;
 
