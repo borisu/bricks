@@ -7,19 +7,25 @@ namespace bricks
 	{
 	public:
 
-		xtree_cloner_t();
+		xtree_cloner_t(const xtree_t* src, const xp_t& xp_src, xtree_t* dst, const xp_t& xp_dst);
 
-		virtual bool start_element(const string& name, const properties_list_t& properties, const buffer_t& value) override;
+		virtual bool start_element(const string& name, const property_list_t& properties, const buffer_t& value) override;
 
 		virtual bool end_element(const string& name) override;
 
-		virtual bool clone(xtree_t* src,  optional<bricks_handle_t> src_h, const string_view& path, xtree_t* dst, optional<bricks_handle_t> dst_h);
+		virtual bool clone();
 
 	protected:
 
 		xtree_t* dst = nullptr;
 
-		list<bricks_handle_t> dst_handles;
+		const xtree_t* src = nullptr;
+		
+		const xp_t& xp_src;
+		
+		const xp_t& xp_dst;
+
+		list<xp_t> dst_handles;
 	};
 
 }

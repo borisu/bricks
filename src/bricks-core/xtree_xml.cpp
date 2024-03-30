@@ -49,7 +49,7 @@ std::string removeTrailingZeros(double value) {
 
 
 bool 
-xml_visitor_t::start_element(const string& name, const properties_list_t& properties, const buffer_t& value)
+xml_visitor_t::start_element(const string& name, const property_list_t& properties, const buffer_t& value)
 {
     tinyxml2::XMLElement* child = doc.NewElement(name.c_str());
 
@@ -65,21 +65,25 @@ xml_visitor_t::start_element(const string& name, const properties_list_t& proper
    
     for (auto& a : properties)
     {
-        if (a.second.type() == typeid(int))
+        if ( holds_alternative<int>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), std::to_string(std::any_cast<int>(a.second)).c_str());
+            child->SetAttribute(a.first.c_str(), std::to_string(std::get<int>(a.second)).c_str());
         }
-        else if (a.second.type() == typeid(double))
+        else if (holds_alternative<double>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), removeTrailingZeros(std::any_cast<double>(a.second)).c_str());
+            child->SetAttribute(a.first.c_str(), removeTrailingZeros(std::get<double>(a.second)).c_str());
         }
-        else if (a.second.type() == typeid(bool))
+        else if (holds_alternative<bool>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), std::any_cast<bool>(a.second) ? "true" : "false");
+            child->SetAttribute(a.first.c_str(), std::get<bool>(a.second) ? "true" : "false");
         }
-        else if (a.second.type() == typeid(string))
+        else if (holds_alternative<string>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), std::any_cast<string>(a.second).c_str());
+            child->SetAttribute(a.first.c_str(), std::get<string>(a.second).c_str());
+        }
+        else
+        {
+            return false;
         }
             
     }
@@ -129,7 +133,7 @@ SaxHandler::LoadXml(const char* xml)
         return nullptr;
     }
 
-    auto root = xt->get_node("/");
+    auto root = xt->get_root();
 
     if (!root.has_value())
     {
@@ -162,7 +166,7 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
     if (attribute) {
         const tinyxml2::XMLAttribute* attr = attribute;
         while (attr) {
-            xt->set_property_value(handle.value(), "", attr->Name(), attr->Value());
+            xt->set_property_value(handle.value(), attr->Name(), attr->Value());
             attr = attr->Next();
         }
     }

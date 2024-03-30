@@ -73,7 +73,7 @@ TEST(xtree_case, xtree_create_2_level_with_clone)
 		serialize_xtree_to_xml(xt));
 
 	auto dst = create_xtree();
-	clone_xtree(xt, xt->get_root(), "", dst, {});
+	clone_xtree(xt, xp_t(xt->get_root().value()), dst, xp_t(""));
 
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<root>\n"
@@ -146,11 +146,11 @@ TEST(xtree_case, xtree_create_1_level)
 
 	EXPECT_EQ(n1,n11);
 
-	auto n111 = xt->get_node(n11, "/").value();
+	auto n111 = xt->get_node(xp_t(n11, "/")).value();
 
 	EXPECT_EQ(n1, n111);
 
-	auto n1111 = xt->get_node(n11, "").value();
+	auto n1111 = xt->get_node(xp_t(n11, "")).value();
 
 	EXPECT_EQ(n1, n1111);
 
