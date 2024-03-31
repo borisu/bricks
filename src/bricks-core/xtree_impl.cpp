@@ -32,7 +32,7 @@ xtree_impl_t::get_node_rec(const xp_t& xp, bool create = false, bool replicate_l
 	optional<xtree_impl_t::xnode_t*> ret = 
 		get_node_rec1(
 			xp.anchor.has_value() ? *(xnode_t*)xp.anchor.value() : genesis,
-			xp.path.has_value()   ? ((string_view&)xp.path.value()) : string_view(""),
+			xp.path.has_value()   ? xp.path.value()   : string_view(""),
 			xp.index.has_value()  ? xp.index.value()  : -1,
 			create,
 			replicate_leaf,
@@ -51,6 +51,10 @@ xtree_impl_t::get_node_rec1(xnode_t& node, const string_view& path, int index, b
 	// non target logic inside while
 	do
 	{
+		auto s = path.size();
+		auto l = path.length();
+
+
 		auto start = path.find_first_not_of('/'); // no more valid node name characters
 		if (start == string_view::npos)
 			break;
@@ -145,9 +149,9 @@ xtree_impl_t::get_node_name(const xp_t& xp) const
 }
 
 bool
-xtree_impl_t::set_node_name(const xp_t& xp, const string_view& name) const
+xtree_impl_t::set_node_name(const xp_t& xp, const char* name)
 {
-	auto node = get_node_rec(xp);
+	auto node = get_node_rec(xp,true,false);
 
 	return node.has_value() ? 
 		node.value()->name = name, 
@@ -158,7 +162,7 @@ xtree_impl_t::set_node_name(const xp_t& xp, const string_view& name) const
 bool
 xtree_impl_t::set_node_value(const xp_t& xp, const char* buf, int len)
 {
-	auto node = get_node_rec(xp);
+	auto node = get_node_rec(xp, true, false);
 
 	return  node.has_value() ? 
 		node.value()->value.resize(len),
@@ -211,9 +215,9 @@ xtree_impl_t::add_node(const xp_t& xp, bool replicate_leaf)
 }
 
 bool
-xtree_impl_t::set_property_value(const xp_t& xp, const string_view& property_name, property_value_t v)
+xtree_impl_t::set_property_value(const xp_t& xp, const char *property_name, property_value_t v)
 {
-	auto node = get_node_rec(xp);
+	auto node = get_node_rec(xp, true, false);
 
 	if (!node.has_value())
 		return false;
@@ -233,7 +237,7 @@ xtree_impl_t::set_property_value(const xp_t& xp, const string_view& property_nam
 }
 
 optional<property_value_t>
-xtree_impl_t::get_property_value(const xp_t& xp, const string_view& property_name) const
+xtree_impl_t::get_property_value(const xp_t& xp, const char *property_name) const
 {
 	auto node = get_node_rec(xp);
 
@@ -256,7 +260,7 @@ xtree_impl_t::~xtree_impl_t()
 }
 
 bool
-xtree_impl_t::remove_property(const xp_t& xp, const string_view& property_name)
+xtree_impl_t::remove_property(const xp_t& xp, const char *property_name)
 {
 	auto node = get_node_rec(xp);
 

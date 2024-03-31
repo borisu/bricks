@@ -38,7 +38,7 @@ namespace bricks {
 			get_node_name(const xp_t& xp) const override;
 
 		virtual bool
-			set_node_name(const xp_t& xp, const string_view& name) const override;
+			set_node_name(const xp_t& xp, const char *name) override;
 
 		//
 		// Node value accessors.
@@ -56,13 +56,13 @@ namespace bricks {
 		// Node property accessors.
 		//
 		virtual optional<property_value_t>
-			get_property_value(const xp_t& xp, const string_view& property_name) const override;
+			get_property_value(const xp_t& xp, const char* property_name) const override;
 
 		virtual bool
-			set_property_value(const xp_t& xp, const string_view& property_name, property_value_t v) override;
+			set_property_value(const xp_t& xp, const char* property_name, property_value_t v) override;
 
 		virtual bool
-			remove_property(const xp_t& xp, const string_view& property_name) override;
+			remove_property(const xp_t& xp, const char* property_name) override;
 
 		//
 		// Children accessors.

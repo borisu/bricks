@@ -2,22 +2,17 @@
 
 using namespace bricks;
 
+xtree_cloner_t::xtree_cloner_t(const xtree_t* src, const xp_t& xp_src, xtree_t* dst, const xp_t& xp_dst):src(src),xp_src(xp_src),dst(dst),xp_dst(xp_dst)
+{
 
-
-xtree_cloner_t::xtree_cloner_t(const xtree_t* src, const xp_t& xp_src, xtree_t* dst, const xp_t& xp_dst):src(src),xp_src(xp_src),dst(dst),xp_dst(xp_dst){}
+}
 
 bool 
 xtree_cloner_t::start_element(const string& name, const property_list_t& properties, const buffer_t& value) 
 {
-    optional<bricks_handle_t> h;
-    if (dst_handles.size() == 0)
-    {
-        h = dst->add_node(name, true);
-    }
-    else
-    {
-        h = dst->add_node(xp_t(dst_handles.back().anchor.value(), name), true);
-    }
+    
+    auto h = dst->add_node(dst_handles.back().set_rel_path(name.c_str()), true);
+    
 
 	if (!h.has_value())
 		return false;
@@ -26,19 +21,23 @@ xtree_cloner_t::start_element(const string& name, const property_list_t& propert
 	{
         if (holds_alternative<int>(a.second))
         {
-            dst->set_property_value(h.value(), a.first, std::get<int>(a.second));
+            if (!dst->set_property_value(h.value(), a.first.c_str(), std::get<int>(a.second)))
+                return false;
         }
         else if (holds_alternative<double>(a.second))
         {
-            dst->set_property_value(h.value(),  a.first,std::get<double>(a.second));
+            if (!dst->set_property_value(h.value(),  a.first.c_str(), std::get<double>(a.second)))
+                return false;
         }
         else if (holds_alternative<bool>(a.second))
         {
-            dst->set_property_value(h.value(),  a.first, std::get<bool>(a.second));
+            if (!dst->set_property_value(h.value(),  a.first.c_str(), std::get<bool>(a.second)))
+                return false;
         }
         else if (holds_alternative<string>(a.second))
         {
-            dst->set_property_value(h.value(),  a.first, std::get<string>(a.second));
+            if (!dst->set_property_value(h.value(),  a.first.c_str(), std::get<string>(a.second)))
+                return false;
         }
 	}
 
@@ -58,7 +57,7 @@ xtree_cloner_t::end_element(const string& name)
 bool 
 xtree_cloner_t::clone()
 {
-    dst_handles.push_back(xp_src);
+    dst_handles.push_back(xp_dst);
 
     return src->traverse(xp_src, this);
 }

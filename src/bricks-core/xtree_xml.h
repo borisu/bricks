@@ -43,7 +43,7 @@ namespace bricks
 
         virtual bool VisitExit(const tinyxml2::XMLElement& element) override;
 
-        list<bricks_handle_t> nodes_stack;
+        list<xp_t> nodes_stack;
 
         xtree_t* xt = nullptr;
        

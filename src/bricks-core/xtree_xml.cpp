@@ -120,28 +120,20 @@ SaxHandler::LoadXml(const char* xml)
 {
     tinyxml2::XMLDocument doc; 
 
-    auto xt = create_xtree();
+    xt = create_xtree();
 
     if (doc.Parse(xml) != tinyxml2::XML_SUCCESS) {
         xt->release();
         return nullptr;
     }
 
+    nodes_stack.push_front(xp_t{});
+
     // Traverse the XML document using SAX
     if (!doc.Accept(this)) {
         xt->release();
         return nullptr;
     }
-
-    auto root = xt->get_root();
-
-    if (!root.has_value())
-    {
-        xt->release();
-        return nullptr;
-    }
-    
-    nodes_stack.push_front(root.value());
 
     return xt;
 }
@@ -157,21 +149,67 @@ SaxHandler::VisitExit(const tinyxml2::XMLElement& element)
 bool 
 SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attribute) {
 
-    auto handle = xt->add_node(nodes_stack.front(), element.Name());
+    auto handle = xt->add_node(nodes_stack.front().set_rel_path(element.Name()),true);
 
     if (!handle.has_value())
         return false;
+
+    if (element.GetText() != nullptr)
+    {
+        string str = base64::from_base64(element.GetText()).c_str();
+
+        std::vector<char> vec(str.begin(), str.end());
+
+        xt->set_node_value(handle.value(), &str[0], str.size());
+    }
     
     // Print the attributes, if any
     if (attribute) {
         const tinyxml2::XMLAttribute* attr = attribute;
         while (attr) {
-            xt->set_property_value(handle.value(), attr->Name(), attr->Value());
+
+            optional<property_value_t> p;
+
+            try {
+                if (strchr(attr->Value(), '.') != nullptr)
+                {
+                    p = std::stod(attr->Value(), nullptr);
+                }
+            }
+            catch (std::exception&) {}
+
+            if (!p.has_value())
+            {
+                try {
+                    p = std::stoi(attr->Value(), nullptr);
+                }
+                catch (std::exception&) {}
+            }
+
+            if (!p.has_value())
+            {
+                if (strcmp(attr->Value(), "true") == 0)
+                    p = true;
+            }
+
+            if (!p.has_value())
+            {
+                if (strcmp(attr->Value(), "false") == 0)
+                    p = false;
+            }
+
+            if (!p.has_value())
+            {
+                p = string(attr->Value());
+            }
+
+            xt->set_property_value(handle.value(), attr->Name(), p.value());
+
             attr = attr->Next();
         }
-    }
+    };
 
-
+    nodes_stack.push_front(xp_t(handle.value()));
 
     return true; // Continue visiting
 }

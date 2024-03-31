@@ -14,25 +14,23 @@ namespace bricks
 	{
 		xp_t() {};
 
-		xp_t(bricks_handle_t a, optional<int> index = {}) :anchor(a), index(index) {}
+		xp_t(bricks_handle_t a):anchor(a) {}
 
-		xp_t(string_view v, optional<int> index = {}) :path(v), index(index) {}
+		xp_t(bricks_handle_t a, const char *p) :anchor(a),path(p) {}
 
-		xp_t(const string &v, optional<int> index = {}) :path(v), index(index) {}
+		xp_t(bricks_handle_t a, const char* p, int i) :anchor(a), path(p), index(i) {}
 
-		xp_t(const char *v, optional<int> index = {}) :path(v), index(index) {}
+		xp_t(const char* p) :path(p){}
 
-		xp_t(bricks_handle_t a, string_view v, optional<int> index = {}) :anchor(a), path(v), index(index) {}
+		xp_t(const char* p, int i) :path(p), index(i) {}
 
-		xp_t(bricks_handle_t a, const string& v, optional<int> index = {}) :anchor(a), path(v), index(index) {}
+		xp_t& set_rel_path(const char* p) { path = p; return *this; }
+		
+		optional<bricks_handle_t> anchor;
 
-		xp_t(bricks_handle_t a, const char *v, optional<int> index = {}) :anchor(a), path(v), index(index) {}
+		optional<string> path;
 
-		const optional<bricks_handle_t> anchor;
-
-		const optional<string_view> path;
-
-		const optional<int> index;
+		optional<int> index;
 
 	};
 	
@@ -72,7 +70,7 @@ namespace bricks
 			get_node_name(const xp_t& xp) const = 0;
 
 		virtual bool
-			set_node_name(const xp_t& xp, const string_view& name) const = 0;
+			set_node_name(const xp_t& xp, const char *name) = 0;
 
 		//
 		// Node value accessors.
@@ -81,7 +79,7 @@ namespace bricks
 			get_node_value(const xp_t& xp) const = 0;
 
 		virtual bool
-			set_node_value(const xp_t& xp, const char*, int len) = 0;
+			set_node_value(const xp_t& xp, const char* buf, int len) = 0;
 
 		virtual bool
 			remove_node_value(const xp_t& xp) = 0;
@@ -90,13 +88,13 @@ namespace bricks
 		// Node property accessors.
 		//
 		virtual optional<property_value_t>
-			get_property_value(const xp_t& xp, const string_view& property_name) const = 0;
+			get_property_value(const xp_t& xp, const char* property_name) const = 0;
 
 		virtual bool
-			set_property_value(const xp_t& xp, const string_view& property_name, property_value_t v) = 0;
+			set_property_value(const xp_t& xp, const char* property_name, property_value_t v) = 0;
 
 		virtual bool 
-			remove_property(const xp_t& xp,  const string_view& property_name) = 0;
+			remove_property(const xp_t& xp,  const char* property_name) = 0;
 		
 		//
 		// Children accessors.
@@ -108,10 +106,10 @@ namespace bricks
 		// Utils.
 		//
 		virtual bool 
-			traverse(xtree_visitor_t*) const = 0;
+			traverse(xtree_visitor_t* visitor) const = 0;
 
 		virtual bool
-			traverse(const xp_t& xp, xtree_visitor_t*) const = 0;
+			traverse(const xp_t& xp, xtree_visitor_t*visitor) const = 0;
 
 		virtual ~xtree_t() {};
 

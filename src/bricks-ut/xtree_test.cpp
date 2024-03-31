@@ -3,28 +3,34 @@
 
 using namespace bricks;
 
-TEST(xtree_case, xtree_load_xml_test) 
+TEST(xtree_case, xtree_load_xml_test_and_children) 
 {
-	/*auto h = create_xtree();
 
-	EXPECT_EQ(BRICKS_SUCCESS, h->load_from_xml(
+	xtree_t* xt = create_xtree_from_xml(
 		"<configuration>"
 		" <property name = \"bool.value\"   value=\"true\">"
-		"    <subproperty/>"
+		"    <subproperty>AQIDBAU=</subproperty>"
 		" </property>"
 		" <property name = \"int.value\"    value=\"5\" />"
 		" <property name = \"double.value\" value=\"5.0\" />"
 		" <property name = \"str.value\"    value=\"Mother do you think\" />"
-		"</configuration>"
-	));
-	
+		"</configuration>");
 
 	
-	EXPECT_EQ(h->get_node_children_count("/configuration/property").value(), 1);
-	EXPECT_EQ(h->get_node_children_count("/configuration/property/subproperty").value(), 0);
+	EXPECT_EQ(xt->get_node_children_count("/configuration").value(), 4);
+	EXPECT_EQ(xt->get_node_children_count("/configuration/property").value(), 1);
+	EXPECT_EQ(xt->get_node_children_count("/configuration/property/subproperty").value(), 0);
+
+	EXPECT_EQ(xt->get_node_name(xp_t("/configuration/property",0)).value(), "subproperty");
+
 	
-	EXPECT_EQ(h->get_child_property_value_as_string("/configuration", 0, "name").value(), "bool.value");
-	EXPECT_EQ(h->get_child_property_value_as_string("/configuration", 0, "value").value(), "true");*/
+
+	EXPECT_EQ(get<double>(xt->get_property_value(xp_t("/configuration", 2), "value").value()), 5.0);
+
+	const buffer_t* buf = xt->get_node_value("/configuration/property/subproperty").value();
+
+	EXPECT_EQ(*buf, buffer_t({ 1,2,3,4,5 }));
+
  	
 }
 
@@ -35,7 +41,13 @@ TEST(xtree_case, xtree_create_empty_xml)
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", serialize_xtree_to_xml(xt));
 
 	EXPECT_EQ(false, xt->get_node("").has_value());
+	EXPECT_EQ(false, xt->get_node(xp_t("",1)).has_value());
+	EXPECT_EQ(false, xt->get_node("/").has_value());
 	EXPECT_EQ(false, xt->get_node("ufo").has_value());
+	EXPECT_EQ(false, xt->set_property_value("/","p",1));
+	EXPECT_EQ(false, xt->set_property_value("", "p", 1));
+	EXPECT_EQ(false, xt->set_node_name("", "n"));
+	EXPECT_EQ(false, xt->set_node_value("", "abc",3));
 
 }
 
@@ -48,6 +60,10 @@ TEST(xtree_case, xtree_create_1_level_replicate_root)
 	auto n11 = xt->add_node("root");
 
 	EXPECT_EQ(n1, n11);
+
+	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		"<root/>\n",
+		serialize_xtree_to_xml(xt));
 
 	EXPECT_EQ(false, xt->add_node("root",true).has_value());
 
