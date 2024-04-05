@@ -1,9 +1,11 @@
 #include "pch.h"
-#include "zeromq_api.h"
+#include "zeromq_plugin.h"
 #include "zeromq_publisher.h"
 #include "zeromq_subscriber.h"
 #include "zeromq_dealer_bidi.h"
 #include "zeromq_router_server.h"
+
+using namespace bricks::plugins;
 
 BRICKSZEROMQ_API publisher_plugin_t*
 create_zeromq_publisher()

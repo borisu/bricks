@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace bricks
+namespace bricks::plugins
 {
 
 	class kafka_publisher_t :

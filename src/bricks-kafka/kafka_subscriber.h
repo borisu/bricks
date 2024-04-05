@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace bricks {
+namespace bricks::plugins {
 
 	class kafka_subscriber_t :
 		public kafka_service_t,

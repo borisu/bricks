@@ -2,6 +2,7 @@
 #include "kafka_service.h"
 
 using namespace bricks;
+using namespace bricks::plugins;
 
 //https://github.com/confluentinc/librdkafka/blob/master/examples/rdkafka_example.c
 
@@ -85,15 +86,14 @@ kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options)
 	{
 		size_t c = options->get_node_children_count("/configuration").value();
 
-
 		for (int i = 0; i < c && err == BRICKS_SUCCESS; i++)
 		{
-			auto prop = options->get_child_name_by_index("/configuration", i).value();
+			auto prop = options->get_node_name(xp_t("/configuration", i)).value();
 			if (prop != "property")
 				continue;
 
-			auto name = options->get_child_property_value_as_string("/configuration", i, "name").value();
-			auto value = options->get_child_property_value_as_string("/configuration", i, "value").value();
+			auto name  = get<string>(options->get_property_value(xp_t("/configuration", i), "name").value());
+			auto value = get<string>(options->get_property_value(xp_t("/configuration", i), "value").value());
 
 			char* errstr = nullptr;
 			if (rd_kafka_conf_set(conf, name.c_str(), value.c_str(), errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK)

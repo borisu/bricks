@@ -3,6 +3,7 @@
 
 using namespace std::placeholders;
 using namespace bricks;
+using namespace bricks::plugins;
 
 msg_cb_t msg_cb = nullptr;
 

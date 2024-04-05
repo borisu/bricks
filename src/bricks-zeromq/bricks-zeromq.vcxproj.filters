@@ -8,14 +8,11 @@
     <Filter Include="api">
       <UniqueIdentifier>{4b376e75-d62c-412f-8e6e-0710b4fa9a97}</UniqueIdentifier>
     </Filter>
-    <Filter Include="impl">
-      <UniqueIdentifier>{4f72f43e-3c95-446a-922b-4c50743bff2c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="zeromq_api.h">
+    <ClInclude Include="zeromq_plugin.h">
       <Filter>api</Filter>
     </ClInclude>
     <ClInclude Include="zeromq_service.h" />
@@ -27,13 +24,11 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="zeromq_impl.cpp">
-      <Filter>impl</Filter>
-    </ClCompile>
     <ClCompile Include="zeromq_service.cpp" />
     <ClCompile Include="zeromq_publisher.cpp" />
     <ClCompile Include="zeromq_subscriber.cpp" />
     <ClCompile Include="zeromq_router_server.cpp" />
     <ClCompile Include="zeromq_dealer_bidi.cpp" />
+    <ClCompile Include="zeromq_plugin.cpp" />
   </ItemGroup>
 </Project>

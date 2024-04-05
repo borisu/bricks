@@ -9,29 +9,21 @@
 
 
 using namespace bricks;
+using namespace bricks::plugins;
 
 publisher_plugin_t*
-bricks::create_kafka_publisher()
+bricks::plugins::create_kafka_publisher()
 {
 	return new kafka_publisher_t();
 }
 
-void
-bricks::destroy_kafka_publisher(publisher_plugin_t* service)
-{
-	delete service;
-}
+
 
 subscriber_plugin_t*
-bricks::create_kafka_subscriber()
+bricks::plugins::create_kafka_subscriber()
 {
 	return new kafka_subscriber_t();
 }
 
-void
-bricks::destroy_kafka_subscriber(subscriber_plugin_t* service)
-{
-	delete service;
-}
 
 

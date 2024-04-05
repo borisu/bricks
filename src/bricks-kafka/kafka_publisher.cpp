@@ -2,6 +2,7 @@
 #include "kafka_publisher.h"
 
 using namespace bricks;
+using namespace bricks::plugins;
 
 void
 kafka_publisher_t::msg_delivered1(rd_kafka_t* rk,

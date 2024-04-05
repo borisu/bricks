@@ -12,10 +12,7 @@
 #include <map>
 #include <chrono>
 #include "zmq.h"
-#include "bricks_api.h"
-#include "logger_api.h"
-#include "xtree_api.h"
-#include "services_api.h"
+#include "bricks.h"
 
 
 
