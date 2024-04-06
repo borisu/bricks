@@ -13,6 +13,7 @@
     <ClCompile Include="queue_impl.cpp" />
     <ClCompile Include="xtree_xml.cpp" />
     <ClCompile Include="xtree_cloner.cpp" />
+    <ClCompile Include="buffer_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -45,6 +46,10 @@
     </ClInclude>
     <ClInclude Include="xtree_xml.h" />
     <ClInclude Include="xtree_cloner.h" />
+    <ClInclude Include="buffer.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer_impl.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">

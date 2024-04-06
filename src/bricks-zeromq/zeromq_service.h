@@ -1,25 +1,38 @@
 #pragma once
 
-#define ZMQ_ASSERT_INITIATED if (!this->initiated) return BRICKS_INVALID_STATE
-#define ZMQ_ASSERT_NOT_INITIATED if (this->initiated) return BRICKS_INVALID_STATE
+using namespace std;
+using namespace bricks;
 
-#define ZMQ_ASSERT_STARTED if (!this->started) return BRICKS_INVALID_STATE
-#define ZMQ_ASSERT_NOT_STARTED if (this->started) return BRICKS_INVALID_STATE
-
-
-class zeromq_service_t
+namespace bricks::plugins
 {
-protected:
+	class zeromq_service_t
+	{
+	protected:
 
-	zeromq_service_t();
+		zeromq_service_t();
 
-	static void monitor_callback(void* arg, int event, int value, void* socket);
+		virtual ~zeromq_service_t();
 
-	bool initiated = false;
+		static void monitor_callback(void* arg, int event, int value, void* socket);
 
-	bool started = false;
+		virtual void zmq_poll_loop();
 
-	request_cb_t req_cb = nullptr;
+		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) = 0;
 
-};
+		virtual bricks_error_code_e start_zmq_poll_loop();
+
+		virtual void stop_zmq_poll_loop();
+
+		bool initiated = false;
+
+		bool started = false;
+
+		atomic<bool> shutdown = false;
+
+		thread* zmq_poll_thread = nullptr;
+
+	};
+}
+
+
 

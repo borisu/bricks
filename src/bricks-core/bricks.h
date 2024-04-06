@@ -5,4 +5,5 @@
 #include "queue.h"
 #include "selector.h"
 #include "plugin.h"
+#include "buffer.h"
 

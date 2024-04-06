@@ -171,12 +171,12 @@ xtree_impl_t::set_node_value(const xp_t& xp, const char* buf, int len)
 	
 }
 
-optional<const buffer_t*>
+optional<const vector_t*>
 xtree_impl_t::get_node_value(const xp_t& xp) const
 {
 	auto node = get_node_rec(xp);
 
-	return node.has_value() ? &(node.value()->value) : optional<const buffer_t*>{};
+	return node.has_value() ? &(node.value()->value) : optional<const vector_t*>{};
 }
 
 bool

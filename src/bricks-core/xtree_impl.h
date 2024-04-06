@@ -43,7 +43,7 @@ namespace bricks {
 		//
 		// Node value accessors.
 		//
-		virtual optional<const buffer_t*>
+		virtual optional<const vector_t*>
 			get_node_value(const xp_t& xp) const override;
 
 		virtual bool
@@ -89,7 +89,7 @@ namespace bricks {
 		{
 			string			name;
 			property_list_t properties;
-			buffer_t		value;
+			vector_t		value;
 			list<xnode_t>	children;
 			xnode_t*		parent	= nullptr; // NULL only for hidden root
 

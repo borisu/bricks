@@ -17,7 +17,7 @@ namespace bricks
 
         string serialize();
 
-        virtual bool start_element(const string& name, const property_list_t& properties, const buffer_t& value) override;
+        virtual bool start_element(const string& name, const property_list_t& properties, const vector_t& value) override;
 
         virtual bool end_element(const string& name) override;
 

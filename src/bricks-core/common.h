@@ -27,8 +27,6 @@ namespace bricks
 		BRICKS_NOT_SUPPORTED = 6,
 	};
 
-	typedef vector<char> buffer_t;
-
 	class brick_t
 	{
 	public:
@@ -40,6 +38,7 @@ namespace bricks
 		void operator()(brick_t* ptr) const { ptr->release(); };
 	};
 
+	typedef std::vector<char> vector_t;
 
 	
 }

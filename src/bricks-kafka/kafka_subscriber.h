@@ -19,7 +19,7 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
-		virtual bricks_error_code_e subscribe(void* opaque, const xtree_t* options) override;
+		virtual bricks_error_code_e start() override;
 
 		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
 

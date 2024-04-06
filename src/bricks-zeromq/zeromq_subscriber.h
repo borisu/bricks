@@ -3,39 +3,47 @@
 
 using namespace std;
 
-class zeromq_subscriber_t:
-	public zeromq_service_t,
-	public subscriber_plugin_t
+namespace bricks::plugins
 {
-public:
 
-	zeromq_subscriber_t();
+	class zeromq_subscriber_t :
+		public zeromq_service_t,
+		public subscriber_plugin_t
+	{
+	public:
 
-	virtual bricks_error_code_e init(msg_cb_t msg_cb, const xtree_t* options)  override;
+		zeromq_subscriber_t();
 
-	virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)  override;
 
-	virtual bricks_error_code_e subscribe(void* opaque, const xtree_t* options) override;
+		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
-	virtual bricks_error_code_e poll(size_t timeout) override;
+		virtual bricks_error_code_e start() override;
 
-	virtual ~zeromq_subscriber_t();
+		virtual ~zeromq_subscriber_t();
 
-private:
+	protected:
 
-	void destroy();
+		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) override;
 
-	msg_cb_t msg_cb;
+	private:
 
-	void* context = nullptr;
+		void destroy();
 
-	void* subscriber = nullptr;
+		msg_cb_t msg_cb;
 
-	zmq_pollitem_t items[1] = { 0 };
+		void* context = nullptr;
 
-	void* opaque = nullptr;
+		void* subscriber = nullptr;
 
-	string url;
+		void* opaque = nullptr;
 
-};
+		cb_queue_t* cb_queue = nullptr;
+
+		zmq_pollitem_t items[1] = { 0 };
+
+		string url;
+
+	};
+}
 

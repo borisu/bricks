@@ -1,39 +1,51 @@
 #pragma once
 #include "zeromq_service.h"
+
+
 using namespace std;
 
-
-class zeromq_publisher_t :
-	public zeromq_service_t,
-	public publisher_plugin_t
+namespace bricks::plugins
 {
-public:
+	class zeromq_publisher_t :
+		public zeromq_service_t,
+		public publisher_plugin_t
+	{
+	public:
 
-	zeromq_publisher_t();
+		zeromq_publisher_t();
 
-	virtual bricks_error_code_e init(delivery_cb_t msg_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options) override;
 
-	virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
+		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
-	virtual bricks_error_code_e publish(const string& topic, const char*, size_t, void* opaque, const xtree_t* options)  override;
+		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, void* opaque, const xtree_t* options)  override;
 
-	virtual bricks_error_code_e poll(size_t timeout) override;
+		virtual bricks_error_code_e do_zmq_poll(int, bool) override { return BRICKS_NOT_SUPPORTED; }
 
-	virtual ~zeromq_publisher_t();
+		virtual bricks_error_code_e start() override ;
 
-private:
+		virtual void release() override { delete this; };
 
-	void destroy();
-	
-	delivery_cb_t msg_cb = nullptr;
+		virtual ~zeromq_publisher_t();
 
-	void* context = nullptr;
+	private:
 
-	void* publisher = nullptr;
+		void destroy();
 
-	string url;
+		delivery_cb_t msg_cb = nullptr;
 
-	string topic;
+		void* context = nullptr;
 
-};
+		void* publisher = nullptr;
+
+		string url;
+
+		string topic;
+
+		cb_queue_t* cb_queue = nullptr;
+
+	};
+
+
+}
 

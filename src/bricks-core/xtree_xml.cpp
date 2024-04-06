@@ -49,7 +49,7 @@ std::string removeTrailingZeros(double value) {
 
 
 bool 
-xml_visitor_t::start_element(const string& name, const property_list_t& properties, const buffer_t& value)
+xml_visitor_t::start_element(const string& name, const property_list_t& properties, const vector_t& value)
 {
     tinyxml2::XMLElement* child = doc.NewElement(name.c_str());
 
@@ -160,7 +160,7 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
 
         std::vector<char> vec(str.begin(), str.end());
 
-        xt->set_node_value(handle.value(), &str[0], str.size());
+        xt->set_node_value(handle.value(), &str[0], (int)str.size());
     }
     
     // Print the attributes, if any

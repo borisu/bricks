@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "zeromq_publisher.h"
 
+using namespace bricks;
+using namespace bricks::plugins;
+
 zeromq_publisher_t::zeromq_publisher_t()
 {
 
@@ -8,11 +11,13 @@ zeromq_publisher_t::zeromq_publisher_t()
 };
 
 bricks_error_code_e 
-zeromq_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
+zeromq_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options)
 {
-	ZMQ_ASSERT_NOT_INITIATED;
+	ASSERT_NOT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
+
+	cb_queue = queue;
 
 	context = zmq_ctx_new();
 
@@ -20,18 +25,20 @@ zeromq_publisher_t::init(delivery_cb_t msg_cb, const xtree_t* options)
 
 	try
 	{
-		auto url = options->get_property_value_as_string("/configuration/publisher", "url").value();
+		auto url = get<string>(options->get_property_value("/configuration/publisher", "url").value());
 
 		int rc = zmq_bind(publisher, url.c_str());
-		if (rc != 0)
-		{
-			err =  BRICKS_3RD_PARTY_ERROR;
+		if (rc != 0) {
+			throw std::exception();
 		}
-
 	}
 	catch (std::bad_optional_access&)
 	{
 		err = BRICKS_INVALID_PARAM;
+	}
+	catch (std::exception&)
+	{
+		err = BRICKS_3RD_PARTY_ERROR;
 	}
 
 	this->msg_cb = msg_cb;
@@ -70,6 +77,8 @@ zeromq_publisher_t::destroy()
 bricks_error_code_e 
 zeromq_publisher_t::register_topic(const string& topic, const xtree_t* options)
 {
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
 
 	return BRICKS_SUCCESS;
 
@@ -78,22 +87,30 @@ zeromq_publisher_t::register_topic(const string& topic, const xtree_t* options)
 bricks_error_code_e 
 zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size, void* opaque, const xtree_t* options)
 {
+	ASSERT_INITIATED;
+	ASSERT_STARTED;
+
 	auto rc = zmq_send(publisher, buf, size, 0);
 
 	auto xt = create_xtree();
 
 	if (msg_cb)
-		msg_cb(opaque, rc > 0 ? BRICKS_SUCCESS : BRICKS_3RD_PARTY_ERROR, *xt);
+	{
+		cb_queue->enqueue(std::bind(msg_cb, opaque, rc > 0 ? BRICKS_SUCCESS : BRICKS_3RD_PARTY_ERROR, xt));
+	}
 
-	destroy_xtree(xt);
-
-	return rc > 0 ? BRICKS_SUCCESS : BRICKS_3RD_PARTY_ERROR;
+	return BRICKS_SUCCESS;
 
 }
 
-bricks_error_code_e 
-zeromq_publisher_t::poll(size_t timeout)
+bricks_error_code_e zeromq_publisher_t::start()
 {
-	return BRICKS_NOT_SUPPORTED;
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
+
+	started = true;
+
+	return BRICKS_SUCCESS;
 }
+
 

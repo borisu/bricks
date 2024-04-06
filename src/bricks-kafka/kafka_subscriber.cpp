@@ -61,6 +61,30 @@ kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opti
 	return BRICKS_SUCCESS;
 }
 
+bricks_error_code_e 
+kafka_subscriber_t::start()
+{
+	bricks_error_code_e err = BRICKS_SUCCESS;
+
+	this->opaque = opaque;
+
+	auto rd_err = rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
+
+	if (rd_err) {
+		log1(BRICKS_ALARM, "Failed to subscribe to topic: %s\n", rd_kafka_err2str(rd_err));
+		return BRICKS_3RD_PARTY_ERROR;
+	}
+
+	if (start_rd_poll_loop() != BRICKS_SUCCESS)
+	{
+		return BRICKS_FAILURE_GENERIC;
+	}
+
+	started = true;
+
+	return BRICKS_SUCCESS;
+}
+
 void
 kafka_subscriber_t::destroy()
 {
@@ -101,31 +125,6 @@ kafka_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 		/* the partition is ignored
 		 * by subscribe() */
 		0);
-
-	return BRICKS_SUCCESS;
-
-}
-
-
-bricks_error_code_e
-kafka_subscriber_t::subscribe(void* opaque,  const xtree_t* options)
-{
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	bricks_error_code_e err = BRICKS_SUCCESS;
-
-	this->opaque = opaque;
-
-	auto rd_err = rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
-
-	if (rd_err) {
-		log1(BRICKS_ALARM, "Failed to subscribe to topic: %s\n", rd_kafka_err2str(rd_err));
-		destroy();
-		return BRICKS_3RD_PARTY_ERROR;
-	}
-
-	start_rd_poll_loop();
 
 	return BRICKS_SUCCESS;
 

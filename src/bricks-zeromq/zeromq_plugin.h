@@ -16,12 +16,8 @@ BRICKSZEROMQ_API publisher_plugin_t*
 BRICKSZEROMQ_API subscriber_plugin_t*
 	create_zeromq_subscriber();
 
-BRICKSZEROMQ_API server_plugin_t*
-	create_zeromq_router_server();
-
 BRICKSZEROMQ_API bidi_plugin_t*
-	create_zeromq_dealer_bidi();
-
+	create_zeromq_pair_bidi();
 	
 }
  

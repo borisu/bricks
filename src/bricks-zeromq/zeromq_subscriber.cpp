@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "zeromq_subscriber.h"
 
+using namespace bricks;
+using namespace bricks::plugins;
+
 
 zeromq_subscriber_t::zeromq_subscriber_t()
 {
-
 
 };
 
@@ -27,11 +29,10 @@ zeromq_subscriber_t::destroy()
 	}
 }
 
-
 bricks_error_code_e
-zeromq_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
+zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)
 {
-	ZMQ_ASSERT_NOT_INITIATED;
+	ASSERT_NOT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -41,9 +42,15 @@ zeromq_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
 
 	try
 	{
-		do {
-			url = options->get_property_value_as_string("/configuration/subscriber", "url").value();
-		} while (false);
+		url = get<string>(options->get_property_value("/configuration/subscriber", "url").value());
+
+		this->opaque = opaque;
+
+		// Connect to the ZeroMQ endpoint
+		auto rc = zmq_connect(subscriber, url.c_str());
+		if (rc != 0) {
+			throw std::exception();
+		}
 
 		this->msg_cb = msg_cb;
 
@@ -54,7 +61,10 @@ zeromq_subscriber_t::init(msg_cb_t msg_cb, const xtree_t* options)
 	{
 		err = BRICKS_INVALID_PARAM;
 	}
-
+	catch (std::exception&)
+	{
+		err = BRICKS_FAILURE_GENERIC;
+	}
 
 	if (err != BRICKS_SUCCESS)
 	{
@@ -73,8 +83,8 @@ zeromq_subscriber_t::~zeromq_subscriber_t()
 bricks_error_code_e
 zeromq_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 {
-	ZMQ_ASSERT_INITIATED;
-	ZMQ_ASSERT_NOT_STARTED;
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
 
 	auto rc = zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, topic.c_str(), 0);
 	if (rc != 0)
@@ -89,52 +99,47 @@ zeromq_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 
 }
 
-bricks_error_code_e
-zeromq_subscriber_t::subscribe(void* opaque, const xtree_t* options)
+bricks_error_code_e 
+zeromq_subscriber_t::start()
 {
-	ZMQ_ASSERT_INITIATED;
-	ZMQ_ASSERT_NOT_STARTED;
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
 
-	this->opaque = opaque;
-
-	// Connect to the ZeroMQ endpoint
-	auto rc = zmq_connect(subscriber, url.c_str());
-	if (rc != 0)
+	auto rc = start_zmq_poll_loop();
+	if (rc == BRICKS_SUCCESS)
 	{
-		return BRICKS_3RD_PARTY_ERROR;
+		started = true;
 	}
 
-	started = true;
-
-	return BRICKS_SUCCESS;
+	return rc;
 
 }
 
 bricks_error_code_e
-zeromq_subscriber_t::poll(size_t timeout)
+zeromq_subscriber_t::do_zmq_poll(int milliseconds, bool last_call)
 {
-	ZMQ_ASSERT_INITIATED;
-	ZMQ_ASSERT_STARTED;
+
+	ASSERT_INITIATED;
+	ASSERT_STARTED;
 
 	// Poll for incoming data
-	zmq_poll(items, 1, (long)timeout);
+	zmq_poll(items, 1, (long)milliseconds);
 
 	// If there's data available, receive it
 	if (items[0].revents & ZMQ_POLLIN) {
-		auto xt = create_xtree();
+		
 		zmq_msg_t msg;
 		zmq_msg_init(&msg);
 		zmq_msg_recv(&msg, subscriber, 0);
 
-		msg_cb(opaque, (const char*)zmq_msg_data(&msg), zmq_msg_size(&msg), *xt);
+		auto xt = create_xtree();
 
-		destroy_xtree(xt);
-	
+		cb_queue->enqueue(
+			std::bind(msg_cb, opaque, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
+		);
+
 	}
 
 	return BRICKS_NOT_SUPPORTED;
 }
-
-
-
 

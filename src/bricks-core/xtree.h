@@ -1,6 +1,8 @@
 #pragma once
-#include "common.h"
 #include <variant>
+#include "common.h"
+#include "buffer.h"
+
 
 using namespace std;
 
@@ -37,7 +39,7 @@ namespace bricks
 	class xtree_visitor_t
 	{
 	public:
-		virtual bool start_element(const string& name, const property_list_t& properties, const buffer_t& value) = 0;
+		virtual bool start_element(const string& name, const property_list_t& properties, const vector_t& value) = 0;
 
 		virtual bool end_element(const string& name) = 0;
 	};
@@ -75,7 +77,7 @@ namespace bricks
 		//
 		// Node value accessors.
 		//
-		virtual optional<const buffer_t*>
+		virtual optional<const vector_t*>
 			get_node_value(const xp_t& xp) const = 0;
 
 		virtual bool

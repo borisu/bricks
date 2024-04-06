@@ -8,7 +8,7 @@ xtree_cloner_t::xtree_cloner_t(const xtree_t* src, const xp_t& xp_src, xtree_t* 
 }
 
 bool 
-xtree_cloner_t::start_element(const string& name, const property_list_t& properties, const buffer_t& value) 
+xtree_cloner_t::start_element(const string& name, const property_list_t& properties, const vector_t& value)
 {
     
     auto h = dst->add_node(dst_handles.back().set_rel_path(name.c_str()), true);
