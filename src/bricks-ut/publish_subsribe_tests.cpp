@@ -33,19 +33,19 @@ publish_subscribe_test_1(xtree_t *pxt, publisher_plugin_t* publisher, xtree_t* s
 		prepare subscriber
 	*/
 	int       received_counter = 0;
-	buffer_t  received_buf;
+	vector_t  received_buf;
 
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(
 		selector->queue(),
-		[&](void*, const char* buf, size_t size, xtree_t* xt)
+		[&](void*, buffer_t *buf, xtree_t* xt)
 		{
 			printf("RECEIVED");
 			received_counter++;
-			received_buf.assign(buf, buf + size);
+			//received_buf.assign(buf.data()  buf + size);
 		}, sxt));
 
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic("bricks.test"));
-	ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(nullptr));
+	ASSERT_EQ(BRICKS_SUCCESS, subscriber->start());
 
 
 	/* 

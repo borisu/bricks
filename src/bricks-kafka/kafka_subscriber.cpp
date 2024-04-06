@@ -148,14 +148,8 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 	else
 	{
 		auto xtree = create_xtree();
-		if (cb_queue)
-		{
-			cb_queue->enqueue(std::bind(msg_cb, this->opaque, (const char*)msg->payload, (size_t)msg->len, xtree));
-		}
-		else
-		{
-			msg_cb(this->opaque, (const char*)msg->payload, (size_t)msg->len, xtree);
-		}
+		
+		cb_queue->enqueue(std::bind(msg_cb, this->opaque, create_buffer((const char*)msg->payload, (int)msg->len), xtree));
 		
 	}
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <optional>
 #include <functional>
+#include <memory>
 
 using namespace std;
 
@@ -37,6 +38,9 @@ namespace bricks
 	{
 		void operator()(brick_t* ptr) const { ptr->release(); };
 	};
+
+	template <class B>
+	using brick_ptr = std::unique_ptr<B, bricks_destroyer>;
 
 	typedef std::vector<char> vector_t;
 

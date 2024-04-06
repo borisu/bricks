@@ -27,9 +27,9 @@ TEST(xtree_case, xtree_load_xml_test_and_children)
 
 	EXPECT_EQ(get<double>(xt->get_property_value(xp_t("/configuration", 2), "value").value()), 5.0);
 
-	const buffer_t* buf = xt->get_node_value("/configuration/property/subproperty").value();
+	const vector_t* buf = xt->get_node_value("/configuration/property/subproperty").value();
 
-	EXPECT_EQ(*buf, buffer_t({ 1,2,3,4,5 }));
+	EXPECT_EQ(*buf, vector_t({ 1,2,3,4,5 }));
 
  	
 }

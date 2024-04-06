@@ -22,6 +22,8 @@ namespace bricks::plugins
 
 		virtual ~zeromq_subscriber_t();
 
+		virtual void release() override { delete this; };
+
 	protected:
 
 		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) override;

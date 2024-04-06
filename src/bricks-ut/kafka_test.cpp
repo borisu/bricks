@@ -3,22 +3,19 @@
 
 using namespace std;
 using namespace bricks;
-
-
-
+using namespace bricks::plugins;
 
 TEST(kafka_case, publish_subscribe_test) {
 
-	return;
-
-	/*unique_ptr<xtree_t, bricks_destroyer> p_xt(
+	brick_ptr<xtree_t> p_xt(
 		create_xtree_from_xml(
 			"<configuration>"
 			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 			"</configuration>"
 		));
 
-	unique_ptr<xtree_t, bricks_destroyer> s_xt ( 
+
+	brick_ptr<xtree_t> s_xt (
 		create_xtree_from_xml(
 			"<configuration>"
 			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
@@ -28,17 +25,17 @@ TEST(kafka_case, publish_subscribe_test) {
 		));
 
 
-	unique_ptr<publisher_plugin_t, bricks_destroyer>  publisher(create_kafka_publisher());
+	brick_ptr<publisher_plugin_t>  publisher(create_kafka_publisher());
 
-	unique_ptr<subscriber_plugin_t, bricks_destroyer>  subscriber(create_kafka_subscriber());
+	brick_ptr<subscriber_plugin_t>  subscriber(create_kafka_subscriber());
 
-	unique_ptr<cb_queue_t, bricks_destroyer>  cb_q(create_callback_queue());
+	brick_ptr<cb_queue_t>  cb_q(create_callback_queue());
 
-	unique_ptr<selector_t, bricks_destroyer>  selector(create_selector());
+	brick_ptr<selector_t>  selector(create_selector());
 
 	selector->init(cb_q.get());
 	
-	publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());*/
+	publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());
 
 }
 

@@ -24,6 +24,7 @@
 #include <mutex>
 #include <deque>
 #include <algorithm>
+#include <memory>
 
 
 #include "tinyxml2.h"
