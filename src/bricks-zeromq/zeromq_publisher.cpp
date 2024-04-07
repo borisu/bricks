@@ -10,6 +10,18 @@ zeromq_publisher_t::zeromq_publisher_t()
 
 };
 
+void
+zeromq_publisher_t::name(const char* pname)
+{
+	bname = pname;
+};
+
+const char*
+zeromq_publisher_t::name() const
+{
+	return bname.c_str();
+}
+
 bricks_error_code_e 
 zeromq_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options)
 {

@@ -17,6 +17,18 @@ kafka_subscriber_t::~kafka_subscriber_t()
 	destroy();
 }
 
+void
+kafka_subscriber_t::name(const char* pname)
+{
+	bname = pname;
+};
+
+const char*
+kafka_subscriber_t::name() const
+{
+	return bname.c_str();
+}
+
 bricks_error_code_e 
 kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)
 {

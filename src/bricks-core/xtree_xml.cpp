@@ -173,7 +173,11 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
             try {
                 if (strchr(attr->Value(), '.') != nullptr)
                 {
-                    p = std::stod(attr->Value(), nullptr);
+                    size_t pos;
+                    p = std::stod(attr->Value(), &pos);
+                    if (pos != strlen(attr->Value()))
+                        p = {};
+
                 }
             }
             catch (std::exception&) {}
@@ -181,7 +185,10 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
             if (!p.has_value())
             {
                 try {
-                    p = std::stoi(attr->Value(), nullptr);
+                    size_t pos;
+                    p = std::stoi(attr->Value(), &pos);
+                    if (pos != strlen(attr->Value()))
+                        p = {};
                 }
                 catch (std::exception&) {}
             }

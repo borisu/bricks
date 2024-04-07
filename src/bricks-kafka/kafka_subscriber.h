@@ -23,6 +23,10 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
 
+		virtual void name(const char*) override;
+
+		virtual const char* name() const override;
+
 		virtual void release() override { delete this; };
 
 		virtual ~kafka_subscriber_t();
@@ -40,6 +44,8 @@ namespace bricks::plugins {
 		msg_cb_t msg_cb;
 
 		void* opaque = nullptr;
+
+		
 
 	};
 

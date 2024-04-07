@@ -22,6 +22,10 @@ namespace bricks::plugins
 
 		virtual ~zeromq_subscriber_t();
 
+		virtual void name(const char*) override;
+
+		virtual const char* name() const override;
+
 		virtual void release() override { delete this; };
 
 	protected:
@@ -45,6 +49,8 @@ namespace bricks::plugins
 		zmq_pollitem_t items[1] = { 0 };
 
 		string url;
+
+		string bname;
 
 	};
 }

@@ -14,7 +14,12 @@ namespace bricks {
 
 	class plugin_t : public brick_t {
 	public:
+
 		virtual bricks_error_code_e start() = 0;
+
+		virtual void name(const char*) = 0;
+
+		virtual const char* name() const = 0;
 	};
 
 	class publisher_plugin_t : public plugin_t

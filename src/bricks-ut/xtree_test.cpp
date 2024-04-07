@@ -142,6 +142,21 @@ TEST(xtree_case, xtree_create_1_level_value_test)
 		serialize_xtree_to_xml(xt));
 
 }
+TEST(xtree_case, xtree_ip_parse)
+{
+	brick_ptr<xtree_t> s_xt(
+		create_xtree_from_xml(
+			"<configuration>"
+			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+			" <property name = \"group.id\" value=\"mygroup\"/>"
+			" <property name = \"auto.offset.reset\" value=\"latest\"/>"
+			"</configuration>"
+		));
+
+	auto value = s_xt->get_property_value_as_string(xp_t("/configuration", 0), "value").value();
+	EXPECT_EQ("127.0.0.1:29092", value);
+
+}
 
 TEST(xtree_case, xtree_create_1_level)
 {

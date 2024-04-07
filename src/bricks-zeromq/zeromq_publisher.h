@@ -24,6 +24,10 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e start() override ;
 
+		virtual void name(const char*) override;
+
+		virtual const char* name() const override;
+
 		virtual void release() override { delete this; };
 
 		virtual ~zeromq_publisher_t();
@@ -43,6 +47,8 @@ namespace bricks::plugins
 		string topic;
 
 		cb_queue_t* cb_queue = nullptr;
+
+		string bname;
 
 	};
 

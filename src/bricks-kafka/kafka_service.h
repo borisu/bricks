@@ -38,6 +38,8 @@ namespace bricks::plugins{
 
 		thread *rd_poll_thread = nullptr;
 
+		string bname;
+
 	};
 }
 

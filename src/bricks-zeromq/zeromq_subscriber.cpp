@@ -80,6 +80,18 @@ zeromq_subscriber_t::~zeromq_subscriber_t()
 	destroy();
 }
 
+void
+zeromq_subscriber_t::name(const char* pname)
+{
+	bname = pname;
+};
+
+const char*
+zeromq_subscriber_t::name() const
+{
+	return bname.c_str();
+}
+
 bricks_error_code_e
 zeromq_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 {

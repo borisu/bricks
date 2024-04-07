@@ -254,6 +254,37 @@ xtree_impl_t::get_property_value(const xp_t& xp, const char *property_name) cons
 }
 
 
+optional<string>
+xtree_impl_t::get_property_value_as_string(const xp_t& xp, const char* property_name) const
+{
+	auto value  = get_property_value(xp, property_name);
+	if (!value.has_value())
+		return {};
+
+	std::string str;
+
+	auto var = value.value();
+	if (std::holds_alternative<int>(var)) {
+		str = std::to_string(std::get<int>(var));
+	}
+	else if (std::holds_alternative<double>(var)) {
+		str = std::to_string(std::get<double>(var));
+	}
+	else if (std::holds_alternative<bool>(var)) {
+		str = std::to_string(std::get<bool>(var));
+	}
+	else if (std::holds_alternative<std::string>(var)) {
+		str = std::get<std::string>(var);
+	}
+	else
+	{
+		return {};
+	};
+
+	return str;
+}
+
+
 xtree_impl_t::~xtree_impl_t()
 {
 

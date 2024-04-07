@@ -92,6 +92,9 @@ namespace bricks
 		virtual optional<property_value_t>
 			get_property_value(const xp_t& xp, const char* property_name) const = 0;
 
+		virtual optional<string>
+			get_property_value_as_string(const xp_t& xp, const char* property_name) const = 0;
+
 		virtual bool
 			set_property_value(const xp_t& xp, const char* property_name, property_value_t v) = 0;
 

@@ -93,20 +93,25 @@ kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options)
 				continue;
 
 			auto name  = get<string>(options->get_property_value(xp_t("/configuration", i), "name").value());
-			auto value = get<string>(options->get_property_value(xp_t("/configuration", i), "value").value());
+			auto value = options->get_property_value_as_string(xp_t("/configuration", i), "value").value();
 
 			char* errstr = nullptr;
+			log1(BRICKS_DEBUG, "%s | Setting rd kafka property name=%s, value=%s\n", bname.c_str(), name.c_str(), value.c_str());
 			if (rd_kafka_conf_set(conf, name.c_str(), value.c_str(), errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK)
 			{
-				log1(BRICKS_ALARM, "%% %s\n", errstr);
+				log1(BRICKS_ALARM, "%s | %s\n", bname.c_str(), errstr);
 				err = BRICKS_3RD_PARTY_ERROR;
-				break;
+				throw std::exception();
 			}
 		}
 	}
 	catch (std::bad_optional_access&)
 	{
 		err = BRICKS_INVALID_PARAM;
+	}
+	catch (std::exception&)
+	{
+
 	}
 
 	return err;
