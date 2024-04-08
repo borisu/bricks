@@ -38,6 +38,8 @@ kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opti
 
 	this->msg_cb = msg_cb;
 
+	this->cb_queue = queue;
+
 	rd_conf_h = rd_kafka_conf_new();
 
 	rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::rd_log);
@@ -66,7 +68,6 @@ kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opti
 	}
 
 	rd_kafka_poll_set_consumer(rd_kafka_h);
-
 	
 	initiated = true;
 
@@ -76,6 +77,9 @@ kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opti
 bricks_error_code_e 
 kafka_subscriber_t::start()
 {
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
+
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	this->opaque = opaque;
@@ -101,7 +105,6 @@ void
 kafka_subscriber_t::destroy()
 {
 	initiated = false;
-
 	started = false;
 
 	stop_rd_poll_loop();

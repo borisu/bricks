@@ -25,11 +25,11 @@ TEST(kafka_case, publish_subscribe_test) {
 		));
 
 	brick_ptr<publisher_plugin_t>  publisher(create_kafka_publisher());
-	publisher->name("kafka:publisher");
+	publisher->name("kafka:publisher_1");
 
 
 	brick_ptr<subscriber_plugin_t>  subscriber(create_kafka_subscriber());
-	subscriber->name("kafka:subscriber");
+	subscriber->name("kafka:subscriber_1");
 
 	brick_ptr<cb_queue_t>  cb_q(create_callback_queue());
 

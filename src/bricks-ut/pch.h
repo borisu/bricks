@@ -5,6 +5,8 @@
 #pragma once
 
 #include <memory>
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>         // std::chrono::seconds
 #include "gtest/gtest.h"
 #include "bricks.h"
 #include "rdkafka_plugin.h"
