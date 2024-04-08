@@ -34,13 +34,19 @@ namespace bricks
 		virtual void release() = 0;
 	};
 
+	void brick_destroy(brick_t* ptr) { ptr->release(); };
+
+	template<class T>
+	auto make_shared_brick(T* ptr) { return std::shared_ptr<T>(ptr, brick_destroy) }
+
+	// for unique ptr
 	struct bricks_destroyer
 	{
 		void operator()(brick_t* ptr) const { ptr->release(); };
 	};
 
 	template <class B>
-	using brick_ptr = std::unique_ptr<B, bricks_destroyer>;
+	using brick_uptr = std::unique_ptr<B, bricks_destroyer>;
 
 	typedef std::vector<char> vector_t;
 

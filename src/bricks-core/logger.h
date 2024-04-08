@@ -5,12 +5,12 @@ namespace bricks {
 
 	enum bricks_debug_level_e
 	{
-		BRICKS_TRACE = 1,
-		BRICKS_DEBUG = 2,
-		BRICKS_INFO = 3,
-		BRICKS_ALARM = 4,
-		BRICKS_FATAL = 5,
-		BRICKS_LOG_OFF = 6,
+		BRICKS_TRACE,
+		BRICKS_DEBUG,
+		BRICKS_INFO,
+		BRICKS_ALARM,
+		BRICKS_FATAL,
+		BRICKS_LOG_OFF
 	};
 
 	/* logs */
@@ -28,15 +28,7 @@ namespace bricks {
 
 	BRICKS_API void
 		log1(bricks_debug_level_e, const char* format, ...);
-
-	//https://stackoverflow.com/questions/7775991/how-to-get-hexdump-of-a-structure-data
-	BRICKS_API void
-		hex_dump1(
-			bricks_debug_level_e log_level,
-			const char* desc,
-			const void* addr,
-			const int len,
-			int perLine);
 }
+	
 
 
