@@ -144,7 +144,7 @@ TEST(xtree_case, xtree_create_1_level_value_test)
 }
 TEST(xtree_case, xtree_ip_parse)
 {
-	brick_ptr<xtree_t> s_xt(
+	brick_uptr<xtree_t> s_xt(
 		create_xtree_from_xml(
 			"<configuration>"
 			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"

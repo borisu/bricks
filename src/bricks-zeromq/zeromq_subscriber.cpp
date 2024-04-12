@@ -44,8 +44,6 @@ zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opt
 	{
 		url = get<string>(options->get_property_value("/configuration/subscriber", "url").value());
 
-		this->opaque = opaque;
-
 		// Connect to the ZeroMQ endpoint
 		auto rc = zmq_connect(subscriber, url.c_str());
 		if (rc != 0) {
@@ -78,18 +76,6 @@ zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opt
 zeromq_subscriber_t::~zeromq_subscriber_t()
 {
 	destroy();
-}
-
-void
-zeromq_subscriber_t::name(const char* pname)
-{
-	bname = pname;
-};
-
-const char*
-zeromq_subscriber_t::name() const
-{
-	return bname.c_str();
 }
 
 bricks_error_code_e
@@ -147,7 +133,7 @@ zeromq_subscriber_t::do_zmq_poll(int milliseconds, bool last_call)
 		auto xt = create_xtree();
 
 		cb_queue->enqueue(
-			std::bind(msg_cb, opaque, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
+			std::bind(msg_cb, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
 		);
 
 	}

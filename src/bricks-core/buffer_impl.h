@@ -8,9 +8,9 @@ namespace bricks
 	{
 	public:
 
-		buffer_impl_t(const char* data, int size);
+		buffer_impl_t(const char* data, size_t size);
 
-		virtual int size() override;
+		virtual size_t size() override;
 
 		virtual const char* data() override;
 

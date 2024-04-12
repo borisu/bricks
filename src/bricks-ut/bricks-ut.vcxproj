@@ -57,7 +57,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-kafka;..\bricks-zeromq</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-kafka;..\bricks-zeromq;..\bricks-logger;..\bricks-jester</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -103,6 +103,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="jester_test.cpp" />
     <ClCompile Include="kafka_test.cpp" />
     <ClCompile Include="publish_subsribe_tests.cpp" />
     <ClCompile Include="xtree_test.cpp" />
@@ -124,8 +125,14 @@
     <ProjectReference Include="..\bricks-core\bricks-core.vcxproj">
       <Project>{4045a212-f1f9-467c-b2ea-9605739ec30f}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\bricks-jester\bricks-jester.vcxproj">
+      <Project>{9cd67cc2-c204-40dd-b89b-0ff52fcce792}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\bricks-kafka\bricks-kafka.vcxproj">
       <Project>{099e9d87-c484-4ff5-8833-cccbdd489736}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\bricks-logger\bricks-logger.vcxproj">
+      <Project>{6f3c1391-37cf-4bad-b9ce-f64376a55a33}</Project>
     </ProjectReference>
     <ProjectReference Include="..\bricks-zeromq\bricks-zeromq.vcxproj">
       <Project>{9b88480f-48a0-442c-a0b5-3dfb10d8fa69}</Project>

@@ -7,15 +7,14 @@ using namespace bricks::plugins;
 
 TEST(kafka_case, publish_subscribe_test) {
 
-	brick_ptr<xtree_t> p_xt(
+	brick_uptr<xtree_t> p_xt (
 		create_xtree_from_xml(
 			"<configuration>"
 			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 			"</configuration>"
-		), brick_destroy);
+		));
 
-
-	brick_ptr<xtree_t> s_xt(
+	brick_uptr<xtree_t> s_xt(
 		create_xtree_from_xml(
 			"<configuration>"
 			" <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
@@ -24,20 +23,17 @@ TEST(kafka_case, publish_subscribe_test) {
 			"</configuration>"
 		));
 
-	brick_ptr<publisher_plugin_t>  publisher(create_kafka_publisher());
-	publisher->name("kafka:publisher_1");
+	brick_uptr<publisher_plugin_t>  publisher(create_kafka_publisher());
+	
+	brick_uptr<subscriber_plugin_t>  subscriber(create_kafka_subscriber());
 
+	brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
 
-	brick_ptr<subscriber_plugin_t>  subscriber(create_kafka_subscriber());
-	subscriber->name("kafka:subscriber_1");
-
-	brick_ptr<cb_queue_t>  cb_q(create_callback_queue());
-
-	brick_ptr<selector_t>  selector(create_selector());
+	brick_uptr<selector_t>  selector(create_selector());
 
 	selector->init(cb_q.get());
 	
-	publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());*/
+	publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());
 
 }
 

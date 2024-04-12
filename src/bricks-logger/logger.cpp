@@ -8,14 +8,14 @@ using namespace bricks;
 
 thread_local char log_buf[MAX_LOG_LEN];
 
-const char *debug_str[] = { "TRACE", "DEBUG", "INFO", "ALARM", "FATAL", "OFF" };
+const char* debug_str[] = { "TRACE", "DEBUG", "INFO", "ALARM", "FATAL", "OFF" };
 
 void console_logger(bricks_debug_level_e log_level, const char* l)
 {
-    if (log_level < BRICKS_TRACE || log_level > BRICKS_LOG_OFF)
-        return;
-    
-    printf("[%s] - %s", debug_str[log_level], l);
+	if (log_level < BRICKS_TRACE || log_level > BRICKS_LOG_OFF)
+		return;
+
+	printf("[%s] - %s", debug_str[log_level], l);
 
 };
 
@@ -23,7 +23,7 @@ logger_t ext_logger = nullptr;
 
 std::atomic<bricks_debug_level_e> curr_log_level = BRICKS_TRACE;
 
-void 
+void
 bricks::log1(bricks_debug_level_e log_level, const char* format, ...)
 {
 	if (log_level < curr_log_level)
@@ -40,7 +40,7 @@ bricks::log1(bricks_debug_level_e log_level, const char* format, ...)
 bricks_debug_level_e
 brick_get_log_level()
 {
-    return curr_log_level;
+	return curr_log_level;
 }
 
 void brick_set_logger(logger_t l)

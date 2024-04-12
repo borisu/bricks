@@ -34,10 +34,10 @@ namespace bricks
 		virtual void release() = 0;
 	};
 
-	void brick_destroy(brick_t* ptr) { ptr->release(); };
+	void brick_destroy(brick_t* ptr);
 
 	template<class T>
-	auto make_shared_brick(T* ptr) { return std::shared_ptr<T>(ptr, brick_destroy) }
+	auto make_shared_brick(T* ptr) { return std::shared_ptr<T>(ptr, brick_destroy); }
 
 	// for unique ptr
 	struct bricks_destroyer

@@ -17,17 +17,6 @@ kafka_subscriber_t::~kafka_subscriber_t()
 	destroy();
 }
 
-void
-kafka_subscriber_t::name(const char* pname)
-{
-	bname = pname;
-};
-
-const char*
-kafka_subscriber_t::name() const
-{
-	return bname.c_str();
-}
 
 bricks_error_code_e 
 kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)
@@ -81,8 +70,6 @@ kafka_subscriber_t::start()
 	ASSERT_NOT_STARTED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
-
-	this->opaque = opaque;
 
 	auto rd_err = rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
 
@@ -164,7 +151,7 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 	{
 		auto xtree = create_xtree();
 		
-		cb_queue->enqueue(std::bind(msg_cb, this->opaque, create_buffer((const char*)msg->payload, (int)msg->len), xtree));
+		cb_queue->enqueue(std::bind(msg_cb, create_buffer((const char*)msg->payload, (int)msg->len), xtree));
 		
 	}
 

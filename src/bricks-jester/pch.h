@@ -9,23 +9,5 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
-#include <ctype.h>
-#include <signal.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
-
-#include <functional>
-#include <string>
-#include <map>
-#include <atomic>
-#include <thread>
-
-#include "logger.h"
-#include "bricks.h"
-#include "utils.h"
-
-#include "librdkafka/rdkafka.h"
 
 #endif //PCH_H

@@ -22,10 +22,6 @@ namespace bricks::plugins
 
 		virtual ~zeromq_subscriber_t();
 
-		virtual void name(const char*) override;
-
-		virtual const char* name() const override;
-
 		virtual void release() override { delete this; };
 
 	protected:
@@ -41,8 +37,6 @@ namespace bricks::plugins
 		void* context = nullptr;
 
 		void* subscriber = nullptr;
-
-		void* opaque = nullptr;
 
 		cb_queue_t* cb_queue = nullptr;
 

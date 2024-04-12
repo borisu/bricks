@@ -1,5 +1,10 @@
 #pragma once
-#include "common.h"
+
+#ifdef BRICKSLOGGER_EXPORTS
+#define BRICKSLOGGER_API __declspec(dllexport)
+#else
+#define BRICKSLOGGER_API __declspec(dllimport)
+#endif
 
 namespace bricks {
 
@@ -17,18 +22,19 @@ namespace bricks {
 	typedef  void (*logger_t)
 		(bricks_debug_level_e, const char* log_str);
 
-	BRICKS_API void
+	BRICKSLOGGER_API void
 		brick_set_logger(logger_t);
 
-	BRICKS_API void
+	BRICKSLOGGER_API void
 		brick_set_log_level(bricks_debug_level_e);
 
-	BRICKS_API bricks_debug_level_e
+	BRICKSLOGGER_API bricks_debug_level_e
 		brick_get_log_level();
 
-	BRICKS_API void
+	BRICKSLOGGER_API void
 		log1(bricks_debug_level_e, const char* format, ...);
 }
-	
 
 
+
+#pragma once

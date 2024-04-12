@@ -16,10 +16,6 @@ namespace bricks {
 	public:
 
 		virtual bricks_error_code_e start() = 0;
-
-		virtual void name(const char*) = 0;
-
-		virtual const char* name() const = 0;
 	};
 
 	class publisher_plugin_t : public plugin_t
@@ -35,7 +31,7 @@ namespace bricks {
 	};
 
 	typedef
-		function<void(void*, buffer_t*, xtree_t*)> msg_cb_t;
+		function<void(buffer_t*, xtree_t*)> msg_cb_t;
 
 	class subscriber_plugin_t : public plugin_t
 	{
@@ -59,6 +55,16 @@ namespace bricks {
 		virtual bricks_error_code_e register_request_handler(void* opaque, request_cb_t request, const xtree_t* options = nullptr) = 0;
 
 		virtual bricks_error_code_e send_response(bricks_handle_t ctx, const char*, size_t, const xtree_t* options = nullptr) = 0;
+
+	};
+
+	class client_plugin_t : public plugin_t
+	{
+	public:
+
+		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options = nullptr) = 0;
+
+		virtual bricks_error_code_e request(bricks_handle_t ctx, const char*, size_t, const xtree_t* options = nullptr) = 0;
 
 	};
 

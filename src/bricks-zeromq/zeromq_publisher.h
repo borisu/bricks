@@ -24,10 +24,6 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e start() override ;
 
-		virtual void name(const char*) override;
-
-		virtual const char* name() const override;
-
 		virtual void release() override { delete this; };
 
 		virtual ~zeromq_publisher_t();

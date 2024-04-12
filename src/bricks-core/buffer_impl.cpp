@@ -5,21 +5,21 @@ using namespace bricks;
 using namespace std;
 
 buffer_t* 
-bricks::create_buffer(const char* data, int size)
+bricks::create_buffer(const char* data, size_t size)
 {
     return new buffer_impl_t(data, size);
 }
 
-buffer_impl_t::buffer_impl_t(const char* data, int length)
+buffer_impl_t::buffer_impl_t(const char* data, size_t length)
 {
     vec.reserve(length); // Reserve space for the characters
     std::copy(data, data + length, std::back_inserter(vec));
 }
 
-int 
+size_t
 buffer_impl_t::size()
 {
-    return (int)vec.size();
+    return vec.size();
 }
 
 const char* 

@@ -7,13 +7,13 @@ namespace bricks
 	{
 	public:
 
-		virtual int size() = 0;
+		virtual size_t size() = 0;
 
 		virtual const char* data() = 0;
 
 	};
 
-	BRICKS_API buffer_t* create_buffer(const char* data, int size);
+	BRICKS_API buffer_t* create_buffer(const char* data, size_t size);
 
 }
 

@@ -4,3 +4,4 @@
 
 using namespace bricks;
 
+void bricks::brick_destroy(brick_t* ptr) { ptr->release(); };

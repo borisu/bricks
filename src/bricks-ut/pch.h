@@ -9,4 +9,6 @@
 #include <chrono>         // std::chrono::seconds
 #include "gtest/gtest.h"
 #include "bricks.h"
+#include "logger.h"
+#include "jester.h"
 #include "rdkafka_plugin.h"

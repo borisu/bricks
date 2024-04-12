@@ -161,7 +161,6 @@
     <ClInclude Include="queue.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="locking_queue.h" />
-    <ClInclude Include="logger.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="queue_impl.h" />
     <ClInclude Include="selector.h" />
@@ -178,7 +177,6 @@
     <ClCompile Include="..\..\3rdparty\modules\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="buffer_impl.cpp" />
     <ClCompile Include="common.cpp" />
-    <ClCompile Include="logger.cpp" />
     <ClCompile Include="queue_impl.cpp" />
     <ClCompile Include="selector_impl.cpp" />
     <ClCompile Include="xtree_cloner.cpp" />
