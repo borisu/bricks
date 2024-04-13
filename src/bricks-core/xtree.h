@@ -127,5 +127,17 @@ namespace bricks
 	BRICKS_API string serialize_xtree_to_xml(const xtree_t*);
 
 	BRICKS_API bool clone_xtree(const xtree_t* src, const xp_t& xp_src, xtree_t* dst, const xp_t& xp_dst);
+
+	template <typename T1, typename T2>
+	auto get_opt(std::optional<T2> opt, T1 d = T1{})
+	{
+		return opt.has_value() ? opt.value() : d;
+	}
+
+	template <typename T1>
+	T1& get_opt(std::optional<property_value_t> opt, T1 d = T1{})
+	{
+		return opt.has_value() ? std::get<T1>(opt.value()) : d;
+	}
 	
 }

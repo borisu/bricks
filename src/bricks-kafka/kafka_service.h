@@ -26,7 +26,7 @@ namespace bricks::plugins{
 
 		virtual void stop_rd_poll_loop();
 
-		static void	rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf);
+		static void rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf);
 
 		bool initiated = false;
 
@@ -38,7 +38,7 @@ namespace bricks::plugins{
 
 		thread *rd_poll_thread = nullptr;
 
-		string bname;
+		string name;
 
 	};
 }
