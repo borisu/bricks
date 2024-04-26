@@ -28,6 +28,10 @@
 #include "oatpp/network/tcp/client/ConnectionProvider.hpp"
 #include "oatpp/web/client/ApiClient.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include "oatpp/core/async/ConditionVariable.hpp"
+#include "oatpp/core/async/Lock.hpp"
+#include "common.h"
+#include "queue.h"
 
 
 #pragma comment(lib,"WS2_32")

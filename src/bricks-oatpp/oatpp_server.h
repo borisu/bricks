@@ -14,8 +14,6 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e register_request_handler(request_cb_t request, const xtree_t* options ) override;
 
-		virtual bricks_error_code_e send_response(bricks_handle_t ctx, const char*, size_t, const xtree_t* options ) override;
-
 		virtual bricks_error_code_e start() override;
 
 		virtual void release() override { delete this; };
@@ -30,13 +28,11 @@ namespace bricks::plugins
 
 		void destroy();
 
-		request_cb_t req_cb;
-
 		cb_queue_t* cb_queue = nullptr;
 
-		bool initiated;
+		bool initiated = false;
 
-		bool started;
+		bool started = false;
 
 		std::shared_ptr<oatpp::async::Executor> executor;
 
@@ -55,6 +51,9 @@ namespace bricks::plugins
 		atomic<bool> shutdown = false;
 
 		request_cb_t request_cb;
+
+		friend class oatpp_server_controller_t;
+
 
 	};
 	

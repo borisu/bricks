@@ -1,26 +1,28 @@
 #include "pch.h"
 #include "oatpp_server_controller.h"
+#include "oatpp_server.h"
 
 using namespace std;
 using namespace bricks;
 using namespace bricks::plugins;
 
 using namespace oatpp::web::server::api;
+using namespace std::placeholders;
 
 
 std::shared_ptr<oatpp_server_controller_t> 
-oatpp_server_controller_t::create_shared(std::shared_ptr<ObjectMapper> objectMapper) {
-    return std::shared_ptr<oatpp_server_controller_t>(new oatpp_server_controller_t(objectMapper));
+oatpp_server_controller_t::create_shared(oatpp_server_t* server, std::shared_ptr<ObjectMapper> objectMapper) {
+    return std::shared_ptr<oatpp_server_controller_t>(new oatpp_server_controller_t(server, objectMapper));
 }
 
 oatpp::async::CoroutineStarterForResult<const std::shared_ptr<oatpp::web::protocol::http::outgoing::Response>&>
 oatpp_server_controller_t::proxy_method(const std::shared_ptr<oatpp::web::protocol::http::incoming::Request>& __request) 
 { 
-    return brick_handler_t::startForResult(this, __request); 
+    return brick_handler_t::startForResult(this, server, __request); 
 }
 
-oatpp_server_controller_t::oatpp_server_controller_t(const std::shared_ptr<ObjectMapper>& objectMapper)
-    : oatpp::web::server::api::ApiController(objectMapper) 
+oatpp_server_controller_t::oatpp_server_controller_t(oatpp_server_t* server, const std::shared_ptr<ObjectMapper>& objectMapper)
+    : oatpp::web::server::api::ApiController(objectMapper), server(server)
 {
 
 };
@@ -56,4 +58,57 @@ oatpp_server_controller_t::add_endpoint(const string& method, const string& path
         handler, 
         info_builder);
   
+}
+
+oatpp_server_controller_t::brick_handler_t::brick_handler_t(oatpp_server_controller_t* pController, oatpp_server_t* server, const std::shared_ptr<IncomingRequest>& pRequest)
+    : HandlerCoroutine(pController, pRequest) , server(server), m_lockGuard(&lock)
+{
+
+}
+
+void
+oatpp_server_controller_t::brick_handler_t::responder(oatpp_server_controller_t::brick_handler_t* THIS, bricks_error_code_e err, const char* data, size_t size, xtree_t*)
+{
+    THIS->err = err;
+
+    if (data)
+    {
+        THIS->response.reserve(size); // Reserve space for the characters
+        std::copy(data, data + size, std::back_inserter(THIS->response));
+    }
+
+    THIS->cv.notifyAll();
+
+}
+
+
+oatpp::async::Action 
+oatpp_server_controller_t::brick_handler_t::act() {
+
+    return  this->request->readBodyToStringAsync().callbackTo(&brick_handler_t::onBody);
+    
+}
+
+oatpp::async::Action
+oatpp_server_controller_t::brick_handler_t::onBody(const oatpp::String& body) {
+
+    response_channel_t  f =
+        std::bind(responder, this, _1, _2, _3, _4);
+
+    auto xt = create_xtree();
+
+    auto buf = create_buffer(body->data(), body->size());
+
+    auto cb = std::bind(server->request_cb, f, buf, xt);
+
+    server->cb_queue->enqueue(cb);
+
+    return cv.wait(m_lockGuard, [this] { return true; }).next(yieldTo(&brick_handler_t::onReady));
+}
+
+oatpp::async::Action 
+oatpp_server_controller_t::brick_handler_t::onReady() {
+    OATPP_ASSERT(m_lockGuard.owns_lock()) // Now coroutine owns the lock
+
+    return _return(controller->createResponse(Status::CODE_200, "dto"));
 }

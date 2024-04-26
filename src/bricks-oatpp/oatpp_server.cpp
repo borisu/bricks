@@ -30,6 +30,8 @@ oatpp_server_t::destroy()
 		executor->stop();
 		executor->join();
 	}
+
+	cb_queue = nullptr;
 }
 
 bricks_error_code_e 
@@ -65,7 +67,7 @@ oatpp_server_t::init(cb_queue_t* queue, const xtree_t* options)
 
 		objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared(serializerConfig, deserializerConfig);
 
-		auto c = oatpp_server_controller_t::create_shared(objectMapper);
+		auto c = oatpp_server_controller_t::create_shared(this, objectMapper);
 
 		size_t ep_size = options->get_node_children_count("/bricks/oatpp_http_server/endpoints").value();
 		if (ep_size == 0)
@@ -88,6 +90,8 @@ oatpp_server_t::init(cb_queue_t* queue, const xtree_t* options)
 
 		server = oatpp::network::Server::createShared(connectionProvider, connectionHandler);
 
+		cb_queue = queue;
+
 		initiated = true;
 
 	}
@@ -106,12 +110,6 @@ oatpp_server_t::register_request_handler(request_cb_t request, const xtree_t* op
 
 	return BRICKS_SUCCESS;
 };
-
-bricks_error_code_e 
-oatpp_server_t::send_response(bricks_handle_t ctx, const char*, size_t, const xtree_t* options)
-{
-	return BRICKS_SUCCESS;
-}
 
 
 void 
