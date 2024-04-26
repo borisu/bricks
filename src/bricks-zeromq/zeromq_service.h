@@ -13,8 +13,6 @@ namespace bricks::plugins
 
 		virtual ~zeromq_service_t();
 
-		static void monitor_callback(void* arg, int event, int value, void* socket);
-
 		virtual void zmq_poll_loop();
 
 		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) = 0;

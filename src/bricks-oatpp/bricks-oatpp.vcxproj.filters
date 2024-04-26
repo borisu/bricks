@@ -8,24 +8,23 @@
     <Filter Include="api">
       <UniqueIdentifier>{974e669f-d267-449f-970e-04c081ba187d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="impl">
-      <UniqueIdentifier>{f09cfbf9-5fe7-4760-a2f1-a73e62a125fd}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="oatpp_server.h" />
-    <ClInclude Include="oatpp_api.h">
+    <ClInclude Include="oatpp_plugin.h">
       <Filter>api</Filter>
     </ClInclude>
+    <ClInclude Include="oatpp_server_controller.h" />
+    <ClInclude Include="oatpp_client.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="oatpp_server.cpp" />
-    <ClCompile Include="oatpp_impl.cpp">
-      <Filter>impl</Filter>
-    </ClCompile>
+    <ClCompile Include="oatpp_impl.cpp" />
+    <ClCompile Include="oatpp_server_controller.cpp" />
+    <ClCompile Include="oatpp_client.cpp" />
   </ItemGroup>
 </Project>

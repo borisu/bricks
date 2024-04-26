@@ -144,14 +144,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
-    <ClInclude Include="oatpp_api.h" />
+    <ClInclude Include="oatpp_client.h" />
+    <ClInclude Include="oatpp_plugin.h" />
     <ClInclude Include="oatpp_server.h" />
+    <ClInclude Include="oatpp_server_controller.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="oatpp_client.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
+    </ClCompile>
     <ClCompile Include="oatpp_impl.cpp" />
     <ClCompile Include="oatpp_server.cpp" />
+    <ClCompile Include="oatpp_server_controller.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

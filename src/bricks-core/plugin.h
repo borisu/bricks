@@ -44,7 +44,7 @@ namespace bricks {
 	};
 
 	typedef
-		function<void(void*, bricks_handle_t, buffer_t*, const xtree_t&)> request_cb_t;
+		function<void(bricks_handle_t, buffer_t*, const xtree_t*)> request_cb_t;
 
 	class server_plugin_t : public plugin_t
 	{
@@ -52,7 +52,7 @@ namespace bricks {
 
 		virtual bricks_error_code_e init(cb_queue_t *queue, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e register_request_handler(void* opaque, request_cb_t request, const xtree_t* options = nullptr) = 0;
+		virtual bricks_error_code_e register_request_handler(request_cb_t request, const xtree_t* options = nullptr) = 0;
 
 		virtual bricks_error_code_e send_response(bricks_handle_t ctx, const char*, size_t, const xtree_t* options = nullptr) = 0;
 
@@ -64,7 +64,7 @@ namespace bricks {
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e request(bricks_handle_t ctx, const char*, size_t, const xtree_t* options = nullptr) = 0;
+		virtual bricks_error_code_e request(const char*, size_t, const xtree_t* options = nullptr) = 0;
 
 	};
 

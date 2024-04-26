@@ -57,7 +57,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-kafka;..\bricks-zeromq;..\bricks-logger;..\bricks-jester</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-kafka;..\bricks-zeromq;..\bricks-logger;..\bricks-jester;..\bricks-oatpp</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -105,7 +105,9 @@
   <ItemGroup>
     <ClCompile Include="jester_test.cpp" />
     <ClCompile Include="kafka_test.cpp" />
+    <ClCompile Include="oatpp_test.cpp" />
     <ClCompile Include="publish_subsribe_tests.cpp" />
+    <ClCompile Include="request_response_tests.cpp" />
     <ClCompile Include="xtree_test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -133,6 +135,9 @@
     </ProjectReference>
     <ProjectReference Include="..\bricks-logger\bricks-logger.vcxproj">
       <Project>{6f3c1391-37cf-4bad-b9ce-f64376a55a33}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\bricks-oatpp\bricks-oatpp.vcxproj">
+      <Project>{9ea10304-8dc4-4aaa-ad82-8ab4133fbac8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\bricks-zeromq\bricks-zeromq.vcxproj">
       <Project>{9b88480f-48a0-442c-a0b5-3dfb10d8fa69}</Project>

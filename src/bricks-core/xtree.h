@@ -135,7 +135,7 @@ namespace bricks
 	}
 
 	template <typename T1>
-	T1& get_opt(std::optional<property_value_t> opt, T1 d = T1{})
+	T1 get_opt(std::optional<property_value_t> opt, T1 d = T1{})
 	{
 		return opt.has_value() ? std::get<T1>(opt.value()) : d;
 	}

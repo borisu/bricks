@@ -18,5 +18,16 @@
 #include "oatpp/network/tcp/server/ConnectionProvider.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/component.hpp"
+#include "oatpp/network/Server.hpp"
+#include "oatpp/web/server/HttpConnectionHandler.hpp"
+#include "oatpp/web/server/HttpRequestHandler.hpp"
+#include "oatpp/web/protocol/http/incoming/Request.hpp"
+#include "oatpp/web/protocol/http/outgoing/Response.hpp"
+#include "oatpp/web/client/HttpRequestExecutor.hpp"
+#include "oatpp/web/client/HttpRequestExecutor.hpp"
+#include "oatpp/network/tcp/client/ConnectionProvider.hpp"
+#include "oatpp/web/client/ApiClient.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+
 
 #pragma comment(lib,"WS2_32")
