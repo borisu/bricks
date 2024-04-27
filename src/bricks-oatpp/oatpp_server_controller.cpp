@@ -69,15 +69,16 @@ oatpp_server_controller_t::brick_handler_t::brick_handler_t(oatpp_server_control
 void
 oatpp_server_controller_t::brick_handler_t::responder(oatpp_server_controller_t::brick_handler_t* THIS, bricks_error_code_e err, const char* data, size_t size, xtree_t*)
 {
+    THIS->responded = true;
+
     THIS->err = err;
 
     if (data)
     {
-        THIS->response.reserve(size); // Reserve space for the characters
-        std::copy(data, data + size, std::back_inserter(THIS->response));
+        THIS->response = create_buffer(data, size);
     }
 
-    THIS->cv.notifyAll();
+    THIS->cv.notifyFirst();
 
 }
 
@@ -103,12 +104,23 @@ oatpp_server_controller_t::brick_handler_t::onBody(const oatpp::String& body) {
 
     server->cb_queue->enqueue(cb);
 
-    return cv.wait(m_lockGuard, [this] { return true; }).next(yieldTo(&brick_handler_t::onReady));
+    return cv.wait(m_lockGuard, [this] {
+                return this->responded; 
+        }).next(yieldTo(&brick_handler_t::onReady));
 }
 
 oatpp::async::Action 
 oatpp_server_controller_t::brick_handler_t::onReady() {
     OATPP_ASSERT(m_lockGuard.owns_lock()) // Now coroutine owns the lock
 
-    return _return(controller->createResponse(Status::CODE_200, "dto"));
+    return _return(controller->createResponse(err == BRICKS_SUCCESS ? 
+        Status::CODE_200: Status::CODE_500 , response == nullptr ? "" : String(response->data(), response->size())));
+}
+
+oatpp_server_controller_t::brick_handler_t::~brick_handler_t()
+{
+    if (response)
+        response->release();
+
+    response = nullptr;
 }

@@ -26,6 +26,7 @@ namespace bricks
 		BRICKS_3RD_PARTY_ERROR = 4,
 		BRICKS_TIMEOUT = 5,
 		BRICKS_NOT_SUPPORTED = 6,
+		BRICKS_REMOTE_ERROR = 3,
 	};
 
 	class brick_t

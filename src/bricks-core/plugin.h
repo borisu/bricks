@@ -59,18 +59,22 @@ namespace bricks {
 
 	};
 
+
+	typedef function<void(bricks_error_code_e, buffer_t*, xtree_t*)>
+		response_cb_t;
+
 	class client_plugin_t : public plugin_t
 	{
 	public:
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e request(const char*, size_t, const xtree_t* options = nullptr) = 0;
+		virtual bricks_error_code_e request(const char*, size_t, response_cb_t, const xtree_t* options = nullptr) = 0;
 
 	};
 
-	typedef
-		function<void(void*, const char*, size_t, xtree_t&)> event_cb_t;
+	typedef function<void(void*, const char*, size_t, xtree_t&)> 
+		event_cb_t;
 
 	class bidi_plugin_t : public plugin_t
 	{

@@ -34,9 +34,11 @@ namespace bricks::plugins
         {
         public:
 
+            bool responded = false;
+
             oatpp_server_t* server = nullptr;
 
-            vector<char> response;
+            buffer_t *response = nullptr;
 
             bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -55,6 +57,8 @@ namespace bricks::plugins
             oatpp::async::Action onBody(const oatpp::String& body);
 
             static void responder(oatpp_server_controller_t::brick_handler_t* THIS, bricks_error_code_e err, const char* data, size_t size,xtree_t*);
+
+            virtual ~brick_handler_t();
 
         };
         
