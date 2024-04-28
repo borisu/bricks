@@ -103,6 +103,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bidi_tests.cpp" />
     <ClCompile Include="jester_test.cpp" />
     <ClCompile Include="kafka_test.cpp" />
     <ClCompile Include="oatpp_test.cpp" />

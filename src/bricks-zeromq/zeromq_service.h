@@ -19,7 +19,7 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e start_zmq_poll_loop();
 
-		virtual void stop_zmq_poll_loop();
+		void stop_zmq_poll_loop();
 
 		bool initiated = false;
 

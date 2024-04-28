@@ -73,7 +73,7 @@ namespace bricks {
 
 	};
 
-	typedef function<void(void*, const char*, size_t, xtree_t&)> 
+	typedef function<void(buffer_t*, xtree_t*)>
 		event_cb_t;
 
 	class bidi_plugin_t : public plugin_t
@@ -82,7 +82,7 @@ namespace bricks {
 
 		virtual bricks_error_code_e init(cb_queue_t *queue, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e register_event_handler(void* opaque, event_cb_t rsp_cb, const xtree_t* options = nullptr) = 0;
+		virtual bricks_error_code_e register_event_handler(event_cb_t event_cb, const xtree_t* options = nullptr) = 0;
 
 		virtual bricks_error_code_e send_event(const char*, size_t, const xtree_t* options = nullptr) = 0;
 	};

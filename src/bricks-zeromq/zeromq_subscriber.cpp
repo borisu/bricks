@@ -16,6 +16,8 @@ zeromq_subscriber_t::destroy()
 	initiated = false;
 	started = false;
 
+	stop_zmq_poll_loop();
+
 	if (subscriber)
 	{
 		zmq_close(subscriber);

@@ -23,6 +23,9 @@
     <ClCompile Include="request_response_tests.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="bidi_tests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

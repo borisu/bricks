@@ -1,6 +1,43 @@
 #include "pch.h"
 #include "gtest/gtest.h"
-//#include "zeromq_api.h"
+#include "zeromq_plugin.h"
+#include "generic_tests.h"
+
+using namespace bricks::plugins;
+
+TEST(zeromq_case, bidi_test) {
+
+	brick_uptr<xtree_t> xt1(
+		create_xtree_from_xml(
+			"<bricks>"
+			"  <zmq name=\"oatpp_server1\">"
+			"   <bidi url=\"tcp://127.0.0.1:7858\"is_server=\"true\"/>"
+			"  </zmq>"
+			"</bricks>"
+		));
+
+	brick_uptr<xtree_t> xt2(
+		create_xtree_from_xml(
+			"<bricks>"
+			"  <zmq name=\"oatpp_server1\">"
+			"   <bidi url=\"tcp://127.0.0.1:7858\" port=\"7858\" is_server=\"false\"/>"
+			"  </zmq>"
+			"</bricks>"
+		));
+
+	brick_uptr<bidi_plugin_t>  p1(create_zeromq_bidi());
+
+	brick_uptr<bidi_plugin_t>  p2(create_zeromq_bidi());
+
+	brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
+
+	brick_uptr<selector_t>  selector(create_selector());
+
+	selector->init(cb_q.get());
+
+	bidi_test_1(xt1.get(), p1.get(),xt2.get(), p2.get(), selector.get());
+
+}
 
 TEST(zeromq_case, publish_subscribe_test) {
 

@@ -44,8 +44,6 @@ namespace bricks::plugins
 
 		string url;
 
-		string bname;
-
 	};
 }
 

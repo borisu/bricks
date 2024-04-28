@@ -18,6 +18,7 @@
     <ClInclude Include="zeromq_service.h" />
     <ClInclude Include="zeromq_publisher.h" />
     <ClInclude Include="zeromq_subscriber.h" />
+    <ClInclude Include="zeromq_bidi.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -26,5 +27,6 @@
     <ClCompile Include="zeromq_publisher.cpp" />
     <ClCompile Include="zeromq_subscriber.cpp" />
     <ClCompile Include="zeromq_plugin.cpp" />
+    <ClCompile Include="zeromq_bidi.cpp" />
   </ItemGroup>
 </Project>

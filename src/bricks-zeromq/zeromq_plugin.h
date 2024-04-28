@@ -17,7 +17,7 @@ BRICKSZEROMQ_API subscriber_plugin_t*
 	create_zeromq_subscriber();
 
 BRICKSZEROMQ_API bidi_plugin_t*
-	create_zeromq_pair_bidi();
+	create_zeromq_bidi();
 	
 }
  
