@@ -38,13 +38,17 @@ zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opt
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
+	this->cb_queue = queue;
+
 	context = zmq_ctx_new();
 
 	subscriber = zmq_socket(context, ZMQ_SUB);
 
 	try
 	{
-		url = get<string>(options->get_property_value("/configuration/subscriber", "url").value());
+		name = get<string>(options->get_property_value("/bricks/zmq/subscriber", "name").value());
+
+		url = get<string>(options->get_property_value("/bricks/zmq/subscriber", "url").value());
 
 		// Connect to the ZeroMQ endpoint
 		auto rc = zmq_connect(subscriber, url.c_str());
@@ -53,6 +57,9 @@ zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opt
 		}
 
 		this->msg_cb = msg_cb;
+
+		// Create a ZMQ poll item
+		items[0] = { subscriber, 0, ZMQ_POLLIN, 0 };
 
 		initiated = true;
 		
@@ -86,15 +93,13 @@ zeromq_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
-	auto rc = zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, topic.c_str(), 0);
+	auto rc = zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, topic.c_str(), strlen(topic.c_str()));
 	if (rc != 0)
 	{
+		BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
 		return  BRICKS_3RD_PARTY_ERROR;
 	}
-
-	// Create a ZMQ poll item
-	items[0] = { subscriber, 0, ZMQ_POLLIN, 0 };
-
+	
 	return BRICKS_SUCCESS;
 
 }
@@ -122,24 +127,84 @@ zeromq_subscriber_t::do_zmq_poll(int milliseconds, bool last_call)
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
 
+	if (last_call)
+		return BRICKS_SUCCESS;
+
 	// Poll for incoming data
-	zmq_poll(items, 1, (long)milliseconds);
+	int rc = zmq_poll(items, 1, (long)milliseconds);
+	if (rc == -1)
+	{
+		BRICK_LOG_ZMQ_ERROR(zmq_poll);
+		return BRICKS_3RD_PARTY_ERROR;
+	}
 
 	// If there's data available, receive it
 	if (items[0].revents & ZMQ_POLLIN) {
-		
-		zmq_msg_t msg;
-		zmq_msg_init(&msg);
-		zmq_msg_recv(&msg, subscriber, 0);
 
-		auto xt = create_xtree();
+		int count = 0;
+		string topic = "";
+		int more = 0;
+		size_t more_size = sizeof(more);
 
-		cb_queue->enqueue(
-			std::bind(msg_cb, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
-		);
+		do {
+
+			zmq_msg_t msg;
+			zmq_msg_init(&msg);
+			rc = zmq_msg_recv(&msg, subscriber, 0);
+			if (rc == -1)
+			{
+				BRICK_LOG_ZMQ_ERROR(zmq_msg_recv);
+				return BRICKS_3RD_PARTY_ERROR;
+			}
+
+			if (count == 0)
+			{
+				topic.assign((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg));
+				count++;
+				if (zmq_getsockopt(subscriber, ZMQ_RCVMORE, &more, &more_size) != 0)
+				{
+					BRICK_LOG_ZMQ_ERROR(zmq_msg_recv);
+					return BRICKS_3RD_PARTY_ERROR;
+				}
+				continue;
+			}
+
+			if (zmq_getsockopt(subscriber, ZMQ_RCVMORE, &more, &more_size) != 0)
+			{
+				BRICK_LOG_ZMQ_ERROR(zmq_msg_recv);
+				return BRICKS_3RD_PARTY_ERROR;
+			}
+
+			count++;
+
+			string opt = "";
+
+			auto xt = create_xtree_from_xml((opt +
+				"<bricks>" + 
+				"  <event last=\"" +  (more ? "true" : "false")  +  "\"/>" +
+				"</bricks>").c_str()
+			);
+
+			if (cb_queue)
+			{
+				cb_queue->enqueue(
+					std::bind(msg_cb, topic, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
+				);
+
+			}
+			else
+			{
+				try { msg_cb(topic, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt); }
+				catch (std::exception&) {};
+			}
+
+		} while (more);
+			
+
+		return BRICKS_SUCCESS;
 
 	}
 
-	return BRICKS_NOT_SUPPORTED;
+	return BRICKS_TIMEOUT;
 }
 

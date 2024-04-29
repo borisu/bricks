@@ -9,29 +9,15 @@ using namespace bricks;
 void
 publish_subscribe_test_1(xtree_t *pxt, publisher_plugin_t* publisher, xtree_t* sxt, subscriber_plugin_t* subscriber, selector_t *selector)
 {
-	/*
-		prepare publisher 
-	*/
-	int delivered_counter             = 0;
-	bricks_error_code_e delivered_err = BRICKS_NOT_SUPPORTED;
-	xtree_t* delivered_xt             = nullptr;
-	void* delivered_opaque            = nullptr;
-
+	
 	ASSERT_EQ(BRICKS_SUCCESS, publisher->init(
 		selector->queue(),
-		[&](void* opaque, bricks_error_code_e err, xtree_t* xt)
-		{
-			//printf("SENT");
-			delivered_counter++;
-			delivered_xt 	 = xt;
-			delivered_err	 = err;
-			delivered_opaque = opaque;
-			xt->release();
-
-		}, pxt));
+	    pxt));
 
 	ASSERT_EQ(BRICKS_SUCCESS, publisher->register_topic(TEST_TOPIC));
 	ASSERT_EQ(BRICKS_SUCCESS, publisher->start());
+
+	this_thread::sleep_for(chrono::milliseconds(3000));
 
 	/*
 		prepare subscriber
@@ -40,38 +26,42 @@ publish_subscribe_test_1(xtree_t *pxt, publisher_plugin_t* publisher, xtree_t* s
 	vector_t  received_buf;
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(
 		selector->queue(),
-		[&](buffer_t *buf, xtree_t* xt)
+		[&](const string& ,buffer_t *buf, xtree_t* xt)
 		{
-			//printf("RECEIVED");
 			received_counter++;
-			received_buf.resize(buf->size());
-			std::memcpy(received_buf.data(), buf->data(), buf->size());
+
+			if (buf->size() > 0)
+			{
+				received_buf.resize(buf->size());
+				std::memcpy(received_buf.data(), buf->data(), buf->size());
+
+			}
+
 			buf->release();
 			xt->release();
 
 		}, sxt));
 
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic(TEST_TOPIC));
-	ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic("dummy"));
+	//ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic("dummy"));
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->start());
+
+	this_thread::sleep_for(chrono::milliseconds(3000));
 
 	/* 
 		publish message
 	*/
 	const char* msg = "Another brick in the wall.";
-	int publisher_opaque = 1001;
-	ASSERT_EQ(BRICKS_SUCCESS, publisher->publish(TEST_TOPIC, msg, strlen(msg), &publisher_opaque));
+	ASSERT_EQ(BRICKS_SUCCESS, publisher->publish(TEST_TOPIC, msg, strlen(msg)));
 
 	int count = 0;
-	while (count++ < 25 || (received_counter > 1 && delivered_counter > 1))
+	while (count++ < 25 && (received_counter < 1))
 	{
 		selector->poll(500);
 	}
 	
 	ASSERT_LE(1, received_counter);	
-	ASSERT_LE(1, delivered_counter);
-	ASSERT_EQ(publisher_opaque, *((int*)delivered_opaque));
-
+	
 	std::string str(received_buf.begin(), received_buf.end());
 
 	ASSERT_STREQ(msg, str.c_str());

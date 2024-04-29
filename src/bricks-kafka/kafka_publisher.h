@@ -14,11 +14,11 @@ namespace bricks::plugins
 
 		kafka_publisher_t();
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
 
 		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
-		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, void* opaque, const xtree_t* options)  override;
+		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, const xtree_t* options)  override;
 
 		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
 
@@ -32,14 +32,6 @@ namespace bricks::plugins
 
 		virtual void destroy();
 
-		static void msg_delivered1(rd_kafka_t* rk,
-			const rd_kafka_message_t* rkmessage,
-			void* opaque);
-
-		void msg_delivered(rd_kafka_t* rk,
-			const rd_kafka_message_t* rkmessage,
-			void* opaque);
-
 		char errstr[512] = { '\0' };
 
 		bool initiated;
@@ -49,8 +41,6 @@ namespace bricks::plugins
 		rd_kafka_t* rd_producer_h = nullptr;
 
 		map<string, rd_kafka_topic_t*> rd_topics;
-
-		delivery_cb_t msg_cb;
 
 	};
 

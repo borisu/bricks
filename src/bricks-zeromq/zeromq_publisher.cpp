@@ -10,9 +10,8 @@ zeromq_publisher_t::zeromq_publisher_t()
 
 };
 
-
 bricks_error_code_e 
-zeromq_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options)
+zeromq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 
@@ -26,12 +25,17 @@ zeromq_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t*
 
 	try
 	{
-		auto url = get<string>(options->get_property_value("/configuration/publisher", "url").value());
+		name = get<string>(options->get_property_value("/bricks/zmq/publisher", "name").value());
+
+		auto url = get<string>(options->get_property_value("/bricks/zmq/publisher", "url").value());
 
 		int rc = zmq_bind(publisher, url.c_str());
 		if (rc != 0) {
+			BRICK_LOG_ZMQ_ERROR(zmq_bind);
 			throw std::exception();
 		}
+
+		initiated = true;
 	}
 	catch (std::bad_optional_access&)
 	{
@@ -42,15 +46,12 @@ zeromq_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t*
 		err = BRICKS_3RD_PARTY_ERROR;
 	}
 
-	this->msg_cb = msg_cb;
-	
 	if (err != BRICKS_SUCCESS)
 	{
 		destroy();
 	}
 
 	return err;
-
 
 }
 
@@ -86,18 +87,21 @@ zeromq_publisher_t::register_topic(const string& topic, const xtree_t* options)
 }
 
 bricks_error_code_e 
-zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size, void* opaque, const xtree_t* options)
+zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size,  const xtree_t* options)
 {
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
 
-	auto rc = zmq_send(publisher, buf, size, 0);
+	auto rc = zmq_send(publisher, topic.c_str(), strlen(topic.c_str()), ZMQ_SNDMORE);
+	if (rc == -1) {
+		BRICK_LOG_ZMQ_ERROR(zmq_send);
+		throw std::exception();
+	}
 
-	auto xt = create_xtree();
-
-	if (msg_cb)
-	{
-		cb_queue->enqueue(std::bind(msg_cb, opaque, rc > 0 ? BRICKS_SUCCESS : BRICKS_3RD_PARTY_ERROR, xt));
+	rc = zmq_send(publisher, buf, size, 0);
+	if (rc == -1) {
+		BRICK_LOG_ZMQ_ERROR(zmq_send);
+		throw std::exception();
 	}
 
 	return BRICKS_SUCCESS;

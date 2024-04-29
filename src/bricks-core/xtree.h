@@ -8,7 +8,7 @@ using namespace std;
 
 namespace bricks
 {
-	typedef variant<int, double, bool, string> property_value_t;
+	typedef variant<int, long long, double, bool, string> property_value_t;
 	typedef pair<string, property_value_t> property_t;
 	typedef list<property_t> property_list_t;
 

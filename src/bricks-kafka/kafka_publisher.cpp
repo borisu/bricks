@@ -4,51 +4,6 @@
 using namespace bricks;
 using namespace bricks::plugins;
 
-void
-kafka_publisher_t::msg_delivered1(rd_kafka_t* rk,
-	const rd_kafka_message_t* rkmessage,
-	void* opaque) {
-
-	((kafka_publisher_t*)opaque)->msg_delivered(rk, rkmessage, opaque);
-}
-
-void
-kafka_publisher_t::msg_delivered(rd_kafka_t* rk,
-	const rd_kafka_message_t* rkmessage,
-	void* opaque) {
-	if (rkmessage->err) 
-	{
-		log1(BRICKS_DEBUG,
-			"%% Message delivery failed (broker %" PRId32 "): %s\n",
-			rd_kafka_message_broker_id(rkmessage),
-			rd_kafka_err2str(rkmessage->err));
-	}
-	else
-	{
-		log1(BRICKS_DEBUG,
-			"%% Message delivered (%zd bytes, offset %" PRId64
-			", "
-			"partition %" PRId32 ", broker %" PRId32 "): %.*s\n",
-			rkmessage->len, rkmessage->offset, rkmessage->partition,
-			rd_kafka_message_broker_id(rkmessage),
-			(int)rkmessage->len, (const char*)rkmessage->payload);
-	}
-
-	
-
-	auto xt = create_xtree();
-
-	if (cb_queue)
-	{
-		cb_queue->enqueue(std::bind(msg_cb, opaque, rkmessage->err ? BRICKS_3RD_PARTY_ERROR : BRICKS_SUCCESS, xt));
-	}
-	else
-	{
-		msg_cb(opaque, rkmessage->err ? BRICKS_3RD_PARTY_ERROR : BRICKS_SUCCESS, xt);
-	}
-
-
-}
 
 kafka_publisher_t::kafka_publisher_t(){};
 
@@ -59,15 +14,13 @@ kafka_publisher_t::~kafka_publisher_t()
 
 
 bricks_error_code_e 
-kafka_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options)
+kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	this->cb_queue = queue;
-
-	this->msg_cb = msg_cb;
 
 	rd_conf_h = rd_kafka_conf_new();
 
@@ -81,7 +34,6 @@ kafka_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* 
 
 	rd_kafka_conf_set_opaque(rd_conf_h, (void*)this);
 
-	rd_kafka_conf_set_dr_msg_cb(rd_conf_h, msg_delivered1);
 
 	// Create producer instance
 	rd_producer_h = rd_kafka_new(RD_KAFKA_PRODUCER, rd_conf_h, NULL, 0);
@@ -108,7 +60,7 @@ kafka_publisher_t::start()
 }
 
 bricks_error_code_e
-kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, void* opaque, const xtree_t* options)
+kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 

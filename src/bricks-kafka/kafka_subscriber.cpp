@@ -150,13 +150,13 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 
 		if (cb_queue)
 		{
-			cb_queue->enqueue(std::bind(msg_cb, create_buffer((const char*)msg->payload, (int)msg->len), xtree));
+			cb_queue->enqueue(std::bind(msg_cb, "", create_buffer((const char*)msg->payload, (int)msg->len), xtree));
 		}
 		else
 		{
 			try
 			{
-				msg_cb(create_buffer((const char*)msg->payload, (int)msg->len), xtree);
+				msg_cb("", create_buffer((const char*)msg->payload, (int)msg->len), xtree);
 			}
 			catch (std::exception&) {}
 		}

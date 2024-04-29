@@ -158,6 +158,22 @@ TEST(xtree_case, xtree_ip_parse)
 
 }
 
+TEST(xtree_case, xtree_enforce_type)
+{
+	xtree_t* xt = create_xtree_from_xml(
+		"<configuration>"
+		" <property int_value=\"%i:5\"  longlong_value=\"%L:5\" double_value=\"%d:5\" string_value=\"%s:5\" bool_value1=\"%b:true\" bool_value2=\"%b:valse\"/>"
+		"</configuration>");
+
+	EXPECT_EQ(get<int>(xt->get_property_value("/configuration/property", "int_value").value()), 5);
+	EXPECT_EQ(get<long long>(xt->get_property_value("/configuration/property", "longlong_value").value()), 5);
+	EXPECT_EQ(get<double>(xt->get_property_value("/configuration/property", "double_value").value()), 5.0);
+	EXPECT_EQ(get<string>(xt->get_property_value("/configuration/property", "string_value").value()), "5");
+	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value1").value()), true);
+	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value2").value()), false);
+
+}
+
 TEST(xtree_case, xtree_create_1_level)
 {
 	auto xt = create_xtree();
@@ -192,7 +208,7 @@ TEST(xtree_case, xtree_create_1_level)
 	xt->set_property_value("/root", "string", string("the wall"));
 
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		      "<root double=\"2.2\" double1=\"1.0\" int=\"1\" bool=\"false\" string=\"the wall\"/>\n",
+		      "<root double=\"%d:2.2\" double1=\"%d:1.0\" int=\"%i:1\" bool=\"%b:false\" string=\"%s:the wall\"/>\n",
 	   serialize_xtree_to_xml(xt));
 
 	// do it twice
@@ -205,38 +221,18 @@ TEST(xtree_case, xtree_create_1_level)
 	xt->add_node("root");
 
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		"<root double=\"2.2\" double1=\"1.0\" int=\"1\" bool=\"false\" string=\"the wall\"/>\n",
+		"<root double=\"%d:2.2\" double1=\"%d:1.0\" int=\"%i:1\" bool=\"%b:false\" string=\"%s:the wall\"/>\n",
 		serialize_xtree_to_xml(xt));
 
 	xt->remove_property("root","double1");
 	xt->remove_property("root", "double1");
 
+	xt->set_property_value("/root", "longlong", (long long)25);
+
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		"<root double=\"2.2\" int=\"1\" bool=\"false\" string=\"the wall\"/>\n",
+		"<root double=\"%d:2.2\" int=\"%i:1\" bool=\"%b:false\" string=\"%s:the wall\" longlong=\"%L:25\"/>\n",
 		serialize_xtree_to_xml(xt));
 }
 
-
-TEST(xtree_case, xtree_direct_access)
-{
-	/*auto h = create_xtree();
-
-	EXPECT_EQ(BRICKS_SUCCESS, h->load_from_xml(
-		"<configuration>"
-		" <property name = \"bool.value\"   value=\"true\">"
-		"    <subproperty/>"
-		" </property>"
-		" <property name = \"int.value\"    value=\"5\" />"
-		" <property name = \"double.value\" value=\"5.0\" />"
-		" <property name = \"str.value\"    value=\"Mother do you think\" />"
-		"</configuration>"
-	));
-
-	auto c = h->get_node("/configuration");
-	EXPECT_EQ(h->get_node_children_count(c.value(), "").value(), 4);
-	EXPECT_EQ(h->get_node_children_count(c.value(), "/").value(), 4);
-	EXPECT_EQ(h->get_node_children_count(c.value(), "/property").value(), 1);*/
-
-}
 
 

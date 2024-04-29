@@ -34,11 +34,11 @@ namespace bricks::plugins {
 
 		jester_publisher_t(jester_ctx_t* ctx);
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
 
 		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
 
-		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, void* opaque, const xtree_t* options ) override;
+		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, const xtree_t* options ) override;
 
 		virtual bricks_error_code_e start() override;
 
@@ -52,8 +52,6 @@ namespace bricks::plugins {
 		bool started = false;
 
 		jester_ctx_t* ctx = nullptr;
-
-		delivery_cb_t msg_cb;
 
 		cb_queue_t* queue = nullptr;
 

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "utils.h"
-#include "jester_impl.h"
+#include "jester_pubsub.h"
 
 using namespace std;
 using namespace bricks;
@@ -83,12 +83,12 @@ jester_publisher_t::jester_publisher_t(jester_ctx_t* ctx) :ctx(ctx)
 }
 
 bricks_error_code_e 
-jester_publisher_t::init(cb_queue_t* queue, delivery_cb_t msg_cb, const xtree_t* options)
+jester_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 
 	this->queue = queue;
-	this->msg_cb = msg_cb;
+
 	this->initiated = true;
 
 	return BRICKS_SUCCESS;
@@ -115,16 +115,12 @@ jester_publisher_t::register_topic(const string& topic, const xtree_t* options)
 }
 
 bricks_error_code_e 
-jester_publisher_t::publish(const string& topic, const char* data, size_t size, void* opaque, const xtree_t* options)
+jester_publisher_t::publish(const string& topic, const char* data, size_t size, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
 
 	ctx->publish(topic.c_str(), data, size);
-
-	auto xt = create_xtree();
-
-	queue->enqueue(std::bind(msg_cb, opaque, BRICKS_SUCCESS, xt));
 
 	return BRICKS_SUCCESS;
 	
@@ -183,7 +179,7 @@ jester_subscriber_t::on_received(const char* topic, const char* data, size_t siz
 
 	auto xtree = create_xtree();
 
-	queue->enqueue(std::bind(msg_cb,  create_buffer(data, size), xtree));
+	queue->enqueue(std::bind(msg_cb,topic,create_buffer(data, size), xtree));
 
 	return BRICKS_SUCCESS;
 }

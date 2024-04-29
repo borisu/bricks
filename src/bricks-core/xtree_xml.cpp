@@ -65,21 +65,25 @@ xml_visitor_t::start_element(const string& name, const property_list_t& properti
    
     for (auto& a : properties)
     {
-        if ( holds_alternative<int>(a.second))
+        if (holds_alternative<long long>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), std::to_string(std::get<int>(a.second)).c_str());
+            child->SetAttribute(a.first.c_str(), ("%L:" + std::to_string(std::get<int64_t>(a.second))).c_str());
+        } 
+        else if ( holds_alternative<int>(a.second))
+        {
+            child->SetAttribute(a.first.c_str(), ("%i:" + std::to_string(std::get<int>(a.second))).c_str());
         }
         else if (holds_alternative<double>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), removeTrailingZeros(std::get<double>(a.second)).c_str());
+            child->SetAttribute(a.first.c_str(),  ("%d:" + removeTrailingZeros(std::get<double>(a.second))).c_str());
         }
         else if (holds_alternative<bool>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), std::get<bool>(a.second) ? "true" : "false");
+            child->SetAttribute(a.first.c_str(), std::get<bool>(a.second) ? "%b:true" : "%b:false");
         }
         else if (holds_alternative<string>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), std::get<string>(a.second).c_str());
+            child->SetAttribute(a.first.c_str(), ("%s:" + std::get<string>(a.second)).c_str());
         }
         else
         {
@@ -145,6 +149,8 @@ SaxHandler::VisitExit(const tinyxml2::XMLElement& element)
     return true;
 }
 
+#define BRICKS_PREFIX_LEN strlen("%x:")
+
 // Override the interface's functions to handle events
 bool 
 SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attribute) {
@@ -170,44 +176,80 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
 
             optional<property_value_t> p;
 
-            try {
-                if (strchr(attr->Value(), '.') != nullptr)
-                {
-                    size_t pos;
-                    p = std::stod(attr->Value(), &pos);
-                    if (pos != strlen(attr->Value()))
-                        p = {};
-
-                }
-            }
-            catch (std::exception&) {}
-
-            if (!p.has_value())
+            // check enforced types 
+            if (strncmp(attr->Value(), "%d:", BRICKS_PREFIX_LEN) == 0)
             {
-                try {
-                    size_t pos;
-                    p = std::stoi(attr->Value(), &pos);
-                    if (pos != strlen(attr->Value()))
-                        p = {};
-                }
-                catch (std::exception&) {}
+                size_t pos;
+                p = std::stod(attr->Value() + BRICKS_PREFIX_LEN, &pos);
+                if (pos != strlen(attr->Value() + BRICKS_PREFIX_LEN))
+                    return false;
             }
-
-            if (!p.has_value())
+            else if (strncmp(attr->Value(), "%b:", BRICKS_PREFIX_LEN) == 0)
             {
-                if (strcmp(attr->Value(), "true") == 0)
+                if (strcmp(attr->Value() + BRICKS_PREFIX_LEN, "true") == 0)
                     p = true;
-            }
-
-            if (!p.has_value())
-            {
-                if (strcmp(attr->Value(), "false") == 0)
+                else
                     p = false;
             }
-
-            if (!p.has_value())
+            else if (strncmp(attr->Value(), "%i:", BRICKS_PREFIX_LEN) == 0)
             {
-                p = string(attr->Value());
+                size_t pos;
+                p = std::stoi(attr->Value()+ BRICKS_PREFIX_LEN, &pos);
+                if (pos != strlen(attr->Value() + BRICKS_PREFIX_LEN))
+                    return false;
+            }
+            else if (strncmp(attr->Value(), "%L:", BRICKS_PREFIX_LEN) == 0)
+            {
+                size_t pos;
+                p = std::stoll (attr->Value() + BRICKS_PREFIX_LEN, &pos);
+                if (pos != strlen(attr->Value() + BRICKS_PREFIX_LEN))
+                    return false;
+            }
+            else if (strncmp(attr->Value(), "%s:", BRICKS_PREFIX_LEN) == 0)
+            {
+                p = string(attr->Value() + BRICKS_PREFIX_LEN);
+            }
+            else // no default values
+            {
+                try {
+                    if (strchr(attr->Value(), '.') != nullptr)
+                    {
+                        size_t pos;
+                        p = std::stod(attr->Value(), &pos);
+                        if (pos != strlen(attr->Value()))
+                            p = {};
+
+                    }
+                }
+                catch (std::exception&) {}
+
+                if (!p.has_value())
+                {
+                    try {
+                        size_t pos;
+                        p = std::stoi(attr->Value(), &pos);
+                        if (pos != strlen(attr->Value()))
+                            p = {};
+                    }
+                    catch (std::exception&) {}
+                }
+
+                if (!p.has_value())
+                {
+                    if (strcmp(attr->Value(), "true") == 0)
+                        p = true;
+                }
+
+                if (!p.has_value())
+                {
+                    if (strcmp(attr->Value(), "false") == 0)
+                        p = false;
+                }
+
+                if (!p.has_value())
+                {
+                    p = string(attr->Value());
+                }
             }
 
             xt->set_property_value(handle.value(), attr->Name(), p.value());

@@ -15,6 +15,7 @@
 #include "zmq.h"
 #include "bricks.h"
 #include "utils.h"
+#include "logger.h"
 
 
 

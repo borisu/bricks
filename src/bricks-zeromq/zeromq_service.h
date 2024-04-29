@@ -3,6 +3,8 @@
 using namespace std;
 using namespace bricks;
 
+#define BRICK_LOG_ZMQ_ERROR(func)  bricks::log1(BRICKS_ALARM,"%s %%%%%% ZMQ Error (" #func ") %d.",  this->name.c_str(), zmq_errno())
+
 namespace bricks::plugins
 {
 	class zeromq_service_t
@@ -28,6 +30,8 @@ namespace bricks::plugins
 		atomic<bool> shutdown = false;
 
 		thread* zmq_poll_thread = nullptr;
+
+		string name;
 
 	};
 }
