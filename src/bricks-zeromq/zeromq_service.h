@@ -17,6 +17,8 @@ namespace bricks::plugins
 
 		virtual void zmq_poll_loop();
 
+		virtual void set_sockopt(const xtree_t* xt, const char* parent, void* sock);
+
 		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) = 0;
 
 		virtual bricks_error_code_e start_zmq_poll_loop();

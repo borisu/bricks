@@ -43,7 +43,7 @@ publish_subscribe_test_1(xtree_t *pxt, publisher_plugin_t* publisher, xtree_t* s
 		}, sxt));
 
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic(TEST_TOPIC));
-	//ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic("dummy"));
+	ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic("dummy"));
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->start());
 
 	this_thread::sleep_for(chrono::milliseconds(3000));

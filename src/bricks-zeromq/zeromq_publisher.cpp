@@ -35,6 +35,8 @@ zeromq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 			throw std::exception();
 		}
 
+		set_sockopt(options, "/bricks/zmq/publisher", publisher);
+
 		initiated = true;
 	}
 	catch (std::bad_optional_access&)

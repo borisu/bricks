@@ -61,6 +61,8 @@ zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opt
 		// Create a ZMQ poll item
 		items[0] = { subscriber, 0, ZMQ_POLLIN, 0 };
 
+		set_sockopt(options, "/bricks/zmq/subscriber", subscriber);
+
 		initiated = true;
 		
 	}

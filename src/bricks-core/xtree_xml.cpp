@@ -67,7 +67,7 @@ xml_visitor_t::start_element(const string& name, const property_list_t& properti
     {
         if (holds_alternative<long long>(a.second))
         {
-            child->SetAttribute(a.first.c_str(), ("%L:" + std::to_string(std::get<int64_t>(a.second))).c_str());
+            child->SetAttribute(a.first.c_str(), ("%L:" + std::to_string(std::get<long long>(a.second))).c_str());
         } 
         else if ( holds_alternative<int>(a.second))
         {

@@ -72,6 +72,8 @@ zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 			throw std::exception();
 		}
 
+		set_sockopt(options, "/bricks/zmq/bidi",pair);
+
 		items[0] = { pair, 0, ZMQ_POLLIN, 0 };
 
 		initiated = true;

@@ -6,3 +6,4 @@
 #define ASSERT_STARTED if (!this->started) return BRICKS_INVALID_STATE
 #define ASSERT_NOT_STARTED if (this->started) return BRICKS_INVALID_STATE
 
+#define BRICKS_MAP_PAIR(x) {#x,x}

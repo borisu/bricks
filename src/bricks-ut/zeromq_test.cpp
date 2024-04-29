@@ -11,7 +11,10 @@ TEST(zeromq_case, bidi_test) {
 		create_xtree_from_xml(
 			"<bricks>"
 			"  <zmq>"
-			"	<bidi name=\"zmq_p1\" url=\"tcp://127.0.0.1:7858\"is_server=\"true\"/>"
+			"	<bidi name=\"zmq_p1\" url=\"tcp://127.0.0.1:7858\" is_server=\"true\">"
+			"	 <sockopt id=\"ZMQ_BACKLOG\" value=\"100\" />" 
+			"	 <sockopt id=\"ZMQ_MAXMSGSIZE\" value=\"%L:-1\" />" 
+			"	</bidi>"
 			"  </zmq>"
 			"</bricks>"
 		));
@@ -21,11 +24,11 @@ TEST(zeromq_case, bidi_test) {
 			"<bricks>"
 			"  <zmq>"
 			"   <bidi name=\"zmq_p2\" url=\"tcp://127.0.0.1:7858\" port=\"7858\" is_server=\"false\">"
-            "     <sockopt num=\"12\" value=\"12\" />" 					
 			"   </bidi>"
 			"  </zmq>"
 			"</bricks>"
 		));
+
 
 	brick_uptr<bidi_plugin_t>  p1(create_zeromq_bidi());
 
@@ -47,7 +50,9 @@ TEST(zeromq_case, publish_subscribe_test) {
 		create_xtree_from_xml(
 			"<bricks>"
 			"  <zmq>"
-			"   <publisher name=\"publisher1\" url=\"tcp://127.0.0.1:7858\" />"
+			"   <publisher name=\"publisher1\" url=\"tcp://127.0.0.1:7858\">"
+			"	 <sockopt id=\"ZMQ_BACKLOG\" value=\"100\" />"
+			"   </publisher>"
 			"  </zmq>"
 			"</bricks>"
 			)
@@ -57,7 +62,9 @@ TEST(zeromq_case, publish_subscribe_test) {
 		create_xtree_from_xml(
 			"<bricks>"
 			"  <zmq>"
-			"   <subscriber name=\"subscriber1\" url=\"tcp://127.0.0.1:7858\" />"
+			"   <subscriber name=\"subscriber1\" url=\"tcp://127.0.0.1:7858\">"
+			"	 <sockopt id=\"ZMQ_SUBSCRIBE\" value=\"some.other.topic\" />"
+			"   </subscriber>"
 			"  </zmq>"
 			"</bricks>"
 		));
