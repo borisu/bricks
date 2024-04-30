@@ -9,7 +9,7 @@ namespace bricks::plugins {
 
 	class jester_subscriber_t;
 
-	class jester_ctx_t : public brick_t
+	class jester_pubsub_ctx_t : public brick_t
 	{
 	public:
 
@@ -32,7 +32,7 @@ namespace bricks::plugins {
 	{
 	public:
 
-		jester_publisher_t(jester_ctx_t* ctx);
+		jester_publisher_t(jester_pubsub_ctx_t* ctx);
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
 
@@ -51,7 +51,7 @@ namespace bricks::plugins {
 
 		bool started = false;
 
-		jester_ctx_t* ctx = nullptr;
+		jester_pubsub_ctx_t* ctx = nullptr;
 
 		cb_queue_t* queue = nullptr;
 
@@ -62,7 +62,7 @@ namespace bricks::plugins {
 	{
 	public:
 
-		jester_subscriber_t(jester_ctx_t* ctx);
+		jester_subscriber_t(jester_pubsub_ctx_t* ctx);
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options = nullptr) override;
 
@@ -84,7 +84,7 @@ namespace bricks::plugins {
 
 		msg_cb_t msg_cb;
 
-		jester_ctx_t* ctx = nullptr;
+		jester_pubsub_ctx_t* ctx = nullptr;
 
 		cb_queue_t* queue = nullptr;
 

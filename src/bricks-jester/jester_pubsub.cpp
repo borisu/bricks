@@ -8,26 +8,26 @@ using namespace bricks::plugins;
 
 
 brick_t*
-bricks::plugins::create_jester_context()
+bricks::plugins::create_jester_pubsub_context()
 {
-	return new jester_ctx_t();
+	return new jester_pubsub_ctx_t();
 }
 
 publisher_plugin_t*
 bricks::plugins::create_jester_publisher(brick_t* ctx)
 {
-	return new jester_publisher_t((jester_ctx_t*)ctx);
+	return new jester_publisher_t((jester_pubsub_ctx_t*)ctx);
 }
 
 BRICKSJESTER_API subscriber_plugin_t*
 bricks::plugins::create_jester_subscriber(brick_t* ctx)
 {
-	return new jester_subscriber_t((jester_ctx_t*)ctx);
+	return new jester_subscriber_t((jester_pubsub_ctx_t*)ctx);
 }
 
 
 bricks_error_code_e 	
-jester_ctx_t::publish(const char* topic, const char*data, size_t size)
+jester_pubsub_ctx_t::publish(const char* topic, const char*data, size_t size)
 {
 	auto it = subscribers.find(topic);
 	if (it == subscribers.end())
@@ -45,7 +45,7 @@ jester_ctx_t::publish(const char* topic, const char*data, size_t size)
 }
 
 bricks_error_code_e 
-jester_ctx_t::subscribe(const char* topic, jester_subscriber_t* s)
+jester_pubsub_ctx_t::subscribe(const char* topic, jester_subscriber_t* s)
 {
 	auto it = subscribers.find(topic);
 	if (it == subscribers.end())
@@ -60,7 +60,7 @@ jester_ctx_t::subscribe(const char* topic, jester_subscriber_t* s)
 }
 
 bricks_error_code_e
-jester_ctx_t::unsubscribe(jester_subscriber_t* s)
+jester_pubsub_ctx_t::unsubscribe(jester_subscriber_t* s)
 {
 	auto it = subscribers.begin();
 	while (it != subscribers.end())
@@ -77,7 +77,7 @@ jester_ctx_t::unsubscribe(jester_subscriber_t* s)
 }
 
 
-jester_publisher_t::jester_publisher_t(jester_ctx_t* ctx) :ctx(ctx)
+jester_publisher_t::jester_publisher_t(jester_pubsub_ctx_t* ctx) :ctx(ctx)
 {
 
 }
@@ -127,7 +127,7 @@ jester_publisher_t::publish(const string& topic, const char* data, size_t size, 
 }
 
 
-jester_subscriber_t::jester_subscriber_t(jester_ctx_t* ctx):ctx(ctx)
+jester_subscriber_t::jester_subscriber_t(jester_pubsub_ctx_t* ctx):ctx(ctx)
 {
 
 }

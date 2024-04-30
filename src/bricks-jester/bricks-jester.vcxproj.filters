@@ -12,10 +12,12 @@
       <Filter>api</Filter>
     </ClInclude>
     <ClInclude Include="jester_pubsub.h" />
+    <ClInclude Include="jester_bidi.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="jester_pubsub.cpp" />
+    <ClCompile Include="jester_bidi.cpp" />
   </ItemGroup>
 </Project>

@@ -18,8 +18,8 @@ bidi_test_1(xtree_t* xt1, bidi_plugin_t* p1, xtree_t* xt2, bidi_plugin_t* p2, se
 	int p1_events = 0;
 	ASSERT_EQ(BRICKS_SUCCESS, p1->register_event_handler([&](buffer_t* buf, xtree_t* tree)
 	{
-			buf->release();
-			tree->release();
+			if (buf) buf->release();
+			if (tree) tree->release();
 			p1_events++;
 
 	}));
@@ -27,8 +27,8 @@ bidi_test_1(xtree_t* xt1, bidi_plugin_t* p1, xtree_t* xt2, bidi_plugin_t* p2, se
 	int p2_events = 0;
 	ASSERT_EQ(BRICKS_SUCCESS, p2->register_event_handler([&](buffer_t* buf, xtree_t* tree)
 		{
-			buf->release();
-			tree->release();
+			if (buf) buf->release();
+			if (tree) tree->release();
 			p2_events++;
 		}));
 
