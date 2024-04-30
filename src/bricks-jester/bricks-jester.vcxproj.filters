@@ -13,11 +13,13 @@
     </ClInclude>
     <ClInclude Include="jester_pubsub.h" />
     <ClInclude Include="jester_bidi.h" />
+    <ClInclude Include="jester_reqrep.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="jester_pubsub.cpp" />
     <ClCompile Include="jester_bidi.cpp" />
+    <ClCompile Include="jester_reqrep.cpp" />
   </ItemGroup>
 </Project>

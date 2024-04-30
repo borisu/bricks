@@ -12,7 +12,7 @@ request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, cli
 	ASSERT_EQ(BRICKS_SUCCESS, client->init(selector->queue(), sxt));
 
 	bool received_request = false;
-	auto cb = [&](response_channel_t ch, buffer_t* buf,  xtree_t* xt)
+	auto cb = [&](server_proxy_cb_t ch, buffer_t* buf,  xtree_t* xt)
 		{
 			xt->release();
 			buf->release();
@@ -29,8 +29,8 @@ request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, cli
 	bool received_response = false;
 	ASSERT_EQ(BRICKS_SUCCESS, client->request("ping", 5, [&](bricks_error_code_e, buffer_t* buf, xtree_t* xt)
 		{
-			buf->release();
-			xt->release();
+			if (buf) buf->release();
+			if (xt ) xt->release();
 			received_response = true;
 		}));
 

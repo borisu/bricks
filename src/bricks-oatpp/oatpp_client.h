@@ -18,7 +18,7 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e start() override;
 
-		virtual bricks_error_code_e request(const char*, size_t, response_cb_t, const xtree_t* options ) override;
+		virtual bricks_error_code_e request(const char*, size_t, client_response_cb_t, const xtree_t* options ) override;
 
 		virtual void release() override { delete this; };
 
@@ -104,11 +104,11 @@ namespace bricks::plugins
 
         cb_queue_t* cb_queue = nullptr;
 
-        response_cb_t callback = nullptr;
+        client_response_cb_t callback = nullptr;
 
     public:
 
-        client_coroutine_t(const std::shared_ptr<api_client_t> client, response_cb_t callback, cb_queue_t* cb_queue)
+        client_coroutine_t(const std::shared_ptr<api_client_t> client, client_response_cb_t callback, cb_queue_t* cb_queue)
             : api_client(client),
             callback(callback),
             cb_queue(cb_queue)

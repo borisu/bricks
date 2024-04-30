@@ -40,3 +40,21 @@ TEST(jester_case, bidi_test) {
 	bidi_test_1(nullptr, p1.get(), nullptr, p2.get(), selector.get());
 
 }
+
+TEST(jester_case, reqrep_test) {
+
+	brick_uptr<brick_t> c(create_jester_reqrep_ctx());
+
+	brick_uptr<server_plugin_t> server(create_jester_server(c.get()));
+
+	brick_uptr<client_plugin_t> client(create_jester_client(c.get()));
+
+	brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
+
+	brick_uptr<selector_t>  selector(create_selector());
+
+	selector->init(cb_q.get());
+
+	request_response_test_1(nullptr, server.get(), nullptr, client.get(), selector.get());
+
+}

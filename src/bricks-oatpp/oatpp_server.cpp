@@ -104,7 +104,7 @@ oatpp_server_t::init(cb_queue_t* queue, const xtree_t* options)
 }
 
 bricks_error_code_e 
-oatpp_server_t::register_request_handler(request_cb_t request, const xtree_t* options)
+oatpp_server_t::register_request_handler(server_request_cb_t request, const xtree_t* options)
 {
 	request_cb = request;
 

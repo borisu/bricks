@@ -67,18 +67,18 @@ oatpp_server_controller_t::brick_handler_t::brick_handler_t(oatpp_server_control
 }
 
 void
-oatpp_server_controller_t::brick_handler_t::responder(oatpp_server_controller_t::brick_handler_t* THIS, bricks_error_code_e err, const char* data, size_t size, xtree_t*)
+oatpp_server_controller_t::brick_handler_t::server_proxy(bricks_error_code_e err, const char* data, size_t size, xtree_t*)
 {
-    THIS->responded = true;
+    responded = true;
 
-    THIS->err = err;
+    err = err;
 
     if (data)
     {
-        THIS->response = create_buffer(data, size);
+        response = create_buffer(data, size);
     }
 
-    THIS->cv.notifyFirst();
+    cv.notifyFirst();
 
 }
 
@@ -93,8 +93,8 @@ oatpp_server_controller_t::brick_handler_t::act() {
 oatpp::async::Action
 oatpp_server_controller_t::brick_handler_t::onBody(const oatpp::String& body) {
 
-    response_channel_t  f =
-        std::bind(responder, this, _1, _2, _3, _4);
+    server_proxy_cb_t  f =
+        std::bind(&oatpp_server_controller_t::brick_handler_t::server_proxy, this,_1, _2, _3, _4);
 
     auto xt = create_xtree();
 

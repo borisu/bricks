@@ -79,7 +79,7 @@ oatpp_client_t::start()
 
 
 bricks_error_code_e 
-oatpp_client_t::request(const char* data, size_t size, response_cb_t callback, const xtree_t* options)
+oatpp_client_t::request(const char* data, size_t size, client_response_cb_t callback, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 	ASSERT_STARTED;

@@ -24,11 +24,14 @@ namespace bricks::plugins {
 	BRICKSJESTER_API bidi_plugin_t*
 		create_jester_bidi(brick_t* ctx, int);
 
-	/*BRICKSJESTER_API server_plugin_t*
+	BRICKSJESTER_API brick_t*
+		create_jester_reqrep_ctx();
+
+	BRICKSJESTER_API server_plugin_t*
 		create_jester_server(brick_t* ctx);
 
 	BRICKSJESTER_API client_plugin_t*
-		create_jester_client(brick_t* ctx);*/
+		create_jester_client(brick_t* ctx);
 
 }
 

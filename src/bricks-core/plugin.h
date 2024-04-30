@@ -41,10 +41,10 @@ namespace bricks {
 	};
 
 	typedef function <void(bricks_error_code_e, const char*, size_t, xtree_t*)>
-		response_channel_t;
+		server_proxy_cb_t;
 
-	typedef function<void(response_channel_t, buffer_t*, xtree_t*)>
-		request_cb_t;
+	typedef function<void(server_proxy_cb_t, buffer_t*, xtree_t*)>
+		server_request_cb_t;
 
 	class server_plugin_t : public plugin_t
 	{
@@ -52,13 +52,13 @@ namespace bricks {
 
 		virtual bricks_error_code_e init(cb_queue_t *queue, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e register_request_handler(request_cb_t request, const xtree_t* options = nullptr) = 0;
+		virtual bricks_error_code_e register_request_handler(server_request_cb_t request, const xtree_t* options = nullptr) = 0;
 
 	};
 
 
 	typedef function<void(bricks_error_code_e, buffer_t*, xtree_t*)>
-		response_cb_t;
+		client_response_cb_t;
 
 	class client_plugin_t : public plugin_t
 	{
@@ -66,7 +66,7 @@ namespace bricks {
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e request(const char*, size_t, response_cb_t, const xtree_t* options = nullptr) = 0;
+		virtual bricks_error_code_e request(const char*, size_t, client_response_cb_t, const xtree_t* options = nullptr) = 0;
 
 	};
 
