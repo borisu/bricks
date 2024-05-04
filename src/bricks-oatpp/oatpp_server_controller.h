@@ -40,6 +40,8 @@ namespace bricks::plugins
 
             buffer_t *response = nullptr;
 
+            xtree_t* rsp_options = nullptr;
+
             bricks_error_code_e err = BRICKS_SUCCESS;
 
             oatpp::async::Lock lock;

@@ -37,7 +37,6 @@ oatpp_server_controller_t::add_endpoint(const string& method, const string& path
         setEndpointHandler(path, handler);
     }
 
-
     std::shared_ptr<oatpp::web::server::api::Endpoint::Info> info = getEndpointInfo(path);
     if (!info) 
     { 
@@ -67,11 +66,11 @@ oatpp_server_controller_t::brick_handler_t::brick_handler_t(oatpp_server_control
 }
 
 void
-oatpp_server_controller_t::brick_handler_t::server_proxy(bricks_error_code_e err, const char* data, size_t size, xtree_t*)
+oatpp_server_controller_t::brick_handler_t::server_proxy(bricks_error_code_e err, const char* data, size_t size, xtree_t* rsp_options)
 {
-    responded = true;
-
-    err = err;
+    this->responded   = true;
+    this->err         = err;
+    this->rsp_options = rsp_options;
 
     if (data)
     {
@@ -93,16 +92,49 @@ oatpp_server_controller_t::brick_handler_t::act() {
 oatpp::async::Action
 oatpp_server_controller_t::brick_handler_t::onBody(const oatpp::String& body) {
 
-    server_proxy_cb_t  f =
-        std::bind(&oatpp_server_controller_t::brick_handler_t::server_proxy, this,_1, _2, _3, _4);
-
+   
     auto xt = create_xtree();
 
-    auto buf = create_buffer(body->data(), body->size());
+    auto headers = this->request->getHeaders().getAll();
+    for (auto &header : headers)
+    {
+        auto hnode = xt->add_node("/bricks/oatpp/request/headers/header", true);
+        xt->set_property_value(hnode.value(), "name", header.first.toString());
+        xt->set_property_value(hnode.value(), "value", header.second.toString());
+    }
 
-    auto cb = std::bind(server->request_cb, f, buf, xt);
+    auto path_vars = this->request->getPathVariables().getVariables();
+    for (auto& path_var : path_vars)
+    {
+        auto hnode = xt->add_node("/bricks/oatpp/request/path_parameters/parameter", true);
+        xt->set_property_value(hnode.value(), "name", path_var.first.toString());
+        xt->set_property_value(hnode.value(), "value", path_var.second.toString());
+    }
 
-    server->cb_queue->enqueue(cb);
+    auto query_vars = this->request->getQueryParameters().getAll();
+    for (auto& query_var : query_vars)
+    {
+        auto hnode = xt->add_node("/bricks/oatpp/request/query_parameters/parameter", true);
+        xt->set_property_value(hnode.value(), "name", query_var.first.toString());
+        xt->set_property_value(hnode.value(), "value", query_var.second.toString());
+    }
+
+    server_proxy_cb_t  f =
+        std::bind(&oatpp_server_controller_t::brick_handler_t::server_proxy, this, _1, _2, _3, _4);
+
+    if (server->cb_queue)
+    {
+        server->cb_queue->enqueue(
+            std::bind(server->request_cb, f, create_buffer(body->data(), body->size()), xt));
+    }
+    else
+    {
+        try
+        {
+            server->request_cb(f, create_buffer(body->data(), body->size()), xt);
+        }
+        catch (std::exception &){}
+    }
 
     return cv.wait(m_lockGuard, [this] {
                 return this->responded; 
@@ -113,14 +145,43 @@ oatpp::async::Action
 oatpp_server_controller_t::brick_handler_t::onReady() {
     OATPP_ASSERT(m_lockGuard.owns_lock()) // Now coroutine owns the lock
 
-    return _return(controller->createResponse(err == BRICKS_SUCCESS ? 
-        Status::CODE_200: Status::CODE_500 , response == nullptr ? "" : String(response->data(), response->size())));
+    auto http_response = controller->createResponse(err == BRICKS_SUCCESS ?
+        Status::CODE_200 : Status::CODE_500, response == nullptr ? "" : String(response->data(), response->size()));
+
+    if (rsp_options)
+    {
+        auto hcount = get_opt<size_t>(rsp_options->get_node_children_count("/bricks/oatpp/response/headers"));
+
+        for (int i = 0; i < hcount; i++)
+        {
+            auto node = rsp_options->get_node_name(xp_t("/bricks/oatpp/response/headers", i));
+            if (node.value() != "header")
+                continue;
+
+            auto header = rsp_options->get_property_value_as_string(xp_t("/bricks/oatpp/response/headers", i), "name").value();
+            auto value = rsp_options->get_property_value_as_string(xp_t("/bricks/oatpp/response/headers", i), "value").value();
+            http_response->putHeader(header, value);
+
+        }
+
+    }
+
+    return _return(http_response);
 }
 
 oatpp_server_controller_t::brick_handler_t::~brick_handler_t()
 {
     if (response)
+    {
         response->release();
+        response = nullptr;
+    }
+
+    if (rsp_options)
+    {
+        rsp_options->release();
+        rsp_options = nullptr;
+    }
 
     response = nullptr;
 }

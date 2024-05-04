@@ -100,6 +100,8 @@ TEST(xtree_case, xtree_create_2_level_with_clone)
 
 }
 
+
+
 TEST(xtree_case, xtree_create_1_level_remove_subtree)
 {
 	auto xt = create_xtree();

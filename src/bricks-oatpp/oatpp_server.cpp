@@ -42,9 +42,9 @@ oatpp_server_t::init(cb_queue_t* queue, const xtree_t* options)
 
 	try
 	{
-		string host		= get<string>(options->get_property_value("/bricks/oatpp_http_server/server", "hostname").value());
-		uint16_t port	= get<int>(options->get_property_value("/bricks/oatpp_http_server/server", "port").value());
-		int version		= get<int>(options->get_property_value("/bricks/oatpp_http_server/server", "ipversion").value());
+		string host		= get<string>(options->get_property_value("/bricks/oatpp/server", "hostname").value());
+		uint16_t port	= get<int>(options->get_property_value("/bricks/oatpp/server", "port").value());
+		int version		= get<int>(options->get_property_value("/bricks/oatpp/server", "ipversion").value());
 
 		// https://github.com/oatpp/example-async-api/blob/master/src/AppComponent.hpp
 
@@ -69,18 +69,18 @@ oatpp_server_t::init(cb_queue_t* queue, const xtree_t* options)
 
 		auto c = oatpp_server_controller_t::create_shared(this, objectMapper);
 
-		size_t ep_size = options->get_node_children_count("/bricks/oatpp_http_server/endpoints").value();
+		size_t ep_size = options->get_node_children_count("/bricks/oatpp/server/endpoints").value();
 		if (ep_size == 0)
 			return BRICKS_INVALID_PARAM;
 
 		for (int i = 0; i < ep_size; i++)
 		{
-			auto nname = options->get_node_name(xp_t("/bricks/oatpp_http_server/endpoints", i));
+			auto nname = options->get_node_name(xp_t("/bricks/oatpp/server/endpoints", i));
 			if (nname.value() != "endpoint")
 				continue;
 
-			string method = get<string>(options->get_property_value(xp_t("/bricks/oatpp_http_server/endpoints", i), "method").value());
-			string path   = get<string>(options->get_property_value(xp_t("/bricks/oatpp_http_server/endpoints", i), "path").value());
+			string method = get<string>(options->get_property_value(xp_t("/bricks/oatpp/server/endpoints", i), "method").value());
+			string path   = get<string>(options->get_property_value(xp_t("/bricks/oatpp/server/endpoints", i), "path").value());
 
 			c->add_endpoint(method, path);
 			

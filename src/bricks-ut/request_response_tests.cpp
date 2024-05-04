@@ -5,18 +5,25 @@
 
 using namespace bricks;
 void
-request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, client_plugin_t* client, selector_t* selector)
+request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, client_plugin_t* client, selector_t* selector, xtree_t* client_send_xt, xtree_t* server_response_xt)
 {
 	ASSERT_EQ(BRICKS_SUCCESS, server->init(selector->queue(), pxt));
 
 	ASSERT_EQ(BRICKS_SUCCESS, client->init(selector->queue(), sxt));
+	
 
 	bool received_request = false;
 	auto cb = [&](server_proxy_cb_t ch, buffer_t* buf,  xtree_t* xt)
 		{
+			
+			auto cloned_xt = create_xtree();
+			if (server_response_xt)
+				clone_xtree(server_response_xt, xp_t(server_response_xt->get_root().value()), cloned_xt, xp_t(""));
+
 			xt->release();
 			buf->release();
-			ch(BRICKS_SUCCESS, "pong", 4, nullptr);
+
+			ch(BRICKS_SUCCESS, "pong", 4, cloned_xt);
 			received_request = true;
 		};
 
@@ -30,9 +37,10 @@ request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, cli
 	ASSERT_EQ(BRICKS_SUCCESS, client->request("ping", 5, [&](bricks_error_code_e, buffer_t* buf, xtree_t* xt)
 		{
 			if (buf) buf->release();
-			if (xt ) xt->release();
+			if (xt) xt->release();
 			received_response = true;
-		}));
+		},
+		client_send_xt));
 
 	int count = 0;
 	while (count++ < 25  &&  ( received_request == false || received_response == false))
