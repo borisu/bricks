@@ -27,7 +27,7 @@ kafka_service_t::rd_log(const rd_kafka_t* rk, int level, const char* fac, const 
 	};
 
 
-	log1(log_level, "%s - RDKAFKA-%i-%s: %s: %s\n",
+	log1(log_level, "%s %%%%%% RDKAFKA-%i-%s: %s: %s",
 		THIS->name.c_str(), fac,
 		rk ? rd_kafka_name(rk) : NULL, buf);
 }
@@ -81,41 +81,86 @@ kafka_service_t::rd_poll_loop()
 
 
 bricks_error_code_e
-kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options)
+kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options, const char* configuration_path)
 {
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
+	if (!options)
+		return BRICKS_SUCCESS;
+
+	if (!conf || !configuration_path)
+		return BRICKS_INVALID_PARAM;
+
+
 	try
 	{
-		this->name = get_opt<string>(options->get_property_value("/rdkafka/plugin", "name"));
 	
-		size_t c = get_opt<size_t>(options->get_node_children_count("/rdkafka/configuration"),0);
+		size_t c = get_opt<size_t>(options->get_node_children_count(configuration_path),0);
 
 		for (int i = 0; i < c && err == BRICKS_SUCCESS; i++)
 		{
-			auto prop = options->get_node_name(xp_t("/rdkafka/configuration", i)).value();
+			auto prop = options->get_node_name(xp_t(configuration_path, i)).value();
 			if (prop != "property")
 				continue;
 
-			auto name  = get<string>(options->get_property_value(xp_t("/configuration", i), "name").value());
-			auto value = options->get_property_value_as_string(xp_t("/configuration", i), "value").value();
+			auto prop_name  = get<string>(options->get_property_value(xp_t(configuration_path, i), "name").value());
+			auto value = options->get_property_value_as_string(xp_t(configuration_path, i), "value").value();
 
-			log1(BRICKS_DEBUG, "%s - (%d) Setting rd kafka property name=%s, value=%s\n", name.c_str(), i, name.c_str(), value.c_str());
-			if (rd_kafka_conf_set(conf, name.c_str(), value.c_str(), nullptr, 0) != RD_KAFKA_CONF_OK)
+			log1(BRICKS_DEBUG, "%s %%%%%% Setting rdkafka property '%s'=%s.", this->name.c_str(), prop_name.c_str(), value.c_str());
+			if (rd_kafka_conf_set(conf, prop_name.c_str(), value.c_str(), nullptr, 0) != RD_KAFKA_CONF_OK)
 			{
-				log1(BRICKS_ALARM, "%s - Error: %s\n", name.c_str(), rd_kafka_err2str(rd_kafka_last_error()));
+				log1(BRICKS_ALARM, "%s %%%%%% Error setting rdkafka property(%d): %s.", this->name.c_str(), rd_kafka_last_error(), rd_kafka_err2str(rd_kafka_last_error()));
 				err = BRICKS_3RD_PARTY_ERROR;
-				throw std::exception();
+				break;
 			}
 		}
 	}
-	catch (std::bad_optional_access&)
+	catch (std::exception&)
 	{
 		err = BRICKS_INVALID_PARAM;
 	}
-	catch (std::exception&)
+
+	return err;
+
+}
+
+bricks_error_code_e
+kafka_service_t::init_topic_conf(rd_kafka_topic_conf_t* conf, const xtree_t* options, const char* configuration_path)
+{
+	bricks_error_code_e err = BRICKS_SUCCESS;
+
+	if (!options)
+		return BRICKS_SUCCESS;
+
+	if (!conf || !configuration_path)
+		return BRICKS_INVALID_PARAM;
+
+	try
 	{
 
+		size_t c = get_opt<size_t>(options->get_node_children_count(configuration_path), 0);
+
+		for (int i = 0; i < c && err == BRICKS_SUCCESS; i++)
+		{
+			auto prop = options->get_node_name(xp_t(configuration_path, i)).value();
+			if (prop != "property")
+				continue;
+
+			auto prop_name = get<string>(options->get_property_value(xp_t(configuration_path, i), "name").value());
+			auto value = options->get_property_value_as_string(xp_t(configuration_path, i), "value").value();
+
+			log1(BRICKS_DEBUG, "%s %%%%%% Setting rdkafka topic property '%s'=%s.", this->name.c_str(), prop_name.c_str(), value.c_str());
+			if (rd_kafka_topic_conf_set(conf, prop_name.c_str(), value.c_str(), nullptr, 0) != RD_KAFKA_CONF_OK)
+			{
+				log1(BRICKS_ALARM, "%s %%%%%% Error setting rdkafka topic property(%d): %s.", this->name.c_str(), prop_name.c_str(), rd_kafka_last_error(), rd_kafka_err2str(rd_kafka_last_error()));
+				err = BRICKS_3RD_PARTY_ERROR;
+				break;
+			}
+		}
+	}
+	catch (std::exception&)
+	{
+		err = BRICKS_INVALID_PARAM;
 	}
 
 	return err;

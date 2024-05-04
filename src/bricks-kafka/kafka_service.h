@@ -16,7 +16,9 @@ namespace bricks::plugins{
 
 	protected:
 
-		virtual bricks_error_code_e init_conf(rd_kafka_conf_t* conf, const xtree_t* options);
+		virtual bricks_error_code_e init_conf(rd_kafka_conf_t* conf, const xtree_t* options, const char *configuration_path);
+
+		virtual bricks_error_code_e init_topic_conf(rd_kafka_topic_conf_t* conf, const xtree_t* options, const char* configuration_path);
 
 		virtual void rd_poll_loop();
 
@@ -28,9 +30,9 @@ namespace bricks::plugins{
 
 		static void rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf);
 
-		bool initiated = false;
+		atomic<bool> initiated = false;
 
-		bool started = false;
+		atomic<bool> started = false;
 
 		atomic<bool> shutdown = false;
 		

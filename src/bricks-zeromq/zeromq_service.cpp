@@ -141,50 +141,60 @@ zeromq_service_t::~zeromq_service_t()
 	stop_zmq_poll_loop();
 }
 
-void 
+bricks_error_code_e
 zeromq_service_t::set_sockopt(const xtree_t* xt, const char* parent, void* sock)
 {
 	if (!xt)
-		return;
+		return BRICKS_SUCCESS;
 
-	size_t ocount = xt->get_node_children_count(parent).value();
-	for (int i = 0; i < ocount; i++)
+	auto err = BRICKS_SUCCESS;
+
+	try
 	{
-		if (xt->get_node_name(xp_t(parent, i)).value() == "sockopt")
+		size_t ocount = xt->get_node_children_count(parent).value();
+		for (int i = 0; i < ocount; i++)
 		{
-			string name = get<string>(xt->get_property_value(xp_t(parent, i), "id").value());
+			if (xt->get_node_name(xp_t(parent, i)).value() == "sockopt")
+			{
+				string name = get<string>(xt->get_property_value(xp_t(parent, i), "id").value());
 
-			int id = option_names[name];
+				int id = option_names[name];
 
-			auto val = xt->get_property_value(xp_t(parent, i), "value").value();
-			if (holds_alternative<long long>(val))
-			{
-				long long opt = std::get<long long>(val);
-				if (zmq_setsockopt(sock, id, &opt, sizeof(opt)) == -1) {
-					BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
-					throw std::exception();
+				auto val = xt->get_property_value(xp_t(parent, i), "value").value();
+				if (holds_alternative<long long>(val))
+				{
+					long long opt = std::get<long long>(val);
+					if (zmq_setsockopt(sock, id, &opt, sizeof(opt)) == -1) {
+						BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
+						err =  BRICKS_3RD_PARTY_ERROR;
+						break;
+					}
+				}
+				else if (holds_alternative<int>(val))
+				{
+					int opt = std::get<int>(val);
+					if (zmq_setsockopt(sock, id, &opt, sizeof(opt)) == -1) {
+						BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
+						err = BRICKS_3RD_PARTY_ERROR;
+						break;
+					}
+				}
+				else if (holds_alternative<string>(val))
+				{
+					string opt = std::get<string>(val);
+					if (zmq_setsockopt(sock, id, opt.c_str(), strlen(opt.c_str())) == -1) {
+						BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
+						err = BRICKS_3RD_PARTY_ERROR;
+						break;
+					}
 				}
 			}
-			else if (holds_alternative<int>(val))
-			{
-				int opt = std::get<int>(val);
-				if (zmq_setsockopt(sock, id, &opt, sizeof(opt)) == -1) {
-					BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
-					throw std::exception();
-				}
-			}
-			else if (holds_alternative<string>(val))
-			{
-				string opt = std::get<string>(val);
-				if (zmq_setsockopt(sock, id, opt.c_str(), strlen(opt.c_str())) == -1) {
-					BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
-					throw std::exception();
-				}
-			}
-			else
-			{
-				throw std::exception();
-			}
-		}
-	};
+		};
+
+		return err;
+	}
+	catch (std::exception&)
+	{
+		return BRICKS_INVALID_PARAM;
+	}
 }

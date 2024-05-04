@@ -72,7 +72,10 @@ zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 			throw std::exception();
 		}
 
-		set_sockopt(options, "/bricks/zmq/bidi",pair);
+		if ((err = set_sockopt(options, "/bricks/zmq/bidi", pair)) != BRICKS_SUCCESS)
+		{
+			throw std::exception();
+		}
 
 		items[0] = { pair, 0, ZMQ_POLLIN, 0 };
 
@@ -80,11 +83,13 @@ zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 	}
 	catch (std::bad_optional_access&)
 	{
-		err = BRICKS_INVALID_PARAM;
+		if (err == BRICKS_SUCCESS)
+			err = BRICKS_INVALID_PARAM;
 	}
 	catch (std::exception&)
 	{
-		err = BRICKS_3RD_PARTY_ERROR;
+		if (err == BRICKS_SUCCESS)
+			err = BRICKS_3RD_PARTY_ERROR;
 	}
 
 	if (err != BRICKS_SUCCESS)
@@ -154,6 +159,7 @@ zeromq_bidi_t::do_zmq_poll(int milliseconds, bool last_call)
 	if (rc == -1)
 	{
 		BRICK_LOG_ZMQ_ERROR(zmq_poll);
+		started = false;
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 

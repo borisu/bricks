@@ -151,6 +151,9 @@ SaxHandler::VisitExit(const tinyxml2::XMLElement& element)
 
 #define BRICKS_PREFIX_LEN strlen("%x:")
 
+
+
+
 // Override the interface's functions to handle events
 bool 
 SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attribute) {
@@ -162,11 +165,19 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
 
     if (element.GetText() != nullptr)
     {
-        string str = base64::from_base64(element.GetText()).c_str();
+        try
+        { 
 
-        std::vector<char> vec(str.begin(), str.end());
+            string str = base64::from_base64(element.GetText()).c_str();
 
-        xt->set_node_value(handle.value(), &str[0], (int)str.size());
+            std::vector<char> vec(str.begin(), str.end());
+
+            xt->set_node_value(handle.value(), &str[0], (int)str.size());
+        }
+        catch (std::exception& e)
+        {
+            return false;
+        }
     }
     
     // Print the attributes, if any

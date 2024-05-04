@@ -32,10 +32,6 @@ namespace bricks::plugins
 
 		virtual void destroy();
 
-		char errstr[512] = { '\0' };
-
-		bool initiated;
-
 		rd_kafka_conf_t* rd_conf_h = nullptr;
 
 		rd_kafka_t* rd_producer_h = nullptr;

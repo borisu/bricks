@@ -35,12 +35,13 @@ bricks_error_code_e
 zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
+	ASSERT_NOT_STARTED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	this->cb_queue = queue;
 
-	context = zmq_ctx_new();
+	context    = zmq_ctx_new();
 
 	subscriber = zmq_socket(context, ZMQ_SUB);
 
@@ -137,6 +138,7 @@ zeromq_subscriber_t::do_zmq_poll(int milliseconds, bool last_call)
 	if (rc == -1)
 	{
 		BRICK_LOG_ZMQ_ERROR(zmq_poll);
+		started = false;
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
@@ -190,16 +192,21 @@ zeromq_subscriber_t::do_zmq_poll(int milliseconds, bool last_call)
 			if (cb_queue)
 			{
 				cb_queue->enqueue(
-					std::bind(msg_cb, topic, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
+					std::bind(
+						msg_cb,
+						topic,
+						create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)),
+						xt)
 				);
-
-			}
-			else
-			{
-				try { msg_cb(topic, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt); }
+			} else {
+				try { 
+					msg_cb(
+						topic, 
+						create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), 
+						xt); 
+				}
 				catch (std::exception&) {};
 			}
-
 		} while (more);
 			
 

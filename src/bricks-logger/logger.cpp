@@ -15,7 +15,7 @@ void console_logger(bricks_debug_level_e log_level, const char* l)
 	if (log_level < BRICKS_TRACE || log_level > BRICKS_LOG_OFF)
 		return;
 
-	printf("[%s] - %s", debug_str[log_level], l);
+	printf("[%s] - %s\n", debug_str[log_level], l);
 
 };
 

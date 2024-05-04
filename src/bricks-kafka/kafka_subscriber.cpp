@@ -34,9 +34,18 @@ kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opti
 
 	rd_kafka_conf_set_opaque(rd_conf_h, this);
 
-	rd_kafka_conf_set_log_cb(rd_conf_h, rd_log);
+	if (options)
+	{
+		auto enabled = get_opt<bool>(options->get_property_value("/bricks/rdkafka/rdlog", "enabled"));
+		if (enabled)
+		{
+			rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::rd_log);
+		}
 
-	if ((err = init_conf(rd_conf_h, options)) != BRICKS_SUCCESS)
+		this->name = get_opt<string>(options->get_property_value("/bricks/rdkafka/consumer", "name"), "kafka-consumer");
+	}
+
+	if ((err = init_conf(rd_conf_h, options, "/bricks/rdkafka/consumer/configuration")) != BRICKS_SUCCESS)
 	{
 		destroy();
 		return err;
@@ -48,7 +57,7 @@ kafka_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opti
 	rd_kafka_h = rd_kafka_new(RD_KAFKA_CONSUMER, rd_conf_h, NULL, 0);
 	if (!rd_kafka_h)
 	{
-		log1(BRICKS_ALARM, "Failed to create Kafka consumer: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+		log1(BRICKS_ALARM, "%s %%%%%% Failed to create rdkafka consumer(%d): %s.\n", this->name.c_str(), rd_kafka_last_error(), rd_kafka_err2str(rd_kafka_last_error()));
 		destroy();
 		return BRICKS_3RD_PARTY_ERROR;
 	}
@@ -71,12 +80,14 @@ kafka_subscriber_t::start()
 	auto rd_err = rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
 
 	if (rd_err) {
-		log1(BRICKS_ALARM, "Failed to subscribe to topic: %s\n", rd_kafka_err2str(rd_err));
+		log1(BRICKS_ALARM, "%s %%%%%% Failed to subscribe to topic(%d): %s.\n", this->name.c_str(), rd_err, rd_kafka_err2str(rd_err));
+		destroy();
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
 	if (start_rd_poll_loop() != BRICKS_SUCCESS)
 	{
+		destroy();
 		return BRICKS_FAILURE_GENERIC;
 	}
 
@@ -120,10 +131,17 @@ kafka_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	rd_kafka_topic_partition_list_add(rd_part_list_h, topic.c_str(),
-		/* the partition is ignored
-		 * by subscribe() */
-		0);
+	int partition = 0;
+
+	if (options)
+	{
+		partition = get_opt<int>(options->get_property_value("/bricks/rdkafka/consumer/topic/partition", "value").value(),0);
+	}
+
+	rd_kafka_topic_partition_list_add(
+		rd_part_list_h, 
+		topic.c_str(),
+		partition);
 
 	return BRICKS_SUCCESS;
 
@@ -134,6 +152,9 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 {
 	bricks_error_code_e  err = BRICKS_SUCCESS;
 
+	if (last_call)
+		return BRICKS_SUCCESS;
+
 	rd_kafka_message_t* msg = rd_kafka_consumer_poll(rd_kafka_h, (int)milliseconds); // Poll for messages
 
 	if (!msg)
@@ -141,7 +162,8 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 
 	if (msg->err)
 	{
-		log1(BRICKS_ALARM, "error consuming messages:%s", rd_kafka_err2str(rd_kafka_last_error()));
+		log1(BRICKS_ALARM, "%s %%%%%% Error consuming rdkafka messages(%d): %s.",  this->name.c_str(), msg->err, rd_kafka_err2str(msg->err));
+		started = false;
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 	else

@@ -17,7 +17,7 @@ namespace bricks::plugins
 
 		virtual void zmq_poll_loop();
 
-		virtual void set_sockopt(const xtree_t* xt, const char* parent, void* sock);
+		virtual bricks_error_code_e set_sockopt(const xtree_t* xt, const char* parent, void* sock);
 
 		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) = 0;
 
@@ -25,9 +25,9 @@ namespace bricks::plugins
 
 		void stop_zmq_poll_loop();
 
-		bool initiated = false;
+		atomic<bool> initiated = false;
 
-		bool started = false;
+		atomic<bool> started = false;
 
 		atomic<bool> shutdown = false;
 

@@ -6,7 +6,16 @@ using namespace bricks;
 
 
 void
-publish_subscribe_test_1(xtree_t* pxt, publisher_plugin_t* publisher, xtree_t* sxt, subscriber_plugin_t* subscriber, selector_t* selector);
+publish_subscribe_test_1(
+	xtree_t* publisher_xt, 
+	publisher_plugin_t* publisher, 
+	xtree_t* subscriber_xt, 
+	subscriber_plugin_t* subscriber, 
+	selector_t* selector, 
+	xtree_t* publisher_topic_xt = nullptr,
+	xtree_t* subscriber_topic_xt = nullptr,
+	xtree_t* publish_xt = nullptr,
+	xtree_t* subscribers_xt = nullptr);
 
 void
 request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, client_plugin_t* client, selector_t* selector);
