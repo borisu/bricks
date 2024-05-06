@@ -1,5 +1,0 @@
-[services]
-[services.svc1]
-
-[discovery.types]
-type=etcd
