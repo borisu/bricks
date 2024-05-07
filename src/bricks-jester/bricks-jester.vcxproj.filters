@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="api">
+    <Filter Include="include">
       <UniqueIdentifier>{acd2f9b9-a24d-44ae-a70e-8a7f8f649101}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="jester.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="jester_pubsub.h" />
     <ClInclude Include="jester_bidi.h" />
     <ClInclude Include="jester_reqrep.h" />
+    <ClInclude Include="include\jester_plugin.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

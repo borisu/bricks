@@ -1,7 +1,6 @@
 #pragma once
 #include "bricks.h"
 
-
 #ifdef BRICKSZEROMQ_EXPORTS
 	#define BRICKSZEROMQ_API __declspec(dllexport)
 #else

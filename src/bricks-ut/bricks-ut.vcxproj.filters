@@ -3,35 +3,35 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="kafka_test.cpp">
-      <Filter>plugins</Filter>
+      <Filter>plugin_tests</Filter>
     </ClCompile>
     <ClCompile Include="zeromq_test.cpp">
-      <Filter>plugins</Filter>
+      <Filter>plugin_tests</Filter>
     </ClCompile>
     <ClCompile Include="jester_test.cpp">
-      <Filter>plugins</Filter>
+      <Filter>plugin_tests</Filter>
     </ClCompile>
     <ClCompile Include="oatpp_test.cpp">
-      <Filter>plugins</Filter>
-    </ClCompile>
-    <ClCompile Include="publish_subsribe_tests.cpp">
-      <Filter>generic_tests</Filter>
-    </ClCompile>
-    <ClCompile Include="request_response_tests.cpp">
-      <Filter>generic_tests</Filter>
+      <Filter>plugin_tests</Filter>
     </ClCompile>
     <ClCompile Include="xtree_test.cpp">
-      <Filter>generic_tests</Filter>
+      <Filter>core_tests</Filter>
+    </ClCompile>
+    <ClCompile Include="publish_subsribe_tests.cpp">
+      <Filter>generic_plugin_tests</Filter>
+    </ClCompile>
+    <ClCompile Include="request_response_tests.cpp">
+      <Filter>generic_plugin_tests</Filter>
     </ClCompile>
     <ClCompile Include="bidi_tests.cpp">
-      <Filter>generic_tests</Filter>
+      <Filter>generic_plugin_tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="generic_tests.h">
-      <Filter>generic_tests</Filter>
+      <Filter>generic_plugin_tests</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -44,11 +44,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="generic_tests">
+    <Filter Include="plugin_tests">
+      <UniqueIdentifier>{30811994-b1ee-4e58-8f71-5ff1bcfd1526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core_tests">
       <UniqueIdentifier>{1e2ca4e0-6a26-492c-b542-bf96be549cbc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="plugins">
-      <UniqueIdentifier>{30811994-b1ee-4e58-8f71-5ff1bcfd1526}</UniqueIdentifier>
+    <Filter Include="generic_plugin_tests">
+      <UniqueIdentifier>{0693bfe7-b77b-463a-9ba7-45e78c79705f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="api">
+    <Filter Include="include">
       <UniqueIdentifier>{974e669f-d267-449f-970e-04c081ba187d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -13,11 +13,11 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="oatpp_server.h" />
-    <ClInclude Include="oatpp_plugin.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="oatpp_server_controller.h" />
     <ClInclude Include="oatpp_client.h" />
+    <ClInclude Include="include\oatpp_plugin.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

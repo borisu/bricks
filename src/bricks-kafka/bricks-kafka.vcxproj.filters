@@ -5,21 +5,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="api">
+    <Filter Include="include">
       <UniqueIdentifier>{bd5e3dd2-dcdf-4a2b-aca0-cf5e595d44c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="rdkafka_plugin.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="kafka_subscriber.h" />
     <ClInclude Include="kafka_publisher.h" />
     <ClInclude Include="kafka_service.h" />
-    <ClInclude Include="rdkafka_common.h">
-      <Filter>api</Filter>
+    <ClInclude Include="include\rdkafka_plugin.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

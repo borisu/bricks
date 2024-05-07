@@ -174,7 +174,7 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
 
             xt->set_node_value(handle.value(), &str[0], (int)str.size());
         }
-        catch (std::exception& e)
+        catch (std::exception&)
         {
             return false;
         }

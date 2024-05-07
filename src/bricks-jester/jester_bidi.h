@@ -1,5 +1,5 @@
 #pragma once
-#include "jester.h"
+#include "jester_plugin.h"
 #include <map>
 
 using namespace std;

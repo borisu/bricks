@@ -5,20 +5,20 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="api">
+    <Filter Include="include">
       <UniqueIdentifier>{4b376e75-d62c-412f-8e6e-0710b4fa9a97}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="zeromq_plugin.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="zeromq_service.h" />
     <ClInclude Include="zeromq_publisher.h" />
     <ClInclude Include="zeromq_subscriber.h" />
     <ClInclude Include="zeromq_bidi.h" />
+    <ClInclude Include="include\zeromq_plugin.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />

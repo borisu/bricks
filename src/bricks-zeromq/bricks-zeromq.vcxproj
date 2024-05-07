@@ -112,7 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-logger;..\..\3rdparty\modules\zeromq\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\3rdparty\modules\zeromq\include;..\bricks-core\include;..\bricks-logger\include;.\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -144,9 +144,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="include\zeromq_plugin.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="zeromq_bidi.h" />
-    <ClInclude Include="zeromq_plugin.h" />
     <ClInclude Include="zeromq_publisher.h" />
     <ClInclude Include="zeromq_service.h" />
     <ClInclude Include="zeromq_subscriber.h" />

@@ -17,41 +17,43 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="xtree.h">
-      <Filter>api</Filter>
-    </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>api</Filter>
-    </ClInclude>
-    <ClInclude Include="plugin.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="xtree_impl.h" />
-    <ClInclude Include="bricks.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="locking_queue.h" />
-    <ClInclude Include="utils.h" />
     <ClInclude Include="selector_impl.h" />
-    <ClInclude Include="queue.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="queue_impl.h" />
-    <ClInclude Include="selector.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="xtree_xml.h" />
     <ClInclude Include="xtree_cloner.h" />
-    <ClInclude Include="buffer.h">
-      <Filter>api</Filter>
-    </ClInclude>
     <ClInclude Include="buffer_impl.h" />
+    <ClInclude Include="include\bricks.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\buffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\plugin.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\queue.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\selector.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xtree.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="3rdparty">
       <UniqueIdentifier>{a81d7290-b53f-46bf-9a3e-2fdb6401e3d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="api">
+    <Filter Include="include">
       <UniqueIdentifier>{9a643695-87f6-4d5d-a5ea-f09ad2462596}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

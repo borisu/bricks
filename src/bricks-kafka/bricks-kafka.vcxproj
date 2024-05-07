@@ -112,7 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\bricks-core;..\bricks-logger</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\bricks-core\include;..\bricks-logger\include;.\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -142,8 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
-    <ClInclude Include="rdkafka_common.h" />
-    <ClInclude Include="rdkafka_plugin.h" />
+    <ClInclude Include="include\rdkafka_plugin.h" />
     <ClInclude Include="kafka_publisher.h" />
     <ClInclude Include="kafka_service.h" />
     <ClInclude Include="kafka_subscriber.h" />

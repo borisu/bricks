@@ -10,6 +10,6 @@
 #include "gtest/gtest.h"
 #include "bricks.h"
 #include "logger.h"
-#include "jester.h"
+#include "jester_plugin.h"
 #include "oatpp_plugin.h"
 #include "rdkafka_plugin.h"

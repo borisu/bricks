@@ -1,5 +1,4 @@
 #pragma once
-#include "rdkafka_common.h"
 #include "queue.h"
 
 using namespace std;

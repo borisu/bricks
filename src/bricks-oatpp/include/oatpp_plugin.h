@@ -1,5 +1,5 @@
 #pragma once
-#include "plugin.h"
+#include "bricks.h"
 
 #ifdef BRICKSOATPP_EXPORTS
 #define BRICKSOATPP_API __declspec(dllexport)
