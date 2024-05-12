@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set (VCPKG_ROOT "${CMAKE_CURRENT_LIST_DIR}/../3rdparty/modules/vcpkg")
-set (CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+set (CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 option(NO_KAFKA_PLUGIN "No Kafka plugin" OFF)
 
