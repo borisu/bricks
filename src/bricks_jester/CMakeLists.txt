@@ -22,22 +22,22 @@ pch.h
 #
 # Target
 #
-add_library(bricks-jester SHARED ${BRICKS_JESTER_API} ${BRICKS_JESTER_SRC})
+add_library(bricks_jester SHARED ${BRICKS_JESTER_API} ${BRICKS_JESTER_SRC})
 
 #
 # vcpkg
 #
-target_link_libraries(bricks-jester PRIVATE bricks-core bricks-logger)
+target_link_libraries(bricks_jester PRIVATE bricks_core bricks_logger)
 
 #
 # Configuration
 #
-set_property(TARGET bricks-jester PROPERTY CXX_STANDARD 17)
+set_property(TARGET bricks_jester PROPERTY CXX_STANDARD 17)
 
-target_include_directories(bricks-jester PUBLIC 
+target_include_directories(bricks_jester PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-core/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-logger/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_core/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
 )
 
 add_compile_definitions(BRICKSJESTER_EXPORTS)

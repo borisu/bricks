@@ -26,7 +26,7 @@ xtree_test.cpp
 #
 # Target
 #
-add_executable(bricks-ut ${BRICKS_UT_SRC})
+add_executable(bricks_ut ${BRICKS_UT_SRC})
 
 #
 # vcpkg
@@ -35,41 +35,41 @@ add_executable(bricks-ut ${BRICKS_UT_SRC})
 #
 # Configuration
 #
-set_property(TARGET bricks-ut PROPERTY CXX_STANDARD 17)
+set_property(TARGET bricks_ut PROPERTY CXX_STANDARD 17)
 
-target_include_directories(bricks-ut PRIVATE 
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-core/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-logger/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-jester/include
+target_include_directories(bricks_ut PRIVATE 
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_core/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_jester/include
 )
 
-target_link_libraries(bricks-ut PRIVATE GTest::gtest_main bricks-core bricks-logger bricks-jester)
+target_link_libraries(bricks_ut PRIVATE GTest::gtest_main bricks_core bricks_logger bricks_jester)
 
-add_custom_command(TARGET bricks-ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks-core>" $<TARGET_FILE_DIR:bricks-ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_core>" $<TARGET_FILE_DIR:bricks_ut>)
   
-add_custom_command(TARGET bricks-ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks-logger>" $<TARGET_FILE_DIR:bricks-ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_logger>" $<TARGET_FILE_DIR:bricks_ut>)
   
-add_custom_command(TARGET bricks-ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks-jester>" $<TARGET_FILE_DIR:bricks-ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_jester>" $<TARGET_FILE_DIR:bricks_ut>)
 
 if (NOT NO_KAFKA_PLUGIN)
-    add_custom_command(TARGET bricks-ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks-kafka>" $<TARGET_FILE_DIR:bricks-ut>)
-    target_include_directories(bricks-ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks-kafka/include)
-    target_sources(bricks-ut PRIVATE kafka_test.cpp)
-    target_link_libraries(bricks-ut PRIVATE bricks-kafka)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_kafka>" $<TARGET_FILE_DIR:bricks_ut>)
+    target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_kafka/include)
+    target_sources(bricks_ut PRIVATE kafka_test.cpp)
+    target_link_libraries(bricks_ut PRIVATE bricks_kafka)
 endif()
 
 if (NOT NO_ZEROMQ_PLUGIN)
-    add_custom_command(TARGET bricks-ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks-zeromq>" $<TARGET_FILE_DIR:bricks-ut>)
-    target_include_directories(bricks-ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks-zeromq/include)
-    target_sources(bricks-ut PRIVATE kafka_test.cpp)
-    target_link_libraries(bricks-ut PRIVATE bricks-zeromq)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_zeromq>" $<TARGET_FILE_DIR:bricks_ut>)
+    target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_zeromq/include)
+    target_sources(bricks_ut PRIVATE zeromq_test.cpp)
+    target_link_libraries(bricks_ut PRIVATE bricks_zeromq)
 endif()  
 
 if (NOT NO_OATPP_PLUGIN)
-    add_custom_command(TARGET bricks-ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks-oatpp>" $<TARGET_FILE_DIR:bricks-ut>)
-    target_include_directories(bricks-ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks-oatpp/include)
-    target_sources(bricks-ut PRIVATE oatpp_test.cpp)
-    target_link_libraries(bricks-ut PRIVATE bricks-oatpp)    
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_oatpp>" $<TARGET_FILE_DIR:bricks_ut>)
+    target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_oatpp/include)
+    target_sources(bricks_ut PRIVATE oatpp_test.cpp)
+    target_link_libraries(bricks_ut PRIVATE bricks_oatpp)    
 endif()  
  
 

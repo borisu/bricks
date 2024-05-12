@@ -2,10 +2,6 @@
 	path = 3rdparty/modules/tinyxml2
 	url = https://github.com/leethomason/tinyxml2.git
 	branch = v10.0.0
-[submodule "3rdparty/modules/zeromq"]
-	path = 3rdparty/modules/zeromq
-	url = https://github.com/zeromq/libzmq.git
-	branch = v4.3.5
 [submodule "3rdparty/modules/oatpp"]
 	path = 3rdparty/modules/oatpp
 	url = https://github.com/oatpp/oatpp.git
@@ -14,6 +10,3 @@
 	path = 3rdparty/modules/base64
 	url = https://github.com/tobiaslocker/base64
 	branch = 387b32f
-[submodule "3rdparty/modules/vcpkg"]
-	path = 3rdparty/modules/vcpkg
-	url = https://github.com/microsoft/vcpkg.git

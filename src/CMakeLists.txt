@@ -11,29 +11,29 @@ option(NO_OATPP_PLUGIN "No Oatpp plugin" OFF)
 
 project(bricks)
 
-add_subdirectory(bricks-logger)
+add_subdirectory(bricks_logger)
 
-add_subdirectory(bricks-core)
+add_subdirectory(bricks_core)
 
-add_subdirectory(bricks-jester)
+add_subdirectory(bricks_jester)
 
 if (NOT NO_KAFKA_PLUGIN)
-    add_subdirectory(bricks-kafka)
+    add_subdirectory(bricks_kafka)
 else()    
     add_compile_definitions(NO_KAFKA_PLUGIN)
 endif()    
 
 if (NOT NO_ZEROMQ_PLUGIN)
-    add_subdirectory(bricks-zeromq)
+    add_subdirectory(bricks_zeromq)
 else()
     add_compile_definitions(NO_ZEROMQ_PLUGIN)
 endif()
 
 if (NOT NO_OATPP_PLUGIN)
-    add_subdirectory(bricks-oatpp)
+    add_subdirectory(bricks_oatpp)
 else()
     add_compile_definitions(NO_OATPP_PLUGIN)
 endif()
 
-add_subdirectory(bricks-ut)
+add_subdirectory(bricks_ut)
     

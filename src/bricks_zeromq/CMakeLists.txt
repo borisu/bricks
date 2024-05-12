@@ -25,23 +25,23 @@ zeromq_subscriber.h
 #
 # Target
 #
-add_library(bricks-zeromq SHARED ${BRICKS_ZEROMQ_API} ${BRICKS_ZEROMQ_SRC})
+add_library(bricks_zeromq SHARED ${BRICKS_ZEROMQ_API} ${BRICKS_ZEROMQ_SRC})
 
 #
 # vcpkg
 #
 find_package(czmq CONFIG REQUIRED)
-target_link_libraries(bricks-zeromq PRIVATE czmq-static bricks-core bricks-logger)
+target_link_libraries(bricks_zeromq PRIVATE czmq-static bricks_core bricks_logger)
 
 #
 # Configuration
 #
-set_property(TARGET bricks-zeromq PROPERTY CXX_STANDARD 17)
+set_property(TARGET bricks_zeromq PROPERTY CXX_STANDARD 17)
 
-target_include_directories(bricks-zeromq PUBLIC 
+target_include_directories(bricks_zeromq PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-core/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-logger/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_core/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
 )
 
 add_compile_definitions(BRICKSZEROMQ_EXPORTS)

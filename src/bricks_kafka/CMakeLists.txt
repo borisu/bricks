@@ -23,25 +23,25 @@ rdkafka_plugin.cpp
 #
 # Target
 #
-add_library(bricks-kafka SHARED ${BRICKS_KAFKA_API} ${BRICKS_KAFKA_SRC})
+add_library(bricks_kafka SHARED ${BRICKS_KAFKA_API} ${BRICKS_KAFKA_SRC})
 
 #
 # vcpkg
 #
 find_package(RdKafka CONFIG REQUIRED)
-target_link_libraries(bricks-kafka PRIVATE RdKafka::rdkafka bricks-core bricks-logger)
+target_link_libraries(bricks_kafka PRIVATE RdKafka::rdkafka bricks_core bricks_logger)
 
 
 
 #
 # Configuration
 #
-set_property(TARGET bricks-kafka PROPERTY CXX_STANDARD 17)
+set_property(TARGET bricks_kafka PROPERTY CXX_STANDARD 17)
 
-target_include_directories(bricks-kafka PUBLIC 
+target_include_directories(bricks_kafka PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-core/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-logger/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_core/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
 )
 
 add_compile_definitions(BRICKSKAFKA_EXPORTS)

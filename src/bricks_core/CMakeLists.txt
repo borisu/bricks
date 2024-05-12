@@ -41,7 +41,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/tinyxml2/tinyxml2.cpp
 #
 # Target
 #
-add_library(bricks-core SHARED 
+add_library(bricks_core SHARED 
 ${BRICKS_CORE_API}
 ${BRICKS_CORE_SRC}
 ${BRICKS_CORE_3RD_PARTY}
@@ -52,9 +52,9 @@ ${BRICKS_CORE_3RD_PARTY}
 #
 add_compile_definitions(BRICKS_EXPORTS)
 
-set_property(TARGET bricks-core PROPERTY CXX_STANDARD 17)
+set_property(TARGET bricks_core PROPERTY CXX_STANDARD 17)
 
-target_include_directories(bricks-core PUBLIC 
+target_include_directories(bricks_core PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}/include
 ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/tinyxml2
 ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/base64/include

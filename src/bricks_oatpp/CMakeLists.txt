@@ -23,7 +23,7 @@ pch.h
 #
 # Target
 #
-add_library(bricks-oatpp SHARED ${BRICKS_OATPP_API} ${BRICKS_OATPP_SRC})
+add_library(bricks_oatpp SHARED ${BRICKS_OATPP_API} ${BRICKS_OATPP_SRC})
 
 #
 # vcpkg
@@ -32,19 +32,19 @@ add_library(bricks-oatpp SHARED ${BRICKS_OATPP_API} ${BRICKS_OATPP_SRC})
 #
 # Configuration
 #
-set_property(TARGET bricks-oatpp PROPERTY CXX_STANDARD 17)
+set_property(TARGET bricks_oatpp PROPERTY CXX_STANDARD 17)
 
-target_include_directories(bricks-oatpp PUBLIC 
+target_include_directories(bricks_oatpp PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/src
 ${CMAKE_CURRENT_SOURCE_DIR}/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-core/include
-${CMAKE_CURRENT_SOURCE_DIR}/../bricks-logger/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_core/include
+${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
 )
 
-target_link_libraries(bricks-oatpp PRIVATE bricks-core bricks-logger)
+target_link_libraries(bricks_oatpp PRIVATE bricks_core bricks_logger)
 
-target_link_libraries(bricks-oatpp PRIVATE debug ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Debug/oatpp.lib)
-target_link_libraries(bricks-oatpp PRIVATE optimized ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Release/oatpp.lib)
+target_link_libraries(bricks_oatpp PRIVATE debug ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Debug/oatpp.lib)
+target_link_libraries(bricks_oatpp PRIVATE optimized ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Release/oatpp.lib)
 
 add_compile_definitions(BRICKSOATPP_EXPORTS)
 
