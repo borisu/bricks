@@ -8,6 +8,8 @@ option(NO_ZEROMQ_PLUGIN "No ZeroMQ plugin" OFF)
 
 option(NO_OATPP_PLUGIN "No Oatpp plugin" OFF)
 
+enable_testing()
+
 project(bricks)
 
 add_subdirectory(bricks_logger)
