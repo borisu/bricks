@@ -1,5 +1,9 @@
 #include "pch.h"
+
+#ifndef NO_KAFKA_PLUGIN
+
 #include "generic_tests.h"
+#include "rdkafka_plugin.h"
 
 using namespace std;
 using namespace bricks;
@@ -101,3 +105,4 @@ TEST(kafka_case, publish_subscribe_test) {
 
 }
 
+#endif // !NO_KAFKA_PLUGIN 

@@ -14,3 +14,6 @@
 	path = 3rdparty/modules/base64
 	url = https://github.com/tobiaslocker/base64
 	branch = 387b32f
+[submodule "3rdparty/modules/vcpkg"]
+	path = 3rdparty/modules/vcpkg
+	url = https://github.com/microsoft/vcpkg.git

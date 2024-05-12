@@ -1,5 +1,9 @@
 #include "pch.h"
+
+#ifndef NO_OATPP_PLUGIN
+
 #include "generic_tests.h"
+#include "oatpp_plugin.h"
 
 using namespace std;
 using namespace bricks;
@@ -73,3 +77,5 @@ TEST(oatpp_case, request_response_test) {
 	
 
 }
+
+#endif

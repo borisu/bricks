@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "generic_tests.h"
+#include "jester_plugin.h"
 
 using namespace std;
 using namespace bricks;
