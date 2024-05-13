@@ -13,7 +13,6 @@ FetchContent_MakeAvailable(googletest)
 set(BRICKS_UT_SRC
 generic_tests.h
 jester_test.cpp
-packages.config
 pch.cpp
 pch.h
 publish_subsribe_tests.cpp
@@ -27,6 +26,7 @@ xtree_test.cpp
 # Target
 #
 add_executable(bricks_ut ${BRICKS_UT_SRC})
+target_sources(bricks_ut PRIVATE bricks_ut.rc resource.h)
 
 #
 # vcpkg

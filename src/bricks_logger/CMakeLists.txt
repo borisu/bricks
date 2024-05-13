@@ -18,6 +18,8 @@ pch.cpp
 #
 add_library(bricks_logger SHARED ${BRICKS_LOGGER_API} ${BRICKS_LOGGER_SRC})
 
+target_sources(bricks_logger PRIVATE bricks_logger.rc)
+
 
 #
 # Configuration

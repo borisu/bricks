@@ -24,6 +24,8 @@ pch.h
 #
 add_library(bricks_jester SHARED ${BRICKS_JESTER_API} ${BRICKS_JESTER_SRC})
 
+target_sources(bricks_jester PRIVATE bricks_jester.rc  resource.h)
+
 #
 # vcpkg
 #

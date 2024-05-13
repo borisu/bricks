@@ -25,6 +25,8 @@ pch.h
 #
 add_library(bricks_oatpp SHARED ${BRICKS_OATPP_API} ${BRICKS_OATPP_SRC})
 
+target_sources(bricks_oatpp PRIVATE bricks_oatpp.rc)
+
 #
 # vcpkg
 #

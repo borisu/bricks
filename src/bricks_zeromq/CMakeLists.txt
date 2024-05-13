@@ -27,6 +27,8 @@ zeromq_subscriber.h
 #
 add_library(bricks_zeromq SHARED ${BRICKS_ZEROMQ_API} ${BRICKS_ZEROMQ_SRC})
 
+target_sources(bricks_zeromq PRIVATE bricks_zeromq.rc)
+
 #
 # vcpkg
 #

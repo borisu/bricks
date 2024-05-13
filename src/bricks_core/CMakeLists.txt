@@ -47,6 +47,8 @@ ${BRICKS_CORE_SRC}
 ${BRICKS_CORE_3RD_PARTY}
 )
 
+target_sources(bricks_core PRIVATE bricks_core.rc)
+
 #
 # Configuration
 #

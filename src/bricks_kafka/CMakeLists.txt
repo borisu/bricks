@@ -25,6 +25,8 @@ rdkafka_plugin.cpp
 #
 add_library(bricks_kafka SHARED ${BRICKS_KAFKA_API} ${BRICKS_KAFKA_SRC})
 
+target_sources(bricks_kafka PRIVATE bricks_kafka.rc)
+
 #
 # vcpkg
 #
