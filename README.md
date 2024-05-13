@@ -1,6 +1,6 @@
 
 
-![/docs/BricksLogo.png]
+![bricsk logo](/docs/BricksLogo.png)
 
 # bricks
 
