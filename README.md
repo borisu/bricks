@@ -1,5 +1,10 @@
+
+
+![/docs/BricksLogo.png]
+
 # bricks
-Network services united ...
+
+Set of interfaces and implementation for services inter-connection abstractions.
 
 ## About 
 
