@@ -1,6 +1,6 @@
 
 <div align="center">
-![bricsk logo](/docs/BricksLogo.png)
+<img alt="Oat++ Logo src="![bricsk logo](/docs/BricksLogo.png)"/>
 </div>
 
 # bricks
