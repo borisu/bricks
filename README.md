@@ -17,21 +17,36 @@ Following table summarizes currently available implemenation
 
 <table>
   <tr>
-    <th>Company</th>
-    <th>Contact</th>
-    <th>Country</th>
+    <th>Plugin</th>
+    <th>Publish-Subscribe</th>
+    <th>Request-Response</th>
+    <th>Bidi</th>
   </tr>
   <tr>
-    <td>Alfreds Futterkiste</td>
-    <td>Maria Anders</td>
-    <td>Germany</td>
+    <td>Kafka Plugin</td>
+    <td>V</td>
+    <td></td>
+    <td></td>
   </tr>
-  <tr>
-    <td>Centro comercial Moctezuma</td>
-    <td>Francisco Chang</td>
-    <td>Mexico</td>
+    <td>Oatpp Plugin</td>
+    <td></td>
+    <td>V</td>
+    <td></td>
+  </tr>
+  </tr>
+    <td>ZeroMQ Plugin</td>
+    <td>V</td>
+    <td></td>
+    <td>V</td>
+  </tr>
+  </tr>
+    <td>Mock(Jester( Plugin</td>
+    <td>V</td>
+    <td>V</td>
+    <td>V</td>
   </tr>
 </table>
+
 
 
 
