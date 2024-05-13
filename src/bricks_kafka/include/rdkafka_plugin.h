@@ -1,11 +1,15 @@
 #pragma once
 #include "bricks.h"
 
-#ifdef BRICKSKAFKA_EXPORTS
-#define BRICKSKAFKA_API __declspec(dllexport)
+#ifdef WIN32
+ #ifdef BRICKSKAFKA_EXPORTS
+  #define BRICKSKAFKA_API __declspec(dllexport)
+ #else
+  #define BRICKSKAFKA_API __declspec(dllimport)
+ #endif
 #else
-#define BRICKSKAFKA_API __declspec(dllimport)
-#endif
+ #define BRICKSKAFKA_API
+#endif 
 
 
 namespace bricks::plugins {

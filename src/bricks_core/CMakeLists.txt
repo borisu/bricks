@@ -18,7 +18,6 @@ pch.h
 buffer_impl.cpp
 buffer_impl.h
 common.cpp
-dllmain.cpp
 framework.h
 locking_queue.h
 queue_impl.cpp
@@ -47,7 +46,9 @@ ${BRICKS_CORE_SRC}
 ${BRICKS_CORE_3RD_PARTY}
 )
 
-target_sources(bricks_core PRIVATE bricks_core.rc)
+if (WIN32)
+  target_sources(bricks_core PRIVATE bricks_core.rc dllmain.cpp)
+endif()
 
 #
 # Configuration

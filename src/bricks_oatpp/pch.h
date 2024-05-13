@@ -8,7 +8,9 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "framework.h"
+#ifdef WIN32
+ #include "framework.h"
+#endif
 
 #endif //PCH_H
 

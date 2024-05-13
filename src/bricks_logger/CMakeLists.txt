@@ -6,9 +6,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/logger.h
 )
 
 set(BRICKS_LOGGER_SRC
-framework.h 
 pch.h
-dllmain.cpp  
 logger.cpp 
 pch.cpp 
 )
@@ -18,13 +16,16 @@ pch.cpp
 #
 add_library(bricks_logger SHARED ${BRICKS_LOGGER_API} ${BRICKS_LOGGER_SRC})
 
-target_sources(bricks_logger PRIVATE bricks_logger.rc)
+if(WIN32)
+target_sources(bricks_logger PRIVATE bricks_logger.rc framework.h dllmain.cpp)
+endif()
 
 
 #
 # Configuration
 #
 set_property(TARGET bricks_logger PROPERTY CXX_STANDARD 17)
+set_property(TARGET bricks_logger PROPERTY C_STANDARD 11)
 
 target_include_directories(bricks_logger PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

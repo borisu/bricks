@@ -6,8 +6,6 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/jester_plugin.h
 )
 
 set(BRICKS_JESTER_SRC
-dllmain.cpp
-framework.h
 jester_bidi.cpp
 jester_bidi.h
 jester_pubsub.cpp
@@ -24,7 +22,9 @@ pch.h
 #
 add_library(bricks_jester SHARED ${BRICKS_JESTER_API} ${BRICKS_JESTER_SRC})
 
-target_sources(bricks_jester PRIVATE bricks_jester.rc  resource.h)
+if (WIN32)
+  target_sources(bricks_jester PRIVATE bricks_jester.rc resource.h dllmain.cpp framework.h)
+endif()
 
 #
 # vcpkg

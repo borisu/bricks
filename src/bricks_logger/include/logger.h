@@ -1,9 +1,13 @@
 #pragma once
 
-#ifdef BRICKSLOGGER_EXPORTS
-#define BRICKSLOGGER_API __declspec(dllexport)
+#ifdef WIN32
+ #ifdef BRICKSLOGGER_EXPORTS
+  #define BRICKSLOGGER_API __declspec(dllexport)
+ #else 
+  #define BRICKSLOGGER_API __declspec(dllimport)
+ #endif
 #else
-#define BRICKSLOGGER_API __declspec(dllimport)
+ #define BRICKSLOGGER_API
 #endif
 
 namespace bricks {

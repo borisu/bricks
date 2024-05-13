@@ -8,10 +8,14 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "framework.h"
+#ifdef WIN32
+ #include "framework.h"
+#endif
 #include <map>
 #include <chrono>
 #include <thread>
+#include <atomic>
+#include <cstring>
 #include "zmq.h"
 #include "bricks.h"
 #include "utils.h"

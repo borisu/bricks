@@ -1,10 +1,14 @@
 #pragma once
 #include "bricks.h"
 
-#ifdef BRICKSOATPP_EXPORTS
-#define BRICKSOATPP_API __declspec(dllexport)
+#ifdef WIN32
+ #ifdef BRICKSOATPP_EXPORTS
+  #define BRICKSOATPP_API __declspec(dllexport)
+ #else
+  #define BRICKSOATPP_API __declspec(dllimport)
+ #endif
 #else
-#define BRICKSOATPP_API __declspec(dllimport)
+ #define BRICKSOATPP_API
 #endif
 
 using namespace bricks;

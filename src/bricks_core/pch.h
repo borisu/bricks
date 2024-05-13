@@ -8,7 +8,10 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "framework.h"
+#ifdef WIN32
+  #include "framework.h"
+#endif
+
 #include <stdio.h>
 #include <atomic>
 #include <vector>
@@ -29,13 +32,5 @@
 
 #include "tinyxml2.h"
 #include "base64.hpp"
-
-#ifdef WIN32
-#include <objbase.h> // For CoCreateGuid
-#else
-
-#endif
-
-
 
 #endif //PCH_H

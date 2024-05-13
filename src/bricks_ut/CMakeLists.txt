@@ -18,7 +18,6 @@ pch.h
 publish_subsribe_tests.cpp
 request_response_tests.cpp
 bidi_tests.cpp
-resource.h
 xtree_test.cpp
 )
 
@@ -26,7 +25,10 @@ xtree_test.cpp
 # Target
 #
 add_executable(bricks_ut ${BRICKS_UT_SRC})
-target_sources(bricks_ut PRIVATE bricks_ut.rc resource.h)
+
+if (WIN32)
+ target_sources(bricks_ut PRIVATE bricks_ut.rc resource.h)
+endif()
 
 #
 # vcpkg
@@ -45,28 +47,28 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_jester/include
 
 target_link_libraries(bricks_ut PRIVATE GTest::gtest_main bricks_core bricks_logger bricks_jester)
 
-add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_core>" $<TARGET_FILE_DIR:bricks_ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_core>" $<TARGET_FILE_DIR:bricks_ut>)
   
-add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_logger>" $<TARGET_FILE_DIR:bricks_ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_logger>" $<TARGET_FILE_DIR:bricks_ut>)
   
-add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_jester>" $<TARGET_FILE_DIR:bricks_ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_jester>" $<TARGET_FILE_DIR:bricks_ut>)
 
 if (NOT NO_KAFKA_PLUGIN)
-    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_kafka>" $<TARGET_FILE_DIR:bricks_ut>)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_kafka>" $<TARGET_FILE_DIR:bricks_ut>)
     target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_kafka/include)
     target_sources(bricks_ut PRIVATE kafka_test.cpp)
     target_link_libraries(bricks_ut PRIVATE bricks_kafka)
 endif()
 
 if (NOT NO_ZEROMQ_PLUGIN)
-    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_zeromq>" $<TARGET_FILE_DIR:bricks_ut>)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_zeromq>" $<TARGET_FILE_DIR:bricks_ut>)
     target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_zeromq/include)
     target_sources(bricks_ut PRIVATE zeromq_test.cpp)
     target_link_libraries(bricks_ut PRIVATE bricks_zeromq)
 endif()  
 
 if (NOT NO_OATPP_PLUGIN)
-    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "$<TARGET_FILE_DIR:bricks_oatpp>" $<TARGET_FILE_DIR:bricks_ut>)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_oatpp>" $<TARGET_FILE_DIR:bricks_ut>)
     target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_oatpp/include)
     target_sources(bricks_ut PRIVATE oatpp_test.cpp)
     target_link_libraries(bricks_ut PRIVATE bricks_oatpp)    

@@ -6,8 +6,6 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/rdkafka_plugin.h
 )
 
 set(BRICKS_KAFKA_SRC
-dllmain.cpp
-framework.h
 kafka_publisher.cpp
 kafka_publisher.h
 kafka_service.cpp
@@ -25,7 +23,9 @@ rdkafka_plugin.cpp
 #
 add_library(bricks_kafka SHARED ${BRICKS_KAFKA_API} ${BRICKS_KAFKA_SRC})
 
-target_sources(bricks_kafka PRIVATE bricks_kafka.rc)
+if (WIN32)
+  target_sources(bricks_kafka PRIVATE bricks_kafka.rc dllmain.cpp framework.h)
+endif()
 
 #
 # vcpkg

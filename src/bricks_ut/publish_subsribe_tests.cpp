@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "pch.h"
+#include "gtest/gtest.h"
 #include "generic_tests.h"
 
 using namespace bricks;

@@ -6,8 +6,6 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/zeromq_plugin.h
 )
 
 set(BRICKS_ZEROMQ_SRC
-dllmain.cpp
-framework.h
 pch.cpp
 pch.h
 zeromq_bidi.cpp
@@ -27,7 +25,9 @@ zeromq_subscriber.h
 #
 add_library(bricks_zeromq SHARED ${BRICKS_ZEROMQ_API} ${BRICKS_ZEROMQ_SRC})
 
-target_sources(bricks_zeromq PRIVATE bricks_zeromq.rc)
+if(WIN32)
+ target_sources(bricks_zeromq PRIVATE bricks_zeromq.rc dllmain.cpp framework.h)
+endif()
 
 #
 # vcpkg

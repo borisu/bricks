@@ -1,10 +1,14 @@
 #pragma once
 #include "bricks.h"
 
-#ifdef BRICKSZEROMQ_EXPORTS
+#ifdef WIN32
+ #ifdef BRICKSZEROMQ_EXPORTS
 	#define BRICKSZEROMQ_API __declspec(dllexport)
-#else
+ #else
 	#define BRICKSZEROMQ_API __declspec(dllimport)
+ #endif
+#else
+  #define BRICKSZEROMQ_API
 #endif
 
 namespace bricks::plugins { 

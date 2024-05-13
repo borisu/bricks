@@ -6,8 +6,6 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/oatpp_plugin.h
 )
 
 set(BRICKS_OATPP_SRC
-dllmain.cpp
-framework.h
 oatpp_client.cpp
 oatpp_client.h
 oatpp_impl.cpp
@@ -25,7 +23,9 @@ pch.h
 #
 add_library(bricks_oatpp SHARED ${BRICKS_OATPP_API} ${BRICKS_OATPP_SRC})
 
-target_sources(bricks_oatpp PRIVATE bricks_oatpp.rc)
+if(WIN32)
+ target_sources(bricks_oatpp PRIVATE bricks_oatpp.rc dllmain.cpp framework.h)
+endif()
 
 #
 # vcpkg
@@ -45,8 +45,13 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
 
 target_link_libraries(bricks_oatpp PRIVATE bricks_core bricks_logger)
 
-target_link_libraries(bricks_oatpp PRIVATE debug ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Debug/oatpp.lib)
-target_link_libraries(bricks_oatpp PRIVATE optimized ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Release/oatpp.lib)
+if (WIN32)
+ target_link_libraries(bricks_oatpp PRIVATE debug ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Debug/oatpp.lib)
+ target_link_libraries(bricks_oatpp PRIVATE optimized ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/Release/oatpp.lib)
+else()
+ target_link_libraries(bricks_oatpp PRIVATE debug ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/liboatpp.a)
+ target_link_libraries(bricks_oatpp PRIVATE optimized ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/oatpp/build/src/liboatpp.a)
+endif()
 
 add_compile_definitions(BRICKSOATPP_EXPORTS)
 

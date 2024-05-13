@@ -5,14 +5,19 @@
 #include <optional>
 #include <functional>
 #include <memory>
+#include <list>
+
+#ifdef WIN32
+ #ifdef BRICKS_EXPORTS
+ 	 #define BRICKS_API __declspec(dllexport)
+ #else
+	 #define BRICKS_API __declspec(dllimport)
+ #endif
+#else
+   #define BRICKS_API
+#endif
 
 using namespace std;
-
-#ifdef BRICKS_EXPORTS
-	#define BRICKS_API __declspec(dllexport)
-#else
-	#define BRICKS_API __declspec(dllimport)
-#endif
 
 namespace bricks
 {

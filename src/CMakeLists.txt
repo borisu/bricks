@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 set (CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 option(NO_KAFKA_PLUGIN "No Kafka plugin" OFF)
 
 option(NO_ZEROMQ_PLUGIN "No ZeroMQ plugin" OFF)

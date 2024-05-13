@@ -1,10 +1,14 @@
 #pragma once
 #include "bricks.h"
 
-#ifdef BRICKSJESTER_EXPORTS
-#define BRICKSJESTER_API __declspec(dllexport)
+#ifdef WIN32
+ #ifdef BRICKSJESTER_EXPORTS
+  #define BRICKSJESTER_API __declspec(dllexport)
+ #else
+  #define BRICKSJESTER_API __declspec(dllimport)
+ #endif
 #else
-#define BRICKSJESTER_API __declspec(dllimport)
+ #define BRICKSJESTER_API
 #endif
 
 namespace bricks::plugins {

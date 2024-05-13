@@ -31,7 +31,7 @@ bricks::log1(bricks_debug_level_e log_level, const char* format, ...)
 
 	va_list args;
 	va_start(args, format);
-	vsprintf_s(log_buf, format, args);
+	vsprintf(log_buf, format, args);
 	ext_logger == nullptr ? console_logger(log_level, log_buf) : ext_logger(log_level, log_buf);
 
 	va_end(args);
