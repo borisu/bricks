@@ -1,9 +1,10 @@
 
 <div align="center">
-<img alt="Oat++ Logo src="![bricsk logo](/docs/BricksLogo.png)"/>
+<img alt="Oat++ Logo src="[![bricsk logo](/docs/BricksLogo.png)](https://github.com/borisu/bricks/assets/7937935/63ad0a60-5d7b-40ff-89bf-748ba04bd2c7)"/>
 </div>
 
 # bricks
+![BricksLogo](https://github.com/borisu/bricks/assets/7937935/63ad0a60-5d7b-40ff-89bf-748ba04bd2c7)
 
 Set of interfaces and implementation for services inter-connection abstractions.
 
