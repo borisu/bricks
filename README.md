@@ -1,6 +1,7 @@
 
-
+<div align="center">
 ![bricsk logo](/docs/BricksLogo.png)
+</div>
 
 # bricks
 
