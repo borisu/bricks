@@ -88,4 +88,70 @@ while (!shutdown)
 
 In general if queue is not supplied to plugin it will call callback directly from one of the implementation threads which basically means unprdicatbel threading model and not what was intended.
 
-#in
+### Plugins 
+
+The example of using kafka plugin to publish topic should be self explicable. Paty attention to following points
+
+- It does not use selector becasue the plugin does not supply the it. Indeed rdkafka has umerous callbacks including delivery confirmation but at this time it is not implemented and also plugin design is built around minimal common denomiator of capabilities between different engines. For example in ZeroMq getting delivery feedback is not trivial.
+
+- All specific implementation details are encapulated in xtree object. Each plugin should document the format of xtree it works with.
+  
+- After plugin is created it should be minimally usable without speicifc xtree.  
+
+```
+brick_uptr<xtree_t> publisher_xt(
+	create_xtree_from_xml(
+		"<bricks>"
+		" <rdkafka>"
+		"  <rdlog enabled=\"true\"/>"
+		"  <producer name=\"producer1\">"
+		"   <configuration>"
+		"    <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+		"   </configuration>"
+		"  </producer>"
+		" </rdkafka>"
+		"</bricks>"
+	));
+brick_uptr<publisher_plugin_t>  publisher(create_kafka_publisher());
+publisher->init(selector->queue(),publisher_xt);
+publisher->start()
+publisher->register_topic(TEST_TOPIC);
+publisher->publish(TEST_TOPIC, msg, strlen(msg))
+```
+
+For more examples of usage see testing files.
+
+
+## How To Build
+
+bricks uses vcpkg for most of the 3rd party packages 
+
+Follow the same proces on Windows and Linux. For Window you should either run cmake --build or use generated solution instead of make.
+
+1. Ensure that cmake, developement tools, and git are available for Linux. For windows the build was tested with Visual Studio 2022 instaleld. Please be sure to install the gtest adapter extension to run bricks tests
+
+3. Install vcpkg
+   
+Please follow the [link](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-cmd) 
+Ensure that you have VCPKG_ROOT variable set to the vcpkg installation directory and vcpkg is found on path
+```
+export VCPKG_ROOT=<vcpkg root>
+```
+4. Clone the bricks directory
+```
+git clone https://github.com/borisu/bricks.git
+cd bricks
+git submodule update --init --recursive
+```
+5. Build oatpp (regrtfully the latest version is not in vcpkg repository)
+```
+cd <bricks>/3rdparty/modules/oatpp
+mkdir build;cd build;
+cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+make
+```
+3. Build bricks
+```
+cd <bricks>/src
+mkdir build;cd build;cmake ..;make
+```
