@@ -7,6 +7,8 @@
 
 Set of C++ abstract interfaces and pluggable implementations for network services patterns.
 
+❗The project is in early stages under active development not stable release is available and interfaces is under constant change. Help if you want. ❗
+
 ## About 
 
 The goal of the brciks project is to abstract the microservices communication patterns. By ssing abstract interface which hides the actual network provider, developer is enabled to replace the actual communication engine at any time, use several engines in parallel in a uniform manner, avoid vendor lock-in, and mostly important replace networking services by mock objects by thus eliminating actual networking layers which improves drastically the testability of your services.
