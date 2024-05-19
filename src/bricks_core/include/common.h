@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 #include <list>
+#include <chrono>
 
 #ifdef WIN32
  #ifdef BRICKS_EXPORTS
@@ -40,6 +41,12 @@ namespace bricks
 		virtual void release() = 0;
 	};
 
+	class startable_brick_t : public brick_t
+	{
+	public:
+		virtual bricks_error_code_e start() = 0;
+	};
+
 	void brick_destroy(brick_t* ptr);
 
 	template<class T>
@@ -55,7 +62,6 @@ namespace bricks
 	using brick_uptr = std::unique_ptr<B, bricks_destroyer>;
 
 	typedef std::vector<char> vector_t;
-
 	
 }
 

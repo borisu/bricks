@@ -32,7 +32,7 @@ zeromq_subscriber_t::destroy()
 }
 
 bricks_error_code_e
-zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)
+zeromq_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
@@ -47,13 +47,18 @@ zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opt
 
 	try
 	{
+		set_sockopt(options, "/bricks/zmq/subscriber", subscriber);
+
 		name = get<string>(options->get_property_value("/bricks/zmq/subscriber", "name").value());
 
 		url = get<string>(options->get_property_value("/bricks/zmq/subscriber", "url").value());
 
-		// Connect to the ZeroMQ endpoint
-		auto rc = zmq_connect(subscriber, url.c_str());
+		auto is_server = get<bool>(options->get_property_value("/bricks/zmq/publisher", "is_server").value());
+
+		int rc = is_server ? zmq_bind(subscriber, url.c_str()) : zmq_connect(subscriber, url.c_str());
+
 		if (rc != 0) {
+			is_server ? BRICK_LOG_ZMQ_ERROR(zmq_bind) : BRICK_LOG_ZMQ_ERROR(zmq_connect);
 			throw std::exception();
 		}
 
@@ -62,8 +67,7 @@ zeromq_subscriber_t::init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* opt
 		// Create a ZMQ poll item
 		items[0] = { subscriber, 0, ZMQ_POLLIN, 0 };
 
-		set_sockopt(options, "/bricks/zmq/subscriber", subscriber);
-
+	
 		initiated = true;
 		
 	}
@@ -91,10 +95,9 @@ zeromq_subscriber_t::~zeromq_subscriber_t()
 }
 
 bricks_error_code_e
-zeromq_subscriber_t::register_topic(const string& topic, const xtree_t* options)
+zeromq_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
 	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
 
 	auto rc = zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, topic.c_str(), strlen(topic.c_str()));
 	if (rc != 0)
@@ -106,6 +109,30 @@ zeromq_subscriber_t::register_topic(const string& topic, const xtree_t* options)
 	return BRICKS_SUCCESS;
 
 }
+
+bricks_error_code_e
+zeromq_subscriber_t::unsubscribe()
+{
+	ASSERT_INITIATED;
+	
+	return unsubscribe("");
+}
+
+bricks_error_code_e 
+zeromq_subscriber_t::unsubscribe(const std::string& topic)
+{
+	ASSERT_INITIATED;
+
+	auto rc = zmq_setsockopt(subscriber, ZMQ_UNSUBSCRIBE, topic.c_str(), strlen(topic.c_str()));
+	if (rc != 0)
+	{
+		BRICK_LOG_ZMQ_ERROR(zmq_setsockopt);
+		return  BRICKS_3RD_PARTY_ERROR;
+	}
+
+	return BRICKS_SUCCESS;
+}
+
 
 bricks_error_code_e 
 zeromq_subscriber_t::start()
@@ -120,6 +147,19 @@ zeromq_subscriber_t::start()
 	}
 
 	return rc;
+
+}
+
+bool
+zeromq_subscriber_t::check_capability(plugin_capabilities_e e)
+{
+	switch (e)
+	{
+	case HIERARCHICAL_SUBSCRIBE:
+		return true;
+	default:
+		return false;
+	}
 
 }
 

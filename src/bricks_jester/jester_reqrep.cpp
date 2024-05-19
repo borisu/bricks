@@ -36,7 +36,7 @@ jester_server_ctx_t::set_server(jester_server_t* server)
 }
 
 bricks_error_code_e 
-jester_server_ctx_t::issue_request(server_proxy_cb_t proxy, const char* data, size_t size)
+jester_server_ctx_t::issue_request(response_proxy_cb_t proxy, const char* data, size_t size)
 {
 	return this->server->issue_request(proxy, data, size);
 }
@@ -52,14 +52,25 @@ jester_server_t::jester_server_t(jester_server_ctx_t* ctx)
 bricks_error_code_e 
 jester_server_t::init(cb_queue_t* queue, const xtree_t*)
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_NOT_INITIATED;
+
 	this->queue = queue;
+
+	this->initiated = true;
 
 	return BRICKS_SUCCESS;
 }
 
 bricks_error_code_e 
-jester_server_t::register_request_handler(server_request_cb_t request_cb, const xtree_t* options)
+jester_server_t::register_request_cb(request_cb_t request_cb, const xtree_t* options)
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
+
 	this->request_cb = request_cb;
 	return BRICKS_SUCCESS;
 }
@@ -67,12 +78,23 @@ jester_server_t::register_request_handler(server_request_cb_t request_cb, const 
 bricks_error_code_e 
 jester_server_t::start()
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_INITIATED;
+	ASSERT_NOT_STARTED;
+
+	this->started = true;
 	return BRICKS_SUCCESS;
 }
 
 bricks_error_code_e 
-jester_server_t::issue_request(server_proxy_cb_t proxy, const char* data, size_t size)
+jester_server_t::issue_request(response_proxy_cb_t proxy, const char* data, size_t size)
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_INITIATED;
+	ASSERT_STARTED;
+
 	auto buf = create_buffer(data, size);
 	auto xt  = create_xtree();
 
@@ -82,48 +104,70 @@ jester_server_t::issue_request(server_proxy_cb_t proxy, const char* data, size_t
 		buf,
 		xt);
 
-	if (queue)
-	{
-		queue->enqueue(cb);
-	}
-	else
-	{
-		request_cb(
-			std::bind(&jester_server_t::server_response_proxy, this, proxy, _1, _2, _3, _4),
-			create_buffer(data, size),
-			create_xtree());
-	}
+	queue->enqueue(cb);
 	
 	return BRICKS_SUCCESS;
 }
 
 bricks_error_code_e 
-jester_server_t::server_response_proxy(server_proxy_cb_t proxy, bricks_error_code_e e, const char* data, size_t size, xtree_t* xt)
+jester_server_t::response_proxy(response_proxy_cb_t proxy, bricks_error_code_e e, const char* data, size_t size, xtree_t* xt)
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_INITIATED;
+	ASSERT_STARTED;
+
 	proxy(e, data, size, xt);
 
 	return BRICKS_SUCCESS;
 }
 
+bool 
+jester_server_t::check_capability(plugin_capabilities_e)
+{
+	SYNCHRONIZED(ctx->mtx);
+
+	return false;
+}
 
 jester_client_t::jester_client_t(jester_server_ctx_t* ctx) :ctx(ctx)
 {
 
 }
 
-bricks_error_code_e 
-jester_client_t::init(cb_queue_t* queue, const xtree_t* options)
+bool
+jester_client_t::check_capability(plugin_capabilities_e)
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	return false;
+}
+
+bricks_error_code_e 
+jester_client_t::init(cb_queue_t* queue, int timeout_ms, const xtree_t* options)
+{
+	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_NOT_INITIATED;
+
 	this->queue = queue;
+
+	this->timeout_ms = timeout_ms;
+
+	this->initiated = true;
 
 	return BRICKS_SUCCESS;
 }
 
 bricks_error_code_e
-jester_client_t::request(const char* data, size_t size, client_response_cb_t response_cb, const xtree_t* options)
+jester_client_t::issue_request(const char* data, size_t size, response_cb_t response_cb, const xtree_t* options)
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_INITIATED;
+	ASSERT_STARTED;
 	
-	server_proxy_cb_t proxy = std::bind(&jester_client_t::client_response_proxy, this, response_cb, _1, _2, _3, _4);
+	response_proxy_cb_t proxy = std::bind(&jester_client_t::client_response_proxy, this, response_cb, _1, _2, _3, _4);
 
 	ctx->issue_request(proxy, data, size);
 	
@@ -131,7 +175,7 @@ jester_client_t::request(const char* data, size_t size, client_response_cb_t res
 }
 
 bricks_error_code_e 
-jester_client_t::client_response_proxy(client_response_cb_t response_cb, bricks_error_code_e err, const char* data, size_t size, xtree_t* xt)
+jester_client_t::client_response_proxy(response_cb_t response_cb, bricks_error_code_e err, const char* data, size_t size, xtree_t* xt)
 {
 	auto buf = create_buffer(data, size);
 

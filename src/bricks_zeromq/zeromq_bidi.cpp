@@ -15,6 +15,12 @@ zeromq_bidi_t::~zeromq_bidi_t()
 	destroy();
 }
 
+bool
+zeromq_bidi_t::check_capability(plugin_capabilities_e e)
+{
+	return false;
+}
+
 void
 zeromq_bidi_t::destroy()
 {
@@ -103,7 +109,7 @@ zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 }
 
 bricks_error_code_e 
-zeromq_bidi_t::register_event_handler( event_cb_t event_cb, const xtree_t* options)
+zeromq_bidi_t::register_event_cb( event_cb_t event_cb, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;

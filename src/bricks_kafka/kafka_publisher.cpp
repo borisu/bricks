@@ -144,7 +144,7 @@ kafka_publisher_t::destroy()
 }
 
 bricks_error_code_e
-kafka_publisher_t::register_topic(const string& topic, const xtree_t* options)
+kafka_publisher_t::add_topic(const string& topic, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
@@ -203,3 +203,8 @@ kafka_publisher_t::rd_poll(int milliseconds, bool last_call)
 	return BRICKS_SUCCESS;
 }
 
+bool 
+kafka_publisher_t::check_capability(plugin_capabilities_e)
+{
+	return false;
+}

@@ -17,13 +17,15 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options ) override;
 
-		virtual bricks_error_code_e register_event_handler( event_cb_t event_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e register_event_cb( event_cb_t event_cb, const xtree_t* options) override;
 
 		virtual bricks_error_code_e send_event(const char*, size_t, const xtree_t* options ) override;
 
 		virtual bricks_error_code_e	start() override;
 
 		virtual void release() override { delete this; };
+
+		virtual bool check_capability(plugin_capabilities_e) override;
 		
 		virtual ~zeromq_bidi_t();
 

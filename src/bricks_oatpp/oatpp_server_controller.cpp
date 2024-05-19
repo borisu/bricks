@@ -119,22 +119,13 @@ oatpp_server_controller_t::brick_handler_t::onBody(const oatpp::String& body) {
         xt->set_property_value(hnode.value(), "value", query_var.second.toString());
     }
 
-    server_proxy_cb_t  f =
+    response_proxy_cb_t  f =
         std::bind(&oatpp_server_controller_t::brick_handler_t::server_proxy, this, _1, _2, _3, _4);
 
-    if (server->cb_queue)
-    {
-        server->cb_queue->enqueue(
-            std::bind(server->request_cb, f, create_buffer(body->data(), body->size()), xt));
-    }
-    else
-    {
-        try
-        {
-            server->request_cb(f, create_buffer(body->data(), body->size()), xt);
-        }
-        catch (std::exception &){}
-    }
+    server->cb_queue->enqueue(
+        std::bind(server->request_cb, f, create_buffer(body->data(), body->size()), xt));
+   
+    
 
     return cv.wait(m_lockGuard, [this] {
                 return this->responded; 

@@ -25,12 +25,13 @@ oatpp_client_t::destroy()
 }
 
 bricks_error_code_e 
-oatpp_client_t::init(cb_queue_t* queue, const xtree_t* options)
+oatpp_client_t::init(cb_queue_t* queue, int timeout_ms, const xtree_t* options)
 {
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
 
-	cb_queue = queue;
+	this->cb_queue = queue;
+	this->timeout_ms = timeout_ms;
 
 	try
 	{
@@ -107,8 +108,14 @@ oatpp_client_t::init_params(const xtree_t* options, const char* path, std::unord
 
 }
 
+bool
+oatpp_client_t::check_capability(plugin_capabilities_e)
+{
+	return false;
+}
+
 bricks_error_code_e 
-oatpp_client_t::request(const char* data, size_t size, client_response_cb_t callback, const xtree_t* options)
+oatpp_client_t::issue_request(const char* data, size_t size, response_cb_t callback, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
@@ -135,7 +142,7 @@ oatpp_client_t::request(const char* data, size_t size, client_response_cb_t call
 		query_params,
 		headers,
 		oatpp::web::protocol::http::outgoing::BufferBody::createShared(oatpp::String(data, size)), 
-		oatpp::web::client::HttpRequestExecutor::createShared(oatpp::network::tcp::client::ConnectionProvider::createShared({ host, port })),
+		oatpp::web::client::HttpRequestExecutor::createShared(oatpp::network::tcp::client::ConnectionProvider::createShared({host, port})),
 		oatpp::parser::json::mapping::ObjectMapper::createShared());
 
 	cor_executor.execute<client_coroutine_t>(api_client, callback, cb_queue);
@@ -176,12 +183,12 @@ api_client_t::~api_client_t()
 }
 
 
-client_coroutine_t::client_coroutine_t(const std::shared_ptr<api_client_t> client, client_response_cb_t callback, cb_queue_t* cb_queue)
+client_coroutine_t::client_coroutine_t(const std::shared_ptr<api_client_t> client, response_cb_t callback, cb_queue_t* cb_queue)
 	: api_client(client),
 	callback(callback),
 	cb_queue(cb_queue)
 {
-
+	
 }
 
 /**
@@ -189,7 +196,8 @@ client_coroutine_t::client_coroutine_t(const std::shared_ptr<api_client_t> clien
  */
 oatpp::async::Action
 client_coroutine_t::act()  {
-	return api_client->getRequestStarter().callbackTo(&client_coroutine_t::onResponse);
+		
+	return 	api_client->getRequestStarter().callbackTo(&client_coroutine_t::onResponse);
 }
 
 /**
@@ -222,19 +230,7 @@ client_coroutine_t::onBody(const oatpp::String& body) {
 
 	auto buffer = create_buffer(body->data(), body->length());
 
-	if (cb_queue)
-	{
-		cb_queue->enqueue(std::bind(callback, status_code == 200 ? BRICKS_SUCCESS : BRICKS_REMOTE_ERROR, buffer, response_xt));
-	}
-	else
-	{
-		try
-		{
-			callback(status_code == 200 ? BRICKS_SUCCESS : BRICKS_REMOTE_ERROR, buffer, response_xt);
-		}
-		catch (std::exception&) {}
-
-	}
-
+	cb_queue->enqueue(std::bind(callback, status_code == 200 ? BRICKS_SUCCESS : BRICKS_REMOTE_ERROR, buffer, response_xt));
+	
 	return finish();
 }

@@ -14,15 +14,17 @@ namespace bricks::plugins
 
         oatpp_client_t();
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, int timeout_ms, const xtree_t* options) override;
 
 		virtual bricks_error_code_e start() override;
 
-		virtual bricks_error_code_e request(const char*, size_t, client_response_cb_t, const xtree_t* options) override;
+		virtual bricks_error_code_e issue_request(const char*, size_t, response_cb_t, const xtree_t* options) override;
 
 		virtual void release() override { delete this; };
 
         virtual ~oatpp_client_t();
+
+        virtual bool check_capability(bricks::plugin_capabilities_e) override;
 
 	private:
 
@@ -49,6 +51,8 @@ namespace bricks::plugins
         string name;
 
         uint16_t port = 80;
+
+        int timeout_ms = BRICKS_DEFAULT_CLIENT_TIMEOUT;
 
         friend api_client_t;
 
@@ -105,13 +109,13 @@ namespace bricks::plugins
 
         cb_queue_t* cb_queue = nullptr;
 
-        client_response_cb_t callback = nullptr;
+        response_cb_t callback = nullptr;
 
         xtree_t* response_xt = nullptr;
 
     public:
 
-        client_coroutine_t(const std::shared_ptr<api_client_t> client, client_response_cb_t callback, cb_queue_t* cb_queue);
+        client_coroutine_t(const std::shared_ptr<api_client_t> client, response_cb_t callback, cb_queue_t* cb_queue);
 
         /**
          * Create DTO and send it via doPostWithDtoAsync method
@@ -127,6 +131,8 @@ namespace bricks::plugins
          * Print read body from the stream and finish
          */
         Action onBody(const oatpp::String& body);
+
+        
 
     };
 	

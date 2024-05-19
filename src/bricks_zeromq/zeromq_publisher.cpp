@@ -10,6 +10,19 @@ zeromq_publisher_t::zeromq_publisher_t()
 
 };
 
+bool 
+zeromq_publisher_t::check_capability(plugin_capabilities_e e)
+{
+	switch (e)
+	{
+	case HIERARCHICAL_SUBSCRIBE:
+		return true;
+	default:
+		return false;
+	}
+
+}
+
 bricks_error_code_e 
 zeromq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
@@ -25,17 +38,20 @@ zeromq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 
 	try
 	{
+		set_sockopt(options, "/bricks/zmq/publisher", publisher);
+
 		name = get<string>(options->get_property_value("/bricks/zmq/publisher", "name").value());
 
 		auto url = get<string>(options->get_property_value("/bricks/zmq/publisher", "url").value());
 
-		int rc = zmq_bind(publisher, url.c_str());
+		auto is_server = get<bool>(options->get_property_value("/bricks/zmq/publisher", "is_server").value());
+
+		int rc =  is_server  ? zmq_bind(publisher, url.c_str()) : zmq_connect(publisher, url.c_str());
+
 		if (rc != 0) {
-			BRICK_LOG_ZMQ_ERROR(zmq_bind);
+			is_server ? BRICK_LOG_ZMQ_ERROR(zmq_bind) : BRICK_LOG_ZMQ_ERROR(zmq_connect);
 			throw std::exception();
 		}
-
-		set_sockopt(options, "/bricks/zmq/publisher", publisher);
 
 		initiated = true;
 	}
@@ -79,7 +95,7 @@ zeromq_publisher_t::destroy()
 }
 
 bricks_error_code_e 
-zeromq_publisher_t::register_topic(const string& topic, const xtree_t* options)
+zeromq_publisher_t::add_topic(const string& topic, const xtree_t* options)
 {
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;

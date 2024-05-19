@@ -5,6 +5,7 @@
 using namespace bricks;
 
 #define TEST_TOPIC "bricks.test"
+#define NUM_OF_MESSAGES 1000000
 
 void
 publish_subscribe_test_1(
@@ -19,57 +20,52 @@ publish_subscribe_test_1(
 	xtree_t* subscribe_xt)
 {
 	
-	ASSERT_EQ(BRICKS_SUCCESS, publisher->init(
-		selector->queue(),
-	    publisher_xt));
-
-	ASSERT_EQ(BRICKS_SUCCESS, publisher->register_topic(TEST_TOPIC, publisher_topic_xt));
-	ASSERT_EQ(BRICKS_SUCCESS, publisher->start());
+	list<string>   all_snd_messages;
+	list<msg_info> all_rcv_messages;
 
 	/*
-		prepare subscriber
+	* Prepare publisher
 	*/
-	int       received_counter = 0;
-	vector_t  received_buf;
-	ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(
-		selector->queue(),
-		[&](const string& ,buffer_t *buf, xtree_t* xt)
+	ASSERT_EQ(BRICKS_SUCCESS, publisher->init(selector->queue(),publisher_xt));
+	ASSERT_EQ(BRICKS_SUCCESS, publisher->add_topic(TEST_TOPIC, publisher_topic_xt));
+	ASSERT_EQ(BRICKS_SUCCESS, publisher->start());
+
+
+	/*
+	* Prepare subscriber.
+	*/
+
+	auto on_topic_cb = [&](const string& topic, buffer_t* buf, xtree_t* xt) 
 		{
-			received_counter++;
-
-			if (buf->size() > 0)
-			{
-				received_buf.resize(buf->size());
-				std::memcpy(received_buf.data(), buf->data(), buf->size());
-
-			}
-
-			buf->release();
+			all_rcv_messages.push_back({topic, buf, xt});
 			xt->release();
+		};
 
-		}, subscriber_xt));
-
-	ASSERT_EQ(BRICKS_SUCCESS, subscriber->register_topic(TEST_TOPIC, subscriber_topic_xt));
+	ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(selector->queue(),on_topic_cb, subscriber_xt));
+	ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(TEST_TOPIC, subscriber_topic_xt));
 	ASSERT_EQ(BRICKS_SUCCESS, subscriber->start());
 
-	this_thread::sleep_for(chrono::milliseconds(4000));
-
-	/* 
-		publish message
+	/*
+	* Let it sink in.
 	*/
-	const char* msg = "Another brick in the wall.";
-	ASSERT_EQ(BRICKS_SUCCESS, publisher->publish(TEST_TOPIC, msg, strlen(msg), publish_xt));
+	this_thread::sleep_for(chrono::milliseconds(1000));
 
-	int count = 0;
-	while (count++ < 25 && (received_counter < 1))
+	for (int i = 0; i < 10000; i++)
 	{
-		selector->poll(500);
-	}
-	
-	ASSERT_EQ(1, received_counter);	
-	
-	std::string str(received_buf.begin(), received_buf.end());
+		/*
+		* Publish the message
+		*/
+		string msg = "Another brick in the wall ";
+		msg += std::to_string(i);
+		all_snd_messages.push_back(msg);
 
-	ASSERT_STREQ(msg, str.c_str());
+		ASSERT_EQ(BRICKS_SUCCESS, publisher->publish(TEST_TOPIC, msg.c_str(), msg.length(), publish_xt));
+	
+		selector->poll(0);
+	}
+
+	this_thread::sleep_for(chrono::milliseconds(1000));
+
+	ASSERT_EQ(all_snd_messages.size() , all_rcv_messages.size());
 	
 }

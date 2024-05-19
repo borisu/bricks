@@ -50,7 +50,7 @@ TEST(zeromq_case, publish_subscribe_test) {
 		create_xtree_from_xml(
 			"<bricks>"
 			"  <zmq>"
-			"   <publisher name=\"publisher1\" url=\"tcp://127.0.0.1:7858\">"
+			"   <publisher name=\"publisher1\" url=\"tcp://127.0.0.1:7858\" is_server=\"true\">"
 			"	 <sockopt id=\"ZMQ_BACKLOG\" value=\"100\" />"
 			"   </publisher>"
 			"  </zmq>"
@@ -62,7 +62,7 @@ TEST(zeromq_case, publish_subscribe_test) {
 		create_xtree_from_xml(
 			"<bricks>"
 			"  <zmq>"
-			"   <subscriber name=\"subscriber1\" url=\"tcp://127.0.0.1:7858\">"
+			"   <subscriber name=\"subscriber1\" url=\"tcp://127.0.0.1:7858\" is_server=\"false\">"
 			"	 <sockopt id=\"ZMQ_SUBSCRIBE\" value=\"some.other.topic\" />"
 			"   </subscriber>"
 			"  </zmq>"

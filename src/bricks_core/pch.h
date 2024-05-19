@@ -29,6 +29,10 @@
 #include <memory>
 #include <cctype>
 #include <locale>
+#include <random>
+#include <inttypes.h>
+#include <functional>
+#include <queue>
 
 #include "tinyxml2.h"
 #include "base64.hpp"

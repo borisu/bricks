@@ -7,3 +7,5 @@
 #define ASSERT_NOT_STARTED if (this->started) return BRICKS_INVALID_STATE
 
 #define BRICKS_MAP_PAIR(x) {#x,x}
+
+#define SYNCHRONIZED(M) std::lock_guard<std::recursive_mutex> lk(M);

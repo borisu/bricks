@@ -14,13 +14,19 @@ namespace bricks::plugins
 
 		zeromq_subscriber_t();
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options)  override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options)  override;
 
-		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
+		virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options) override;
 
 		virtual bricks_error_code_e start() override;
 
 		virtual ~zeromq_subscriber_t();
+
+		virtual bool check_capability(plugin_capabilities_e) override;
+
+		virtual bricks_error_code_e unsubscribe() override;
+
+		virtual bricks_error_code_e unsubscribe(const std::string&) override;
 
 		virtual void release() override { delete this; };
 
@@ -32,7 +38,7 @@ namespace bricks::plugins
 
 		void destroy();
 
-		msg_cb_t msg_cb;
+		topic_cb_t msg_cb;
 
 		void* context = nullptr;
 

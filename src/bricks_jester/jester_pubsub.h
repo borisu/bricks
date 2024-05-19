@@ -19,7 +19,11 @@ namespace bricks::plugins {
 
 		bricks_error_code_e unsubscribe(jester_subscriber_t*);
 
+		bricks_error_code_e remove_subscription(const char* topic, jester_subscriber_t*);
+
 		virtual void release()  override { delete this; };
+
+		std::recursive_mutex mtx;
 
 	protected:
 
@@ -36,9 +40,11 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
 
-		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
+		virtual bricks_error_code_e add_topic(const string& topic, const xtree_t* options) override;
 
 		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, const xtree_t* options ) override;
+
+		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual bricks_error_code_e start() override;
 
@@ -64,15 +70,21 @@ namespace bricks::plugins {
 
 		jester_subscriber_t(jester_pubsub_ctx_t* ctx);
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options = nullptr) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options = nullptr) override;
 
-		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options = nullptr) override;
+		virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options = nullptr) override;
 
-		virtual bricks_error_code_e on_received(const char *topic, const char* data, size_t size);
+		virtual bricks_error_code_e unsubscribe(const string& topic) override;
+
+		virtual bricks_error_code_e unsubscribe() override;
 
 		virtual bricks_error_code_e start() override;
 
 		virtual void release()  override { delete this; };
+
+		virtual bool check_capability(plugin_capabilities_e) override;
+
+		virtual bricks_error_code_e topic_cb(const char *topic, const char* data, size_t size);
 
 		virtual ~jester_subscriber_t();
 
@@ -82,14 +94,13 @@ namespace bricks::plugins {
 
 		bool started = false;
 
-		msg_cb_t msg_cb;
+		topic_cb_t msg_cb;
 
 		jester_pubsub_ctx_t* ctx = nullptr;
 
 		cb_queue_t* queue = nullptr;
 
 		list<string> topics;
-
 
 	};
 }

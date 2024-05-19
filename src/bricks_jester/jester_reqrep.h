@@ -18,9 +18,11 @@ namespace bricks::plugins {
 
 		void set_server(jester_server_t* server);
 
-		virtual bricks_error_code_e issue_request(server_proxy_cb_t proxy, const char* data, size_t size);
+		virtual bricks_error_code_e issue_request(response_proxy_cb_t proxy, const char* data, size_t size);
 
 		virtual void release()  override { delete this; };
+
+		std::recursive_mutex mtx;
 
 	protected:
 
@@ -36,13 +38,15 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* ) override;
 
-		virtual bricks_error_code_e register_request_handler(server_request_cb_t request_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e register_request_cb(request_cb_t request_cb, const xtree_t* options) override;
 
 		virtual bricks_error_code_e start() override;
 
-		virtual bricks_error_code_e issue_request(server_proxy_cb_t proxy, const char* data, size_t size) ;
+		virtual bricks_error_code_e issue_request(response_proxy_cb_t proxy, const char* data, size_t size) ;
 
-		virtual bricks_error_code_e server_response_proxy(server_proxy_cb_t proxy, bricks_error_code_e, const char*, size_t, xtree_t*);
+		virtual bricks_error_code_e response_proxy(response_proxy_cb_t proxy, bricks_error_code_e, const char*, size_t, xtree_t*);
+
+		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual void release()  override { delete this; };
 
@@ -52,7 +56,11 @@ namespace bricks::plugins {
 
 		cb_queue_t* queue = nullptr;
 
-		server_request_cb_t request_cb;
+		request_cb_t request_cb;
+
+		bool initiated = false;
+
+		bool started = false;
 		
 	};
 
@@ -62,13 +70,15 @@ namespace bricks::plugins {
 
 		jester_client_t(jester_server_ctx_t* ctx);
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options ) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, int timeout_ms, const xtree_t* options = nullptr) override;
 
-		virtual bricks_error_code_e request(const char* , size_t , client_response_cb_t, const xtree_t* options ) override;
+		virtual bricks_error_code_e issue_request(const char* , size_t , response_cb_t, const xtree_t* options ) override;
 
 		virtual bricks_error_code_e start() override;
 
-		virtual bricks_error_code_e client_response_proxy(client_response_cb_t response_cb, bricks_error_code_e, const char*, size_t, xtree_t*);
+		virtual bricks_error_code_e client_response_proxy(response_cb_t response_cb, bricks_error_code_e, const char*, size_t, xtree_t*);
+
+		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual void release()  override { delete this; };
 
@@ -77,6 +87,12 @@ namespace bricks::plugins {
 		jester_server_ctx_t* ctx = nullptr;
 
 		cb_queue_t* queue = nullptr;
+
+		int timeout_ms = BRICKS_DEFAULT_CLIENT_TIMEOUT;
+
+		bool initiated = false;
+
+		bool started = false;
 
 	};
 }

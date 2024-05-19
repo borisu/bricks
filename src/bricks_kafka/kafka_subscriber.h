@@ -15,13 +15,17 @@ namespace bricks::plugins {
 
 		kafka_subscriber_t();
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, msg_cb_t msg_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options) override;
 
-		virtual bricks_error_code_e register_topic(const string& topic, const xtree_t* options) override;
+		virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options) override;
+
+		virtual bricks_error_code_e unsubscribe(const string& topic) override;
+
+		virtual bricks_error_code_e unsubscribe() override;
 
 		virtual bricks_error_code_e start() override;
 
-		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
+		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual void release() override { delete this; };
 
@@ -31,13 +35,15 @@ namespace bricks::plugins {
 
 		virtual void destroy();
 
+		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
+
 		rd_kafka_conf_t* rd_conf_h = nullptr;
 
 		rd_kafka_t* rd_kafka_h = nullptr;
 
 		rd_kafka_topic_partition_list_t* rd_part_list_h = nullptr;
 
-		msg_cb_t msg_cb;
+		topic_cb_t msg_cb;
 
 	};
 

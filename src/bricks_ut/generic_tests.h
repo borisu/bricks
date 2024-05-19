@@ -4,6 +4,12 @@
 using namespace std;
 using namespace bricks;
 
+struct msg_info
+{
+	string topic;
+	buffer_t* buf;
+	xtree_t* xt;
+};
 
 void
 publish_subscribe_test_1(
