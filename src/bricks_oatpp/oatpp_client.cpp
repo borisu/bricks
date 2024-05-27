@@ -135,6 +135,9 @@ oatpp_client_t::issue_request(const char* data, size_t size, response_cb_t callb
 		return err;
 	}
 
+	auto conn_provider = oatpp::network::tcp::client::ConnectionProvider::createShared({ host, port });
+		
+
 	auto api_client = std::make_shared<api_client_t>(
 		method,
 		path,
@@ -142,8 +145,18 @@ oatpp_client_t::issue_request(const char* data, size_t size, response_cb_t callb
 		query_params,
 		headers,
 		oatpp::web::protocol::http::outgoing::BufferBody::createShared(oatpp::String(data, size)), 
-		oatpp::web::client::HttpRequestExecutor::createShared(oatpp::network::tcp::client::ConnectionProvider::createShared({host, port})),
+		oatpp::web::client::HttpRequestExecutor::createShared(conn_provider),
 		oatpp::parser::json::mapping::ObjectMapper::createShared());
+
+
+	auto monitor = std::make_shared<oatpp::network::monitor::ConnectionMonitor>(conn_provider);
+
+	// close all connections that stay opened for more than 120 seconds 
+	monitor->addMetricsChecker(
+		std::make_shared<oatpp::network::monitor::ConnectionMaxAgeChecker>(
+			std::chrono::milliseconds(this->timeout_ms)
+		)
+	);
 
 	cor_executor.execute<client_coroutine_t>(api_client, callback, cb_queue);
 

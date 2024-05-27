@@ -21,6 +21,8 @@
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/component.hpp"
 #include "oatpp/network/Server.hpp"
+#include "oatpp/network/monitor/ConnectionMonitor.hpp"
+#include "oatpp/network/monitor/ConnectionMaxAgeChecker.hpp"
 #include "oatpp/web/server/HttpConnectionHandler.hpp"
 #include "oatpp/web/server/HttpRequestHandler.hpp"
 #include "oatpp/web/protocol/http/incoming/Request.hpp"
