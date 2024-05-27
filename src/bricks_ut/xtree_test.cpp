@@ -31,6 +31,8 @@ TEST(xtree_case, xtree_load_xml_test_and_children)
 
 	EXPECT_EQ(*buf, vector_t({ 1,2,3,4,5 }));
 
+	xt->release();
+
  	
 }
 
@@ -49,6 +51,7 @@ TEST(xtree_case, xtree_create_empty_xml)
 	EXPECT_EQ(false, xt->set_node_name("", "n"));
 	EXPECT_EQ(false, xt->set_node_value("", "abc",3));
 
+	xt->release();
 }
 
 TEST(xtree_case, xtree_create_1_level_replicate_root)
@@ -70,6 +73,8 @@ TEST(xtree_case, xtree_create_1_level_replicate_root)
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<root/>\n",
 		serialize_xtree_to_xml(xt));
+
+	xt->release();
 
 }
 
@@ -98,6 +103,9 @@ TEST(xtree_case, xtree_create_2_level_with_clone)
 		"</root>\n",
 		serialize_xtree_to_xml(dst));
 
+	xt->release();
+	dst->release();
+
 }
 
 
@@ -121,6 +129,8 @@ TEST(xtree_case, xtree_create_1_level_remove_subtree)
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
 		serialize_xtree_to_xml(xt));
 
+	xt->release();
+
 }
 
 
@@ -143,6 +153,8 @@ TEST(xtree_case, xtree_create_1_level_value_test)
 		      "<root/>\n",
 		serialize_xtree_to_xml(xt));
 
+	xt->release();
+
 }
 TEST(xtree_case, xtree_ip_parse)
 {
@@ -157,6 +169,7 @@ TEST(xtree_case, xtree_ip_parse)
 
 	auto value = s_xt->get_property_value_as_string(xp_t("/configuration", 0), "value").value();
 	EXPECT_EQ("127.0.0.1:29092", value);
+
 
 }
 
@@ -173,6 +186,8 @@ TEST(xtree_case, xtree_enforce_type)
 	EXPECT_EQ(get<string>(xt->get_property_value("/configuration/property", "string_value").value()), "5");
 	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value1").value()), true);
 	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value2").value()), false);
+
+	xt->release();
 
 }
 
@@ -234,6 +249,8 @@ TEST(xtree_case, xtree_create_1_level)
 	EXPECT_EQ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<root double=\"%d:2.2\" int=\"%i:1\" bool=\"%b:false\" string=\"%s:the wall\" longlong=\"%L:25\"/>\n",
 		serialize_xtree_to_xml(xt));
+
+	xt->release();
 }
 
 

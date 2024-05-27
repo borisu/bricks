@@ -53,8 +53,10 @@ kafka_service_t::stop_rd_poll_loop()
 	if (rd_poll_thread)
 	{
 		shutdown = true;
+		started = false;
 		rd_poll_thread->join();
 		rd_poll_thread = nullptr;
+		delete rd_poll_thread;
 	}
 }
 
