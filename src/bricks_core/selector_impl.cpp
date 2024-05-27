@@ -30,20 +30,16 @@ selector_impl_t::poll(int milliseconds)
 		return BRICKS_INVALID_STATE;
 
 	callback_t cb = nullptr;
-	if (!q->try_dequeue(cb, milliseconds))
+	bricks_error_code_e err;
+	if ((err = q->try_dequeue(cb, milliseconds)) != BRICKS_SUCCESS)
 	{
 		return BRICKS_TIMEOUT;
 	}
 
-	try
-	{
-		cb();
-	}
-	catch (std::exception&)
-	{
-		return BRICKS_FAILURE_GENERIC;
-	}
-
+	
+	cb();
+	
+	
 	return BRICKS_SUCCESS;
 }
 

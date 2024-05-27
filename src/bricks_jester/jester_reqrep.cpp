@@ -177,19 +177,16 @@ jester_client_t::issue_request(const char* data, size_t size, response_cb_t resp
 bricks_error_code_e 
 jester_client_t::client_response_proxy(response_cb_t response_cb, bricks_error_code_e err, const char* data, size_t size, xtree_t* xt)
 {
+	SYNCHRONIZED(ctx->mtx);
+
 	auto buf = create_buffer(data, size);
 
-	if (queue)
-	{
-		callback_t cb = std::bind(response_cb, err, buf, xt);
+	
+	callback_t cb = std::bind(response_cb, err, buf, xt);
 
-		queue->enqueue(cb);
-	}
-	else
-	{
-		response_cb(err, buf, xt);
-	}
-
+	queue->enqueue(cb);
+	
+	
 	return BRICKS_SUCCESS;
 
 }
@@ -197,5 +194,9 @@ jester_client_t::client_response_proxy(response_cb_t response_cb, bricks_error_c
 bricks_error_code_e 
 jester_client_t::start()
 {
+	SYNCHRONIZED(ctx->mtx);
+
+	this->started = true;
+
 	return BRICKS_SUCCESS;
 }

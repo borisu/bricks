@@ -1,12 +1,15 @@
-#include "gtest/gtest.h"
 #include "pch.h"
+#include "gtest/gtest.h"
 #include "generic_tests.h"
+#include "utils.h"
 
 using namespace bricks;
 
 void
 bidi_test_1(xtree_t* xt1, bidi_plugin_t* p1, xtree_t* xt2, bidi_plugin_t* p2, selector_t* selector)
 {
+	brick_uptr<brick_t> c(create_poller(BRICKS_DEFAULT_CLIENT_TIMEOUT, selector));
+
 	ASSERT_EQ(BRICKS_SUCCESS, p1->init(
 		selector->queue(),
 		xt1));
@@ -35,15 +38,14 @@ bidi_test_1(xtree_t* xt1, bidi_plugin_t* p1, xtree_t* xt2, bidi_plugin_t* p2, se
 	ASSERT_EQ(BRICKS_SUCCESS, p1->start());
 	ASSERT_EQ(BRICKS_SUCCESS, p2->start());
 
-	ASSERT_EQ(BRICKS_SUCCESS, p1->send_event("ping1", 5, nullptr));
-	ASSERT_EQ(BRICKS_SUCCESS, p2->send_event("ping2", 5, nullptr));
-
-	int count = 0;
-	while (count++ < 25 && (p1_events == 0 || p2_events == 0))
+	for (int i = 0; i < NUM_OF_ITERATIONS; i++)
 	{
-		selector->poll(500);
+		ASSERT_EQ(BRICKS_SUCCESS, p1->send_event("ping1", 5, nullptr));
+		ASSERT_EQ(BRICKS_SUCCESS, p2->send_event("ping2", 5, nullptr));
 	}
+	
+	this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 
-	ASSERT_EQ(1, p1_events);
-	ASSERT_EQ(1, p2_events);
+	ASSERT_EQ(NUM_OF_ITERATIONS, p1_events);
+	ASSERT_EQ(NUM_OF_ITERATIONS, p2_events);
 }

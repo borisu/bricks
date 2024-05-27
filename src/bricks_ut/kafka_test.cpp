@@ -10,8 +10,8 @@ using namespace bricks;
 using namespace bricks::plugins;
 
 TEST(kafka_case, publish_subscribe_test) {
+	for (int i = 0; i < 2; i++) 
 	{
-
 		brick_uptr<xtree_t> publisher_xt(
 			create_xtree_from_xml(
 				"<bricks>"
@@ -61,8 +61,6 @@ TEST(kafka_case, publish_subscribe_test) {
 				"   <configuration>"
 				"    <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 				"    <property name = \"group.id\" value=\"bricks.test.group\"/>"
-				"    <property name = \"enable.auto.commit\" value=\"%s:false\"/>"
-				"    <property name = \"auto.offset.reset\" value=\"latest\"/>"
 				"   </configuration>"
 				"  </consumer>"
 				" </rdkafka>"
@@ -82,13 +80,13 @@ TEST(kafka_case, publish_subscribe_test) {
 				"</bricks>"
 			));
 
-		brick_uptr<publisher_plugin_t>  publisher(create_kafka_publisher());
-
-		brick_uptr<subscriber_plugin_t>  subscriber(create_kafka_subscriber());
-
 		brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
 
 		brick_uptr<selector_t>  selector(create_selector());
+
+		brick_uptr<publisher_plugin_t>  publisher(create_kafka_publisher());
+
+		brick_uptr<subscriber_plugin_t>  subscriber(create_kafka_subscriber());
 
 		selector->init(cb_q.get());
 

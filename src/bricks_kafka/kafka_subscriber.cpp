@@ -21,6 +21,8 @@ kafka_subscriber_t::~kafka_subscriber_t()
 bricks_error_code_e 
 kafka_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -72,10 +74,10 @@ kafka_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* op
 bricks_error_code_e 
 kafka_subscriber_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
-
-	
 
 	if (start_rd_poll_loop() != BRICKS_SUCCESS)
 	{
@@ -118,17 +120,19 @@ kafka_subscriber_t::destroy()
 bricks_error_code_e  
 kafka_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
 	ASSERT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	int partition = 0;
+	int partition = -1;
 
 	if (options)
 	{
 		partition = get_opt<int>(options->get_property_value("/bricks/rdkafka/consumer/topic/partition", "value").value(),0);
 	}
 
+	partition = RD_KAFKA_PARTITION_UA;
 	rd_kafka_topic_partition_list_add(
 		rd_part_list_h, 
 		topic.c_str(),
@@ -141,18 +145,24 @@ kafka_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
+	log1(BRICKS_DEBUG, "%s %%%%%% Subscribed to to topics(%s:%d).\n", this->name.c_str(), topic.c_str(), partition);
+
 	return BRICKS_SUCCESS;
 
 }
+
 bricks_error_code_e 
 kafka_subscriber_t::unsubscribe(const string& topic)
 {
+	SYNCHRONIZED(mtx);
 	ASSERT_INITIATED;
 
+	
 	bool found = false;
-
 	do
 	{
+		
+		found = false;
 		for (int i = 0; i < rd_part_list_h->cnt; i++) {
 			if (topic == rd_part_list_h->elems[i].topic)
 			{
@@ -162,7 +172,7 @@ kafka_subscriber_t::unsubscribe(const string& topic)
 			}
 		}
 
-	} while (found);
+	} while (!found);
 
 
 	auto rd_err = rd_part_list_h->cnt == 0 ? rd_kafka_unsubscribe(rd_kafka_h) : rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
@@ -178,6 +188,8 @@ kafka_subscriber_t::unsubscribe(const string& topic)
 bricks_error_code_e 
 kafka_subscriber_t::unsubscribe()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 
 	while (rd_part_list_h->cnt > 0)
@@ -207,7 +219,9 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 	rd_kafka_message_t* msg = rd_kafka_consumer_poll(rd_kafka_h, (int)milliseconds); // Poll for messages
 
 	if (!msg)
+	{
 		return BRICKS_TIMEOUT;
+	}
 
 	if (msg->err)
 	{

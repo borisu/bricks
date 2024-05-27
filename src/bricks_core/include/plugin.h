@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define BRICKS_DEFAULT_CLIENT_TIMEOUT 500
+
 
 namespace bricks {
 

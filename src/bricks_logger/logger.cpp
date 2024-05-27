@@ -12,10 +12,21 @@ const char* debug_str[] = { "TRACE", "DEBUG", "INFO", "ALARM", "FATAL", "OFF" };
 
 void console_logger(bricks_debug_level_e log_level, const char* l)
 {
+	char buffer[20] = { 0 };
+
+	// Get the current time
+	time_t curr_time = time(NULL);
+
+	// Convert it to local time
+	struct tm* local_time = localtime(&curr_time);
+
+	// Format the time into the buffer
+	strftime(buffer, 20, "%Y-%m-%d %H:%M:%S", local_time);
+
 	if (log_level < BRICKS_TRACE || log_level > BRICKS_LOG_OFF)
 		return;
 
-	printf("[%s] - %s\n", debug_str[log_level], l);
+	printf("%s: [%s] - %s\n", buffer, debug_str[log_level], l);
 
 };
 

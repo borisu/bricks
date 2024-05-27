@@ -12,3 +12,9 @@
 #include "bricks.h"
 #include "logger.h"
 #include "jester_plugin.h"
+
+#ifdef WIN32
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif

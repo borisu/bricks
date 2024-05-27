@@ -14,21 +14,11 @@ cb_queue_impl_t::enqueue(callback_t cb)
 }
 
 bricks_error_code_e
-cb_queue_impl_t::try_dequeue(callback_t&, int milliseconds)
+cb_queue_impl_t::try_dequeue(callback_t& cb, int milliseconds)
 {
-	callback_t cb = nullptr;
 	if (!cb_queue.tryWaitAndPop(cb, milliseconds))
 	{
 		return BRICKS_TIMEOUT;
-	}
-
-	try
-	{
-		cb();
-	}
-	catch (std::exception&)
-	{
-
 	}
 
 	return BRICKS_SUCCESS;

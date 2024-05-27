@@ -15,5 +15,6 @@
 #include <stdio.h>
 #include <atomic>
 #include <stdarg.h>
+#include <time.h>
 
 #endif //PCH_H

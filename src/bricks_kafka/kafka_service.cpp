@@ -6,7 +6,6 @@ using namespace bricks::plugins;
 
 //https://github.com/confluentinc/librdkafka/blob/master/examples/rdkafka_example.c
 
-#define KAFKA_POLL_TIMEOUT 500
 
 void
 kafka_service_t::rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf) {
@@ -27,9 +26,9 @@ kafka_service_t::rd_log(const rd_kafka_t* rk, int level, const char* fac, const 
 	};
 
 
-	log1(log_level, "%s %%%%%% RDKAFKA-%i-%s: %s: %s",
-		THIS->name.c_str(), fac,
-		rk ? rd_kafka_name(rk) : NULL, buf);
+	log1(log_level, "%s %%%%%% RDKAFKA-%s: %s: %s",
+		THIS->name.c_str(), 
+		rk ? rd_kafka_name(rk) : "", fac, buf);
 }
 
 kafka_service_t::kafka_service_t() 
@@ -64,7 +63,7 @@ kafka_service_t::rd_poll_loop()
 {
 	while (shutdown != true)
 	{
-		auto err = rd_poll(KAFKA_POLL_TIMEOUT, false);
+		auto err = rd_poll(BRICKS_DEFAULT_CLIENT_TIMEOUT, false);
 		switch (err)
 		{
 		case BRICKS_TIMEOUT:
@@ -76,7 +75,7 @@ kafka_service_t::rd_poll_loop()
 		}
 	}
 
-	rd_poll(KAFKA_POLL_TIMEOUT, true);
+	rd_poll(BRICKS_DEFAULT_CLIENT_TIMEOUT, true);
 }
 
 

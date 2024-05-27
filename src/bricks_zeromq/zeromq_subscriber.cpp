@@ -34,6 +34,8 @@ zeromq_subscriber_t::destroy()
 bricks_error_code_e
 zeromq_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -53,7 +55,7 @@ zeromq_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* o
 
 		url = get<string>(options->get_property_value("/bricks/zmq/subscriber", "url").value());
 
-		auto is_server = get<bool>(options->get_property_value("/bricks/zmq/publisher", "is_server").value());
+		auto is_server = get<bool>(options->get_property_value("/bricks/zmq/subscriber", "is_server").value());
 
 		int rc = is_server ? zmq_bind(subscriber, url.c_str()) : zmq_connect(subscriber, url.c_str());
 
@@ -97,6 +99,8 @@ zeromq_subscriber_t::~zeromq_subscriber_t()
 bricks_error_code_e
 zeromq_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 
 	auto rc = zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, topic.c_str(), strlen(topic.c_str()));
@@ -113,6 +117,8 @@ zeromq_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 bricks_error_code_e
 zeromq_subscriber_t::unsubscribe()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	
 	return unsubscribe("");
@@ -121,6 +127,8 @@ zeromq_subscriber_t::unsubscribe()
 bricks_error_code_e 
 zeromq_subscriber_t::unsubscribe(const std::string& topic)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 
 	auto rc = zmq_setsockopt(subscriber, ZMQ_UNSUBSCRIBE, topic.c_str(), strlen(topic.c_str()));
@@ -137,6 +145,8 @@ zeromq_subscriber_t::unsubscribe(const std::string& topic)
 bricks_error_code_e 
 zeromq_subscriber_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -229,24 +239,15 @@ zeromq_subscriber_t::do_zmq_poll(int milliseconds, bool last_call)
 				"</bricks>").c_str()
 			);
 
-			if (cb_queue)
-			{
-				cb_queue->enqueue(
-					std::bind(
-						msg_cb,
-						topic,
-						create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)),
-						xt)
-				);
-			} else {
-				try { 
-					msg_cb(
-						topic, 
-						create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), 
-						xt); 
-				}
-				catch (std::exception&) {};
-			}
+			
+			cb_queue->enqueue(
+				std::bind(
+					msg_cb,
+					topic,
+					create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)),
+					xt)
+			);
+			
 		} while (more);
 			
 

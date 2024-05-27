@@ -7,9 +7,21 @@ using namespace bricks;
 struct msg_info
 {
 	string topic;
-	buffer_t* buf;
-	xtree_t* xt;
+
+	buffer_t* buf = nullptr;
+	xtree_t* xt   = nullptr;
+
+	~msg_info()
+	{
+		if (buf)
+			buf->release();
+		if (xt)
+			xt->release();
+	}
 };
+
+#define NUM_OF_ITERATIONS 1000
+#define STABILIZATION_TIMEOUT 1000
 
 void
 publish_subscribe_test_1(

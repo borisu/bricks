@@ -1,5 +1,6 @@
 #pragma once
 #include "plugin.h"
+#include "utils.h"
 
 namespace bricks::plugins
 {

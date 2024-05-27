@@ -26,6 +26,8 @@ zeromq_publisher_t::check_capability(plugin_capabilities_e e)
 bricks_error_code_e 
 zeromq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
@@ -97,8 +99,9 @@ zeromq_publisher_t::destroy()
 bricks_error_code_e 
 zeromq_publisher_t::add_topic(const string& topic, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
 
 	return BRICKS_SUCCESS;
 
@@ -107,6 +110,8 @@ zeromq_publisher_t::add_topic(const string& topic, const xtree_t* options)
 bricks_error_code_e 
 zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size,  const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
 
@@ -128,6 +133,8 @@ zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size, 
 
 bricks_error_code_e zeromq_publisher_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 

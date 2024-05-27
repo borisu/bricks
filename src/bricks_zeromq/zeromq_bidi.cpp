@@ -45,6 +45,8 @@ zeromq_bidi_t::destroy()
 bricks_error_code_e
 zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_INITIATED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
@@ -111,8 +113,7 @@ zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 bricks_error_code_e 
 zeromq_bidi_t::register_event_cb( event_cb_t event_cb, const xtree_t* options)
 {
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
+	SYNCHRONIZED(mtx);
 
 	this->event_cb = event_cb;
 
@@ -123,6 +124,8 @@ zeromq_bidi_t::register_event_cb( event_cb_t event_cb, const xtree_t* options)
 bricks_error_code_e
 zeromq_bidi_t::send_event(const char* buf, size_t size, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
 
@@ -137,6 +140,8 @@ zeromq_bidi_t::send_event(const char* buf, size_t size, const xtree_t* options)
 bricks_error_code_e
 zeromq_bidi_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -153,9 +158,6 @@ zeromq_bidi_t::start()
 bricks_error_code_e
 zeromq_bidi_t::do_zmq_poll(int milliseconds, bool last_call)
 {
-
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
 
 	if (last_call)
 		return BRICKS_SUCCESS;
@@ -200,18 +202,12 @@ zeromq_bidi_t::do_zmq_poll(int milliseconds, bool last_call)
 				"</bricks>").c_str()
 			);
 
-			if (cb_queue)
-			{
-				cb_queue->enqueue(
-					std::bind(event_cb, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
-				);
+			
+			cb_queue->enqueue(
+				std::bind(event_cb, create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt)
+			);
 
-			}
-			else
-			{
-				try { event_cb(create_buffer((const char*)zmq_msg_data(&msg), (int)zmq_msg_size(&msg)), xt); }
-				catch (std::exception&) {};
-			}
+			
 
 		} while (more);
 

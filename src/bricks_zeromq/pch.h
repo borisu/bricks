@@ -16,6 +16,7 @@
 #include <thread>
 #include <atomic>
 #include <cstring>
+#include <mutex>
 #include "zmq.h"
 #include "bricks.h"
 #include "utils.h"

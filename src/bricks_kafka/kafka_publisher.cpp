@@ -18,6 +18,8 @@ kafka_publisher_t::~kafka_publisher_t()
 bricks_error_code_e 
 kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -64,6 +66,8 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 bricks_error_code_e 
 kafka_publisher_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -81,6 +85,8 @@ kafka_publisher_t::start()
 bricks_error_code_e
 kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
 	
@@ -146,6 +152,8 @@ kafka_publisher_t::destroy()
 bricks_error_code_e
 kafka_publisher_t::add_topic(const string& topic, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 

@@ -35,6 +35,8 @@ namespace bricks::plugins
 
 		string name;
 
+		std::recursive_mutex mtx;
+
 	};
 }
 

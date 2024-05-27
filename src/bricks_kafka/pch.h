@@ -24,6 +24,7 @@
 #include <map>
 #include <atomic>
 #include <thread>
+#include <mutex>
 
 #include "logger.h"
 #include "bricks.h"

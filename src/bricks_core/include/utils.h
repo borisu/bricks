@@ -8,4 +8,6 @@
 
 #define BRICKS_MAP_PAIR(x) {#x,x}
 
-#define SYNCHRONIZED(M) std::lock_guard<std::recursive_mutex> lk(M);
+#define SYNCHRONIZED(M) std::lock_guard<std::recursive_mutex> lk__(M);
+
+#define BRICKS_DEFAULT_CLIENT_TIMEOUT 1000
