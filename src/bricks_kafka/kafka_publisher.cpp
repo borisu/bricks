@@ -202,7 +202,7 @@ kafka_publisher_t::rd_poll(int milliseconds, bool last_call)
 		auto err = rd_kafka_poll(rd_producer_h, (int)milliseconds);
 		if (err != RD_KAFKA_RESP_ERR_NO_ERROR)
 		{
-			log1(BRICKS_ALARM, "%s %%%%%%% Error polling rdkafka messages (%d): %s.", rd_kafka_last_error(), rd_kafka_err2str(rd_kafka_last_error()));
+			log1(BRICKS_ALARM, "%s %%%%%%% Error polling rdkafka messages (%d): %s.", this->name.c_str(), rd_kafka_last_error(), rd_kafka_err2str(rd_kafka_last_error()));
 			return BRICKS_3RD_PARTY_ERROR;
 		}
 

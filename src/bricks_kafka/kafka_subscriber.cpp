@@ -125,14 +125,13 @@ kafka_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	int partition = -1;
+	int partition = RD_KAFKA_PARTITION_UA;
 
 	if (options)
 	{
 		partition = get_opt<int>(options->get_property_value("/bricks/rdkafka/consumer/topic/partition", "value").value(),0);
 	}
 
-	partition = RD_KAFKA_PARTITION_UA;
 	rd_kafka_topic_partition_list_add(
 		rd_part_list_h, 
 		topic.c_str(),
@@ -145,7 +144,7 @@ kafka_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
-	log1(BRICKS_DEBUG, "%s %%%%%% Subscribed to to topics(%s:%d).\n", this->name.c_str(), topic.c_str(), partition);
+	log1(BRICKS_DEBUG, "%s %%%%%% Subscribed to topic(%s:%d).\n", this->name.c_str(), topic.c_str(), partition);
 
 	return BRICKS_SUCCESS;
 
@@ -178,9 +177,11 @@ kafka_subscriber_t::unsubscribe(const string& topic)
 	auto rd_err = rd_part_list_h->cnt == 0 ? rd_kafka_unsubscribe(rd_kafka_h) : rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
 
 	if (rd_err) {
-		log1(BRICKS_ALARM, "%s %%%%%% Error unsubscribing to topics(%d): %s.\n", this->name.c_str(), rd_err, rd_kafka_err2str(rd_err));
+		log1(BRICKS_ALARM, "%s %%%%%% Error unsubscribing from topics(%d): %s.\n", this->name.c_str(), rd_err, rd_kafka_err2str(rd_err));
 		return BRICKS_3RD_PARTY_ERROR;
 	}
+
+	log1(BRICKS_DEBUG, "%s %%%%%% Unsubscribed from topic(%s:%d).\n", this->name.c_str(), topic.c_str(), -1);
 
 	return BRICKS_SUCCESS;
 }

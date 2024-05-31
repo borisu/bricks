@@ -10,7 +10,7 @@ using namespace bricks;
 using namespace bricks::plugins;
 
 TEST(kafka_case, publish_subscribe_test) {
-	for (int i = 0; i < 2; i++) 
+	for (int i = 0; i < NUM_OF_TESTS ; i++)
 	{
 		brick_uptr<xtree_t> publisher_xt(
 			create_xtree_from_xml(
@@ -20,6 +20,7 @@ TEST(kafka_case, publish_subscribe_test) {
 				"  <producer name=\"producer1\">"
 				"   <configuration>"
 				"    <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+				"    <property name = \"debug\" value=\"all\"/>"
 				"   </configuration>"
 				"  </producer>"
 				" </rdkafka>"
@@ -61,11 +62,15 @@ TEST(kafka_case, publish_subscribe_test) {
 				"   <configuration>"
 				"    <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 				"    <property name = \"group.id\" value=\"bricks.test.group\"/>"
+				"    <property name = \"heartbeat.interval.ms\" value=\"1000\"/>"
+				"    <property name = \"debug\" value=\"all\"/>"
 				"   </configuration>"
 				"  </consumer>"
 				" </rdkafka>"
 				"</bricks>"
 			));
+
+		
 
 		brick_uptr<xtree_t> subscriber_topic_xt(
 			create_xtree_from_xml(
