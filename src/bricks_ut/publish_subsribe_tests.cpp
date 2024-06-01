@@ -57,49 +57,49 @@ publish_subscribe_test_1(
 		* Prepare publisher
 		*/
 
-		printf("$$$ === Init Publisher ===\n");
+		//printf("$$$ === Init Publisher ===\n");
 
 		ASSERT_EQ(BRICKS_SUCCESS, publisher->init(selector->queue(), publisher_xt));
 		ASSERT_EQ(BRICKS_SUCCESS, publisher->add_topic(TEST_TOPIC, publisher_topic_xt));
 		ASSERT_EQ(BRICKS_SUCCESS, publisher->start());
 
-		printf("$$$ === Waiting  0  ===\n");
+		//printf("$$$ === Waiting  0  ===\n");
 
-		//this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
+		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 
-		printf("$$$ === Init Subscribe  ===\n");
+		//printf("$$$ === Init Subscribe  ===\n");
 
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(selector->queue(), on_topic_cb, subscriber_xt));
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(TEST_TOPIC, subscriber_topic_xt));
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->start());
 
-		printf("$$$ === Waiting  1  (long) ===\n");
+		//printf("$$$ === Waiting  1  (long) ===\n");
 
 		this_thread::sleep_for(chrono::milliseconds(6*STABILIZATION_TIMEOUT));
 
-		printf("$$$ === Publishing 1 ===\n");
+		//printf("$$$ === Publishing 1 ===\n");
 
 		publish(publisher, TEST_TOPIC, publish_xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
 
-		printf("$$$ === Waiting  2  (short) ===\n");
+		//printf("$$$ === Waiting  2  (short) ===\n");
 
 		this_thread::sleep_for(chrono::milliseconds( STABILIZATION_TIMEOUT));
 
-		printf("=== Unsubscribing 1 ===\n");
+		//printf("=== Unsubscribing 1 ===\n");
 
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->unsubscribe(TEST_TOPIC));
-
-		printf("$$$ === Waiting  2 (long)  ===\n");
+/
+		//printf("$$$ === Waiting  2 (long)  ===\n");
 
 		this_thread::sleep_for(chrono::milliseconds(5 * STABILIZATION_TIMEOUT));
 
-		printf("$$$ === Publishing 2 ===\n");
+		//printf("$$$ === Publishing 2 ===\n");
 		publish(publisher, TEST_TOPIC, publish_xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
 
-		printf("$$$ === Waiting  3  ===\n");
+		//printf("$$$ === Waiting  3  ===\n");
 		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 
-		printf("$$$ === Exiting ===\n");
+		//printf("$$$ === Exiting ===\n");
 	}
 	
 	ASSERT_EQ(all_rcv_messages.size(), NUM_OF_ITERATIONS);
