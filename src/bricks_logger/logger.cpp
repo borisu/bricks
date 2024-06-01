@@ -23,7 +23,7 @@ void console_logger(bricks_debug_level_e log_level, const char* l)
 	// Convert it to local time
 	localtime_s(&tm_buf , &curr_time);
 #else
-	localtime_r(&tm_buf, &curr_time);
+	localtime_r(&curr_time , &tm_buf);
 #endif
 
 	// Format the time into the buffer
