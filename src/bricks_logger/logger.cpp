@@ -19,8 +19,12 @@ void console_logger(bricks_debug_level_e log_level, const char* l)
 
 	struct tm tm_buf;
 
+#ifdef WIN32
 	// Convert it to local time
 	localtime_s(&tm_buf , &curr_time);
+#else
+	localtime_r(&tm_buf, &curr_time);
+#endif
 
 	// Format the time into the buffer
 	strftime(buffer, 20, "%Y-%m-%d %H:%M:%S", &tm_buf);
