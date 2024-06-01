@@ -23,6 +23,6 @@ namespace bricks
 	};
 
 
-	BRICKS_API timer_t* create_timer();
+	BRICKS_API bricks::timer_t* create_timer();
 }
 
