@@ -5,7 +5,7 @@
 
 using namespace bricks;
 
-BRICKS_API timer_t* bricks::create_timer()
+BRICKS_API bricks::timer_t* bricks::create_timer()
 {
     return new timer_impl_t();
 }
