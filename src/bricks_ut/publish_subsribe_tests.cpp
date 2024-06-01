@@ -88,7 +88,7 @@ publish_subscribe_test_1(
 		//printf("=== Unsubscribing 1 ===\n");
 
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->unsubscribe(TEST_TOPIC));
-/
+
 		//printf("$$$ === Waiting  2 (long)  ===\n");
 
 		this_thread::sleep_for(chrono::milliseconds(5 * STABILIZATION_TIMEOUT));
