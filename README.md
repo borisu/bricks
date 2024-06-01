@@ -7,18 +7,18 @@
 
 Set of C++ abstract interfaces and pluggable implementations for network services patterns.
 
-❗The project is in early stages under active development not stable release is available and interfaces is under constant change. Help if you want. ❗
+❗The project is in early stages under active development. Help if you want.❗
 
 ## About 
 
-The goal of the brciks project is to abstract the microservices communication patterns. By ssing abstract interface which hides the actual network provider, developer is enabled to replace the actual communication engine at any time, use several engines in parallel in a uniform manner, avoid vendor lock-in, and mostly important replace networking services by mock objects by thus eliminating actual networking layers which improves drastically the testability of your services.
+The goal of the bricks project is to abstract the microservices communication patterns. By using abstract interface which hides the actual provider, developer is enabled to replace the actual communication engine at any time, use several engines in parallel in a uniform manner, avoid vendor lock-in, and mostly important replace networking services by mock objects by thus eliminating actual networking layers which improves drastically the testability of your services.
 
 Current supported communication paradigms are :-
 - Publish/Subscribe (aka producer/consumer).
 - P2P (aka bidi, aka pair) 
 - Request Response 
 
-So bricks are mostly interfaces + POC implementations. 
+So bricks are C++ interfaces + replaceable implementations. 
 
 Following table summarizes currently available plugins and their capabilities :-
 
@@ -66,7 +66,7 @@ Interface of the plugins was designed around following principles :-
 All brick object are created with the help of factory methods and released via brick_t::release interface. This is to ensure, that plugin implemntors can choose the allocation and deallocation mechanism of their own, similar to MS COM interfaces.
 
 ### XTree 
-All specific communication engine peculiarities are handled by xtree data structures which passesd as optional object to most of the interface methods. Xtree is conceptually an XML in OOP, e.g. tree like data structures where nodes can be accessed by string path, have set of properties of predefined list of types and can hold a single char buffer as a value (text in XML). XTree is not bound to XML in a way other than concept, but naturtally the only serializion and de-serialization logic of XTree is implemented in XML. It theoretcially can be extended to any other format of preference.
+All specific communication engine peculiarities are handled by xtree data structures which passesd as optional object to most of the interface methods. Xtree is conceptually an XML in OOP, e.g. tree like data structures where nodes can be accessed by string path, have set of properties of predefined list of types and can hold a single char buffer as a value (text in XML). XTree is not bound to XML in a way other than concept.
 
 An example of creating xtree directly from XML and getting its propertiy :-
 
@@ -84,7 +84,7 @@ auto value = s_xt->get_property_value_as_string(xp_t("/configuration", 0), "valu
 ```
 ### Threading Model 
 
-The flexibility of the engines introduces the challenge of consistent thread model. In usch way that for example replacing Kafka engine with ZeromMQ engine will not change the threading architecture of your program. The solution is to communciate with the engine via abstract queue of simple callbacks. If you would like to receive callback as result of topic subscription for example, you have to supply queue object when intiiating the plugin and then "pump" the queue from the chosen thread. The callbacks in this case are promised to be called from the the same thread that is pumping the queue. Class selector is provided to automate the task of waiting on queue and invoking the callbacks :-
+The flexibility of the engines introduces the challenge of consistent thread model. In such way that for example replacing Kafka engine with ZeromMQ engine will not change the threading architecture of your program. The solution is to communciate with the engine via abstract queue of simple callbacks. If you would like to receive callback as result of topic subscription for example, you have to supply queue object when initiating the plugin and then "pump" the queue from the chosen thread. The callbacks in this case are promised to be called from the the same thread that is pumping the queue. Class selector is provided to automate the task of waiting on queue and invoking the callbacks. All methods apart from ctprs and dtors are synchronized :-
 
 ```
 while (!shutdown)
@@ -93,15 +93,9 @@ while (!shutdown)
 }
 ```
 
-In general if queue is not supplied to plugin, it will invoke callback directly from one of the implementation threads which basically means unpredicatble threading model and not what was intended.
-
 ### Plugins 
 
 The example of using kafka plugin to publish topic should be self explicable. Paty attention to following important points:-
-
-- It does not use selector because the plugin does not supply any delivery feedback. Indeed rdkafka which was used to implement the plugin has umerous callbacks including delivery confirmation, but at this time it is not implemented and also plugin design is built around minimal common denomiator of capabilities between different engines. For example in ZeroMq getting delivery feedback is not trivial so it cannot be mandatory for implementation.
-- All specific implementation details are encapulated in xtree object. Each plugin should document the format of xtree it expects to receive.
-- After plugin is created it should be minimally usable without speicifc xtree parameters.  
 
 ```
 brick_uptr<xtree_t> publisher_xt(
