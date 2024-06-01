@@ -17,11 +17,13 @@ void console_logger(bricks_debug_level_e log_level, const char* l)
 	// Get the current time
 	time_t curr_time = time(NULL);
 
+	struct tm tm_buf;
+
 	// Convert it to local time
-	struct tm* local_time = localtime(&curr_time);
+	localtime_s(&tm_buf , &curr_time);
 
 	// Format the time into the buffer
-	strftime(buffer, 20, "%Y-%m-%d %H:%M:%S", local_time);
+	strftime(buffer, 20, "%Y-%m-%d %H:%M:%S", &tm_buf);
 
 	if (log_level < BRICKS_TRACE || log_level > BRICKS_LOG_OFF)
 		return;
@@ -42,7 +44,7 @@ bricks::log1(bricks_debug_level_e log_level, const char* format, ...)
 
 	va_list args;
 	va_start(args, format);
-	vsprintf(log_buf, format, args);
+	vsnprintf(log_buf, MAX_LOG_LEN,format, args);
 	ext_logger == nullptr ? console_logger(log_level, log_buf) : ext_logger(log_level, log_buf);
 
 	va_end(args);

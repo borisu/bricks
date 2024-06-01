@@ -17,23 +17,26 @@ pch.h
 rdkafka_plugin.cpp
 )
 
+if (WIN32)
+set (BRICKS_KAFKA_OS_SPECIFIC_SRC
+ bricks_kafka.rc 
+ dllmain.cpp 
+ framework.h
+ resource.h
+)
+endif()
+
 
 #
 # Target
 #
-add_library(bricks_kafka SHARED ${BRICKS_KAFKA_API} ${BRICKS_KAFKA_SRC})
-
-if (WIN32)
-  target_sources(bricks_kafka PRIVATE bricks_kafka.rc dllmain.cpp framework.h)
-endif()
+add_library(bricks_kafka SHARED ${BRICKS_KAFKA_API} ${BRICKS_KAFKA_SRC} ${BRICKS_KAFKA_OS_SPECIFIC_SRC})
 
 #
 # vcpkg
 #
 find_package(RdKafka CONFIG REQUIRED)
 target_link_libraries(bricks_kafka PRIVATE RdKafka::rdkafka bricks_core bricks_logger)
-
-
 
 #
 # Configuration
@@ -47,13 +50,12 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
 )
 
 add_compile_definitions(BRICKSKAFKA_EXPORTS)
-  
-
 
 #
 # Source Groups
 #
 source_group("" FILES ${BRICKS_KAFKA_SRC})
 source_group("include" FILES ${BRICKS_KAFKA_API})
+source_group("os_specific" FILES ${BRICKS_KAFKA_OS_SPECIFIC_SRC})
 
 

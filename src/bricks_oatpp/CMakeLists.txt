@@ -18,14 +18,21 @@ pch.h
 )
 
 
+
+if(WIN32)
+set (BRICKS_OATPP_OS_SPECIFIC_SRC
+ bricks_oatpp.rc 
+ framework.h 
+ dllmain.cpp
+ resource.h
+)
+endif()
+
 #
 # Target
 #
-add_library(bricks_oatpp SHARED ${BRICKS_OATPP_API} ${BRICKS_OATPP_SRC})
+add_library(bricks_oatpp SHARED ${BRICKS_OATPP_API} ${BRICKS_OATPP_SRC} ${BRICKS_OATPP_OS_SPECIFIC_SRC})
 
-if(WIN32)
- target_sources(bricks_oatpp PRIVATE bricks_oatpp.rc dllmain.cpp framework.h)
-endif()
 
 #
 # vcpkg
@@ -60,5 +67,6 @@ add_compile_definitions(BRICKSOATPP_EXPORTS)
 #
 source_group("" FILES ${BRICKS_OATPP_SRC})
 source_group("include" FILES ${BRICKS_OATPP_API})
+source_group("os_specific" FILES ${BRICKS_OATPP_OS_SPECIFIC_SRC})
 
 

@@ -17,14 +17,25 @@ pch.h
 )
 
 
+if (WIN32)
+set (BRICKS_JESTER_OS_SPECIFIC_SRC
+ bricks_jester.rc 
+ resource.h 
+ dllmain.cpp 
+ framework.h
+)
+endif()
+
 #
 # Target
 #
-add_library(bricks_jester SHARED ${BRICKS_JESTER_API} ${BRICKS_JESTER_SRC})
+add_library(bricks_jester SHARED 
+ ${BRICKS_JESTER_API} 
+ ${BRICKS_JESTER_SRC}
+ ${BRICKS_JESTER_OS_SPECIFIC_SRC}
+ )
 
-if (WIN32)
-  target_sources(bricks_jester PRIVATE bricks_jester.rc resource.h dllmain.cpp framework.h)
-endif()
+
 
 #
 # vcpkg
@@ -49,7 +60,8 @@ add_compile_definitions(BRICKSJESTER_EXPORTS)
 #
 # Source Groups
 #
-source_group("" FILES ${BBRICKS_JESTER_SRC})
-source_group("include" FILES ${BBRICKS_JESTER_API})
+source_group("" FILES ${BRICKS_JESTER_SRC})
+source_group("include" FILES ${BRICKS_JESTER_API})
+source_group("os_specific" FILES ${BRICKS_JESTER_OS_SPECIFIC_SRC})
 
 

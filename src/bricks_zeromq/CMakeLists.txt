@@ -19,15 +19,22 @@ zeromq_subscriber.cpp
 zeromq_subscriber.h
 )
 
+if(WIN32)
+set (BRICKS_OATPP_OS_SPECIFIC_SRC
+ bricks_zeromq.rc 
+ framework.h 
+ dllmain.cpp
+ resource.h
+)
+endif()
+
+
 
 #
 # Target
 #
-add_library(bricks_zeromq SHARED ${BRICKS_ZEROMQ_API} ${BRICKS_ZEROMQ_SRC})
+add_library(bricks_zeromq SHARED ${BRICKS_ZEROMQ_API} ${BRICKS_ZEROMQ_SRC} ${BRICKS_OATPP_OS_SPECIFIC_SRC})
 
-if(WIN32)
- target_sources(bricks_zeromq PRIVATE bricks_zeromq.rc dllmain.cpp framework.h)
-endif()
 
 #
 # vcpkg
@@ -55,5 +62,6 @@ add_compile_definitions(BRICKSZEROMQ_EXPORTS)
 #
 source_group("" FILES ${BRICKS_ZEROMQ_SRC})
 source_group("include" FILES ${BRICKS_ZEROMQ_API})
+source_group("os_specific" FILES ${BRICKS_OATPP_OS_SPECIFIC_SRC})
 
 

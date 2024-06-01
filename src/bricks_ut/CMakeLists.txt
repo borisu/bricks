@@ -10,70 +10,97 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-set(BRICKS_UT_SRC
-generic_tests.h
-jester_test.cpp
+set (BRICKS_UT_SRC
 pch.cpp
 pch.h
-publish_subsribe_tests.cpp
-request_response_tests.cpp
-bidi_tests.cpp
+)
+
+set (BRICKS_UT_CORE_TESTS_SRC
 xtree_test.cpp
 )
 
-#
-# Target
-#
-add_executable(bricks_ut ${BRICKS_UT_SRC})
+set (BRICKS_UT_GENERIC_TESTS_SRC
+generic_tests.h
+publish_subsribe_tests.cpp
+request_response_tests.cpp
+bidi_tests.cpp
+)
+
+set (BRICKS_UT_PLUGIN_TESTS_SRC
+jester_test.cpp
+)
 
 if (WIN32)
- target_sources(bricks_ut PRIVATE bricks_ut.rc resource.h)
+set (BRICKS_UT_OS_SPECIFIC_SRC
+ bricks_ut.rc 
+ resource.h
+)
 endif()
 
-#
-# vcpkg
-#
-  
-#
-# Configuration
-#
-set_property(TARGET bricks_ut PROPERTY CXX_STANDARD 17)
 
-target_include_directories(bricks_ut PRIVATE 
+set (BRICKS_UT_INCLUDE
 ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_core/include
 ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_logger/include
 ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_jester/include
 )
 
-target_link_libraries(bricks_ut PRIVATE GTest::gtest_main bricks_core bricks_logger bricks_jester)
-
-add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_core>" $<TARGET_FILE_DIR:bricks_ut>)
-  
-add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_logger>" $<TARGET_FILE_DIR:bricks_ut>)
-  
-add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_jester>" $<TARGET_FILE_DIR:bricks_ut>)
+set (BRICKS_UT_LIBS 
+GTest::gtest_main 
+bricks_core 
+bricks_logger 
+bricks_jester
+)
 
 if (NOT NO_KAFKA_PLUGIN)
-    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_kafka>" $<TARGET_FILE_DIR:bricks_ut>)
-    target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_kafka/include)
-    target_sources(bricks_ut PRIVATE kafka_test.cpp)
-    target_link_libraries(bricks_ut PRIVATE bricks_kafka)
+    set(BRICKS_UT_INCLUDE ${BRICKS_UT_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_kafka/include)
+    set(BRICKS_UT_PLUGIN_TESTS_SRC ${BRICKS_UT_PLUGIN_TESTS_SRC} kafka_test.cpp)
+    set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_kafka)
 endif()
 
 if (NOT NO_ZEROMQ_PLUGIN)
-    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_zeromq>" $<TARGET_FILE_DIR:bricks_ut>)
-    target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_zeromq/include)
-    target_sources(bricks_ut PRIVATE zeromq_test.cpp)
-    target_link_libraries(bricks_ut PRIVATE bricks_zeromq)
+    set(BRICKS_UT_INCLUDE ${BRICKS_UT_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_zeromq/include)
+    set(BRICKS_UT_PLUGIN_TESTS_SRC ${BRICKS_UT_PLUGIN_TESTS_SRC} zeromq_test.cpp)
+    set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_zeromq)
 endif()  
 
 if (NOT NO_OATPP_PLUGIN)
-    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_oatpp>" $<TARGET_FILE_DIR:bricks_ut>)
-    target_include_directories(bricks_ut PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_oatpp/include)
-    target_sources(bricks_ut PRIVATE oatpp_test.cpp)
-    target_link_libraries(bricks_ut PRIVATE bricks_oatpp)    
+    set(BRICKS_UT_INCLUDE ${BRICKS_UT_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_oatpp/include)
+    set(BRICKS_UT_PLUGIN_TESTS_SRC ${BRICKS_UT_PLUGIN_TESTS_SRC} oatpp_test.cpp)
+    set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_oatpp)
 endif()  
- 
 
 
+#
+# Target
+#
+add_executable(bricks_ut ${BRICKS_UT_SRC} ${BRICKS_UT_CORE_TESTS_SRC} ${BRICKS_UT_GENERIC_TESTS_SRC} ${BRICKS_UT_PLUGIN_TESTS_SRC} ${BRICKS_UT_OS_SPECIFIC_SRC})
+target_include_directories(bricks_ut PRIVATE ${BRICKS_UT_INCLUDE})
+target_link_libraries(bricks_ut PRIVATE ${BRICKS_UT_LIBS})
+
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_core>"   $<TARGET_FILE_DIR:bricks_ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_logger>" $<TARGET_FILE_DIR:bricks_ut>)
+add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_jester>" $<TARGET_FILE_DIR:bricks_ut>)
+if (NOT NO_KAFKA_PLUGIN)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_kafka>" $<TARGET_FILE_DIR:bricks_ut>)
+endif()
+if (NOT NO_ZEROMQ_PLUGIN)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_zeromq>" $<TARGET_FILE_DIR:bricks_ut>)
+endif()  
+if (NOT NO_OATPP_PLUGIN)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_oatpp>" $<TARGET_FILE_DIR:bricks_ut>)
+endif()  
+
+#
+# Configuration
+#
+set_property(TARGET bricks_ut PROPERTY CXX_STANDARD 17)
+
+#
+# Source Groups
+#
+source_group("" FILES ${BRICKS_UT_SRC})
+source_group("core_tests" FILES ${BRICKS_UT_CORE_TESTS_SRC})
+source_group("generic_tests" FILES ${BRICKS_UT_GENERIC_TESTS_SRC})
+source_group("plugin_tests" FILES ${BRICKS_UT_PLUGIN_TESTS_SRC})
+source_group("os_specific" FILES ${BRICKS_UT_OS_SPECIFIC_SRC})
 

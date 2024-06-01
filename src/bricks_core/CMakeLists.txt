@@ -10,6 +10,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/queue.h
 ${CMAKE_CURRENT_SOURCE_DIR}/include/selector.h
 ${CMAKE_CURRENT_SOURCE_DIR}/include/utils.h
 ${CMAKE_CURRENT_SOURCE_DIR}/include/xtree.h
+${CMAKE_CURRENT_SOURCE_DIR}/include/timer.h
 )
 
 set (BRICKS_CORE_SRC 
@@ -18,7 +19,6 @@ pch.h
 buffer_impl.cpp
 buffer_impl.h
 common.cpp
-framework.h
 locking_queue.h
 queue_impl.cpp
 queue_impl.h
@@ -49,6 +49,8 @@ if (WIN32)
 set (BRICKS_CORE_OS_SPECIFIC_SRC
  bricks_core.rc 
  dllmain.cpp
+ framework.h
+ resource.h
 )
 endif()
 

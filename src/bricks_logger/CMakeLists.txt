@@ -11,14 +11,21 @@ logger.cpp
 pch.cpp 
 )
 
+if(WIN32)
+set (BRICKS_LOGGER_OS_SPECIFIC_SRC
+ bricks_logger.rc 
+ framework.h 
+ dllmain.cpp
+ resource.h
+)
+endif()
+
+
 #
 # Target
 #
-add_library(bricks_logger SHARED ${BRICKS_LOGGER_API} ${BRICKS_LOGGER_SRC})
+add_library(bricks_logger SHARED ${BRICKS_LOGGER_API} ${BRICKS_LOGGER_SRC} ${BRICKS_LOGGER_OS_SPECIFIC_SRC})
 
-if(WIN32)
-target_sources(bricks_logger PRIVATE bricks_logger.rc framework.h dllmain.cpp)
-endif()
 
 
 #
@@ -36,5 +43,6 @@ add_compile_definitions(BRICKSLOGGER_EXPORTS)
 #
 source_group("" FILES ${BRICKS_LOGGER_SRC})
 source_group("include" FILES ${BRICKS_LOGGER_API})
+source_group("os_specific" FILES ${BRICKS_LOGGER_OS_SPECIFIC_SRC})
 
 
