@@ -33,6 +33,7 @@
 #include <inttypes.h>
 #include <functional>
 #include <queue>
+#include <condition_variable>
 
 #include "tinyxml2.h"
 #include "base64.hpp"
