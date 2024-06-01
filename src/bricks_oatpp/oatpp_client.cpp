@@ -27,6 +27,8 @@ oatpp_client_t::destroy()
 bricks_error_code_e 
 oatpp_client_t::init(cb_queue_t* queue, int timeout_ms, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -69,6 +71,8 @@ oatpp_client_t::init(cb_queue_t* queue, int timeout_ms, const xtree_t* options)
 bricks_error_code_e 
 oatpp_client_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -111,12 +115,16 @@ oatpp_client_t::init_params(const xtree_t* options, const char* path, std::unord
 bool
 oatpp_client_t::check_capability(plugin_capabilities_e)
 {
+	SYNCHRONIZED(mtx);
+
 	return false;
 }
 
 bricks_error_code_e 
 oatpp_client_t::issue_request(const char* data, size_t size, response_cb_t callback, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_STARTED;
 
@@ -246,4 +254,9 @@ client_coroutine_t::onBody(const oatpp::String& body) {
 	cb_queue->enqueue(std::bind(callback, status_code == 200 ? BRICKS_SUCCESS : BRICKS_REMOTE_ERROR, buffer, response_xt));
 	
 	return finish();
+}
+
+client_coroutine_t::~client_coroutine_t()
+{
+
 }

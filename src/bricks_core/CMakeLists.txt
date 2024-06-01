@@ -30,12 +30,27 @@ xtree_impl.cpp
 xtree_impl.h
 xtree_xml.cpp
 xtree_xml.h
+pubsub_server.h
+pubsub_server.cpp
+pubsub_client.h
+pubsub_client.cpp
+poller_impl.h
+poller_impl.cpp
+timer_impl.h
+timer_impl.cpp
 )
 
 set (BRICKS_CORE_3RD_PARTY
 ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/tinyxml2/tinyxml2.h
 ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/tinyxml2/tinyxml2.cpp
 )
+
+if (WIN32)
+set (BRICKS_CORE_OS_SPECIFIC_SRC
+ bricks_core.rc 
+ dllmain.cpp
+)
+endif()
 
 #
 # Target
@@ -44,19 +59,19 @@ add_library(bricks_core SHARED
 ${BRICKS_CORE_API}
 ${BRICKS_CORE_SRC}
 ${BRICKS_CORE_3RD_PARTY}
+${BRICKS_CORE_OS_SPECIFIC_SRC}
 )
 
-if (WIN32)
-  target_sources(bricks_core PRIVATE bricks_core.rc dllmain.cpp)
-endif()
-
 #
-# Configuration
+# Configuration Optionss
 #
 add_compile_definitions(BRICKS_EXPORTS)
 
 set_property(TARGET bricks_core PROPERTY CXX_STANDARD 17)
 
+#
+# Include Directories
+#
 target_include_directories(bricks_core PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}/include
 ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/tinyxml2
@@ -67,6 +82,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/modules/base64/include
 # Source Groups
 #
 source_group("" FILES ${BRICKS_CORE_SRC})
+source_group("os_specific" FILES ${BRICKS_CORE_OS_SPECIFIC_SRC})
 source_group("include" FILES ${BRICKS_CORE_API})
 source_group("3rdparty" FILES ${BRICKS_CORE_3RD_PARTY})
 

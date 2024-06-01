@@ -54,6 +54,8 @@ namespace bricks::plugins
 
 		request_cb_t request_cb;
 
+		std::recursive_mutex mtx;
+
 		friend class oatpp_server_controller_t;
 
 

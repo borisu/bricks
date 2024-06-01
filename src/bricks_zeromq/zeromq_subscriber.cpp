@@ -115,17 +115,17 @@ zeromq_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 }
 
 bricks_error_code_e
-zeromq_subscriber_t::unsubscribe()
+zeromq_subscriber_t::unsubscribe(const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
 	ASSERT_INITIATED;
 	
-	return unsubscribe("");
+	return unsubscribe("", options);
 }
 
 bricks_error_code_e 
-zeromq_subscriber_t::unsubscribe(const std::string& topic)
+zeromq_subscriber_t::unsubscribe(const std::string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 

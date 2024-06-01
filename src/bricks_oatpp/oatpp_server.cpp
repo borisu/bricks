@@ -37,6 +37,8 @@ oatpp_server_t::destroy()
 bricks_error_code_e 
 oatpp_server_t::init(cb_queue_t* queue, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+	
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -106,6 +108,8 @@ oatpp_server_t::init(cb_queue_t* queue, const xtree_t* options)
 bricks_error_code_e 
 oatpp_server_t::register_request_cb(request_cb_t request, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	request_cb = request;
 
 	return BRICKS_SUCCESS;
@@ -124,6 +128,8 @@ oatpp_server_t::oatpp_worker(oatpp_server_t* THIS)
 bricks_error_code_e 
 oatpp_server_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_STARTED;
 
 	server_thread = new thread(&oatpp_server_t::oatpp_worker, this);
@@ -141,5 +147,7 @@ oatpp_server_t::~oatpp_server_t()
 bool 
 oatpp_server_t::check_capability(plugin_capabilities_e)
 {
+	SYNCHRONIZED(mtx);
+
 	return false;
 }

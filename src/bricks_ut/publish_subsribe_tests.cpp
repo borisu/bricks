@@ -5,7 +5,7 @@
 
 using namespace bricks;
 
-#define TEST_TOPIC "bricks.test.16"
+#define TEST_TOPIC "bricks.test.17"
 
 bricks_error_code_e 
 publish(publisher_plugin_t* publisher, const char *topic, xtree_t* publish_xt, list<string> &cache,  int count, int &offset)

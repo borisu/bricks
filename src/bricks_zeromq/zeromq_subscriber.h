@@ -24,9 +24,9 @@ namespace bricks::plugins
 
 		virtual bool check_capability(plugin_capabilities_e) override;
 
-		virtual bricks_error_code_e unsubscribe() override;
+		virtual bricks_error_code_e unsubscribe(const std::string&, const xtree_t* options) override;
 
-		virtual bricks_error_code_e unsubscribe(const std::string&) override;
+		virtual bricks_error_code_e unsubscribe(const xtree_t* options) override;
 
 		virtual void release() override { delete this; };
 

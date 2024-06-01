@@ -62,7 +62,6 @@ TEST(kafka_case, publish_subscribe_test) {
 				"   <configuration>"
 				"    <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
 				"    <property name = \"group.id\" value=\"bricks.test.group\"/>"
-				"    <property name = \"heartbeat.interval.ms\" value=\"1000\"/>"
 				"    <property name = \"debug\" value=\"all\"/>"
 				"   </configuration>"
 				"  </consumer>"

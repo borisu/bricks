@@ -189,7 +189,7 @@ jester_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* o
 }
 
 bricks_error_code_e 
-jester_subscriber_t::unsubscribe(const string& topic)
+jester_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 {
 	SYNCHRONIZED(ctx->mtx);
 
@@ -203,7 +203,7 @@ jester_subscriber_t::unsubscribe(const string& topic)
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e jester_subscriber_t::unsubscribe()
+bricks_error_code_e jester_subscriber_t::unsubscribe(const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 

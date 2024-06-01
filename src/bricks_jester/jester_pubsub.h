@@ -74,9 +74,9 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options = nullptr) override;
 
-		virtual bricks_error_code_e unsubscribe(const string& topic) override;
+		virtual bricks_error_code_e unsubscribe(const string& topic, const xtree_t* options) override;
 
-		virtual bricks_error_code_e unsubscribe() override;
+		virtual bricks_error_code_e unsubscribe(const xtree_t* options ) override;
 
 		virtual bricks_error_code_e start() override;
 

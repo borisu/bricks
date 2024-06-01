@@ -59,6 +59,8 @@ namespace bricks::plugins
 
         friend client_coroutine_t;
 
+        std::recursive_mutex mtx;
+
 	};
 
 
@@ -133,7 +135,7 @@ namespace bricks::plugins
          */
         Action onBody(const oatpp::String& body);
 
-        
+        virtual ~client_coroutine_t();
 
     };
 	

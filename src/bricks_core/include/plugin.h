@@ -43,9 +43,9 @@ namespace bricks {
 
 		virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e unsubscribe(const string& topic) = 0;
+		virtual bricks_error_code_e unsubscribe(const string& topic, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e unsubscribe() = 0;
+		virtual bricks_error_code_e unsubscribe(const xtree_t* options = nullptr) = 0;
 
 	};
 
