@@ -20,4 +20,7 @@ namespace bricks::plugins {
 	BRICKREDISPP_API subscriber_plugin_t*
 		create_redispp_subscriber();
 
+	BRICKREDISPP_API subscriber_plugin_t*
+		create_redispp_psubscriber();
+
 }

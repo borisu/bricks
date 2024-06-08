@@ -47,13 +47,7 @@ redispp_publisher_t::check_capability(plugin_capabilities_e e)
 {
 	SYNCHRONIZED(mtx);
 
-	switch (e)
-	{
-	case HIERARCHICAL_PUBLISH:
-		return true;
-	default:
-		return false;
-	}
+	return false;
 }
 
 
@@ -124,7 +118,6 @@ redispp_publisher_t::publish(const string& topic, const char* data, size_t size,
 	SYNCHRONIZED(mtx);
 
 	ASSERT_INITIATED;
-
 	ASSERT_STARTED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;

@@ -11,13 +11,10 @@ request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, cli
 	brick_uptr<brick_t> c(create_poller(BRICKS_DEFAULT_CLIENT_TIMEOUT, selector));
 
 	ASSERT_EQ(BRICKS_SUCCESS, server->init(selector->queue(),pxt));
-	ASSERT_EQ(BRICKS_SUCCESS, client->init(selector->queue(), BRICKS_DEFAULT_CLIENT_TIMEOUT, sxt));
-	
-
 	int req_count = 0;
-	auto cb = [&](response_proxy_cb_t proxy, buffer_t* buf,  xtree_t* xt)
+	auto cb = [&](response_proxy_cb_t proxy, buffer_t* buf, xtree_t* xt)
 		{
-			
+
 			auto cloned_xt = create_xtree();
 
 			if (server_response_xt)
@@ -30,11 +27,14 @@ request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, cli
 			req_count++;
 		};
 
-	ASSERT_EQ(BRICKS_SUCCESS, server->register_request_cb(cb,nullptr));
-
+	ASSERT_EQ(BRICKS_SUCCESS, server->register_request_cb(cb, nullptr));
 	ASSERT_EQ(BRICKS_SUCCESS, server->start());
 
+
+	ASSERT_EQ(BRICKS_SUCCESS, client->init(selector->queue(), BRICKS_DEFAULT_CLIENT_TIMEOUT, sxt));
 	ASSERT_EQ(BRICKS_SUCCESS, client->start());
+
+	this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 
 	int rsp_count = 0;
 	for (int i = 0; i < NUM_OF_ITERATIONS; i++)
@@ -48,7 +48,7 @@ request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, cli
 			client_send_xt));
 	}
 
-	this_thread::sleep_for(chrono::milliseconds(2*STABILIZATION_TIMEOUT));
+	this_thread::sleep_for(chrono::seconds(3600));
 
 	ASSERT_EQ(rsp_count, NUM_OF_ITERATIONS);
 	ASSERT_EQ(req_count, NUM_OF_ITERATIONS);

@@ -8,6 +8,8 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/redispp_plugin.h
 set(BRICKS_REDISPP_SRC
 redispp_subscriber.h
 redispp_subscriber.cpp
+redispp_psubscriber.h
+redispp_psubscriber.cpp
 redispp_publisher.h
 redispp_publisher.cpp
 pch.cpp

@@ -12,20 +12,26 @@ server_plugin_t* bricks::create_pubsub_server(
 	publisher_plugin_t* publisher,
 	subscriber_plugin_t* subscriber,
 	const char* request_topic_prefix,
-	const char* reponse_topic_prefix)
+	const char* response_topic_prefix,
+	const char* error_topic_prefix)
 {
-	return new pubsusb_server_t(publisher, subscriber, request_topic_prefix, reponse_topic_prefix);
+    if (!subscriber->check_capability(HIERARCHICAL_SUBSCRIBE))
+		return nullptr;
+
+	return new pubsusb_server_t(publisher, subscriber, request_topic_prefix, response_topic_prefix, error_topic_prefix);
 }
 
 pubsusb_server_t::pubsusb_server_t(
 	publisher_plugin_t* publisher,
 	subscriber_plugin_t* subscriber,
 	const char* request_topic_prefix,
-	const char* reponse_topic_prefix) :
+	const char* response_topic_prefix,
+	const char* error_topic_prefix) :
 	publisher(publisher),
 	subscriber(subscriber),
 	request_topic_prefix(request_topic_prefix),
-	response_topic_prefix(response_topic_prefix)
+	response_topic_prefix(response_topic_prefix),
+	error_topic_prefix(error_topic_prefix)
 {
 
 }
@@ -33,6 +39,8 @@ pubsusb_server_t::pubsusb_server_t(
 bricks_error_code_e
 pubsusb_server_t::init(cb_queue_t* queue,  const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_NOT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -63,6 +71,8 @@ pubsusb_server_t::init(cb_queue_t* queue,  const xtree_t* options)
 bricks_error_code_e
 pubsusb_server_t::register_request_cb(request_cb_t request_cb, const xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 	
@@ -74,6 +84,8 @@ pubsusb_server_t::register_request_cb(request_cb_t request_cb, const xtree_t* op
 bricks_error_code_e
 pubsusb_server_t::start()
 {
+	SYNCHRONIZED(mtx);
+
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
@@ -96,6 +108,8 @@ pubsusb_server_t::start()
 void
 pubsusb_server_t::topic_cb(const string& topic, buffer_t* buf, xtree_t* xt)
 {
+	SYNCHRONIZED(mtx);
+
 	size_t delimiter = topic.find_last_of("/");
 	if (delimiter == string::npos || delimiter == (topic.length()-1))
 		return;
@@ -119,6 +133,8 @@ pubsusb_server_t::topic_cb(const string& topic, buffer_t* buf, xtree_t* xt)
 void 
 pubsusb_server_t::response_proxy_cb(const string& topic, bricks_error_code_e err, const char* data, size_t size, xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	if (err == BRICKS_SUCCESS)
 		publisher->publish(topic,data, size, options);
 	
@@ -127,5 +143,7 @@ pubsusb_server_t::response_proxy_cb(const string& topic, bricks_error_code_e err
 bool 
 pubsusb_server_t::check_capability(plugin_capabilities_e)
 {
+	SYNCHRONIZED(mtx);
+
 	return false;
 }

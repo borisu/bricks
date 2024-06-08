@@ -6,5 +6,6 @@
 #include "selector.h"
 #include "buffer.h"
 #include "plugin.h"
+#include "meta.h"
 
 

@@ -11,6 +11,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/selector.h
 ${CMAKE_CURRENT_SOURCE_DIR}/include/utils.h
 ${CMAKE_CURRENT_SOURCE_DIR}/include/xtree.h
 ${CMAKE_CURRENT_SOURCE_DIR}/include/timer.h
+${CMAKE_CURRENT_SOURCE_DIR}/include/meta.h
 )
 
 set (BRICKS_CORE_SRC 
@@ -38,6 +39,7 @@ poller_impl.h
 poller_impl.cpp
 timer_impl.h
 timer_impl.cpp
+
 )
 
 set (BRICKS_CORE_3RD_PARTY

@@ -26,6 +26,8 @@ timer_impl_t::~timer_impl_t() {
 bricks_error_code_e 
 timer_impl_t::init(cb_queue_t* queue, const xtree_t* options = nullptr)
 {
+    std::unique_lock<std::mutex> lock(mtx);
+
     ASSERT_NOT_INITIATED;
     ASSERT_NOT_STARTED;
 
@@ -39,6 +41,8 @@ timer_impl_t::init(cb_queue_t* queue, const xtree_t* options = nullptr)
 bricks_error_code_e 
 timer_impl_t::start()
 {
+    std::unique_lock<std::mutex> lock(mtx);
+
     ASSERT_INITIATED;
     ASSERT_NOT_STARTED;
 

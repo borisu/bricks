@@ -11,7 +11,8 @@ namespace bricks
 			publisher_plugin_t* publisher,
 			subscriber_plugin_t* subscriber,
 			const char* request_topic_prefix,
-			const char* reponse_topic_prefix);
+			const char* reponse_topic_prefix,
+			const char* error_topic_prefix);
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
 
@@ -39,6 +40,8 @@ namespace bricks
 
 		string response_topic_prefix;
 
+		string error_topic_prefix;
+
 		map<string, response_cb_t> clients;
 
 		atomic<bool> initiated = false;
@@ -46,6 +49,8 @@ namespace bricks
 		atomic<bool> started = false;
 
 		request_cb_t request_cb;
+
+		std::recursive_mutex mtx;
 
 	};
 }

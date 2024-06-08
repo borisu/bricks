@@ -13,7 +13,8 @@ namespace bricks
 			subscriber_plugin_t *subscriber,
 			timer_t *timer,
 			const char *request_topic_prefix,
-			const char *reponse_topic_prefix);
+			const char *reponse_topic_prefix,
+			const char *error_topic_prefix);
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, int timeout_ms, const xtree_t* options ) override;
 
@@ -41,6 +42,8 @@ namespace bricks
 
 		string response_topic_prefix;
 
+		string error_topic_prefix;
+
 		struct request_ctx
 		{
 			response_cb_t request_cb;
@@ -56,6 +59,8 @@ namespace bricks
 		timer_t *timer = nullptr;
 
 		int timeout_ms = BRICKS_DEFAULT_CLIENT_TIMEOUT ;
+
+		std::recursive_mutex mtx;
 		
 	};
 }

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "redispp_subscriber.h"
+#include "redispp_psubscriber.h"
 #include "redispp_plugin.h"
 
 using namespace std;
@@ -10,17 +10,17 @@ using namespace std::placeholders;
 
 
 subscriber_plugin_t*
-bricks::plugins::create_redispp_subscriber()
+bricks::plugins::create_redispp_psubscriber()
 {
-	return new redispp_subscriber_t();
+	return new redispp_psubscriber_t();
 }
 
-redispp_subscriber_t::redispp_subscriber_t()
+redispp_psubscriber_t::redispp_psubscriber_t()
 {
 
 }
 
-redispp_subscriber_t::~redispp_subscriber_t()
+redispp_psubscriber_t::~redispp_psubscriber_t()
 {
 	SYNCHRONIZED(mtx);
 
@@ -28,7 +28,7 @@ redispp_subscriber_t::~redispp_subscriber_t()
 }
 
 void
-redispp_subscriber_t::destroy()
+redispp_psubscriber_t::destroy()
 {
 	SYNCHRONIZED(mtx);
 
@@ -50,7 +50,7 @@ redispp_subscriber_t::destroy()
 }
 
 bricks_error_code_e
-redispp_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options)
+redispp_psubscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* options)
 {
 
 	SYNCHRONIZED(mtx);
@@ -96,23 +96,27 @@ redispp_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* 
 
 
 bool 
-redispp_subscriber_t::check_capability(plugin_capabilities_e e)
+redispp_psubscriber_t::check_capability(plugin_capabilities_e e)
 {
 	SYNCHRONIZED(mtx);
 
-	return false;
+	switch (e)
+	{
+	case HIERARCHICAL_SUBSCRIBE:
+		return true;
+	default:
+		return false;
+	}
 }
-
-
 void 
-redispp_subscriber_t::on_meta(Subscriber::MsgType type, OptionalString channel, long long num)
+redispp_psubscriber_t::on_meta(Subscriber::MsgType type, OptionalString channel, long long num)
 {
 	log1(BRICKS_DEBUG, "%s %%%%%% Event %d on topic (where relevant) '%s' (%d).\n", this->name.c_str(), type, channel ? channel.value().c_str():"", num);
 }
 
 
 void 
-redispp_subscriber_t::on_topic(std::string channel, std::string msg)
+redispp_psubscriber_t::on_topic(std::string channel, std::string msg)
 {
 	SYNCHRONIZED(mtx);
 
@@ -135,7 +139,7 @@ redispp_subscriber_t::on_topic(std::string channel, std::string msg)
 }
 
 bricks_error_code_e 
-redispp_subscriber_t::subscribe(const string& topic, const xtree_t* options)
+redispp_psubscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
@@ -145,7 +149,7 @@ redispp_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 
 	try
 	{
-		auto fut= subscriber->subscribe(topic);
+		auto fut= subscriber->psubscribe(topic + "*");
 		fut.wait();
 	}
 	catch (Error& e)
@@ -159,7 +163,7 @@ redispp_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 }
 
 bricks_error_code_e 
-redispp_subscriber_t::unsubscribe(const string& topic, const xtree_t* options)
+redispp_psubscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
@@ -169,7 +173,7 @@ redispp_subscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 
 	try
 	{
-		auto fut = subscriber->unsubscribe(topic);
+		auto fut = subscriber->punsubscribe(topic + "*");
 		fut.wait();
 	}
 	catch (Error& e)
@@ -182,7 +186,7 @@ redispp_subscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 }
 
 bricks_error_code_e  
-redispp_subscriber_t::unsubscribe(const xtree_t* options)
+redispp_psubscriber_t::unsubscribe(const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
@@ -206,15 +210,15 @@ redispp_subscriber_t::unsubscribe(const xtree_t* options)
 
 
 bricks_error_code_e 
-redispp_subscriber_t::start()
+redispp_psubscriber_t::start()
 {
 	SYNCHRONIZED(mtx);
 
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
-	subscriber->on_message(std::bind(&redispp_subscriber_t::on_topic,this,_1,_2));
-	subscriber->on_meta(std::bind(&redispp_subscriber_t::on_meta, this, _1, _2,_3));
+	subscriber->on_pmessage(std::bind(&redispp_psubscriber_t::on_topic,this,_1,_2));
+	subscriber->on_meta(std::bind(&redispp_psubscriber_t::on_meta, this, _1, _2,_3));
 
 	return BRICKS_SUCCESS;
 

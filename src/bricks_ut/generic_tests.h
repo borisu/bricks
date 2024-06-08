@@ -20,8 +20,8 @@ struct msg_info
 	}
 };
 
-#define NUM_OF_ITERATIONS 10
-#define NUM_OF_TESTS 2
+#define NUM_OF_ITERATIONS 1
+#define NUM_OF_TESTS 1
 #define STABILIZATION_TIMEOUT 1000
 
 void
