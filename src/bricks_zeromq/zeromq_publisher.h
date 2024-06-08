@@ -33,15 +33,12 @@ namespace bricks::plugins
 	private:
 
 		void destroy();
-
 	
 		void* context = nullptr;
 
 		void* publisher = nullptr;
 
 		string url;
-
-		string topic;
 
 		cb_queue_t* cb_queue = nullptr;
 

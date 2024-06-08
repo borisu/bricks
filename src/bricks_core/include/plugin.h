@@ -13,7 +13,8 @@ namespace bricks {
 
 	enum plugin_capabilities_e
 	{
-		HIERARCHICAL_SUBSCRIBE
+		HIERARCHICAL_SUBSCRIBE,
+		HIERARCHICAL_PUBLISH,
 	};
 
 	class plugin_t : public startable_brick_t {

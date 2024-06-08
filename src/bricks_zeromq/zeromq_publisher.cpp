@@ -15,7 +15,7 @@ zeromq_publisher_t::check_capability(plugin_capabilities_e e)
 {
 	switch (e)
 	{
-	case HIERARCHICAL_SUBSCRIBE:
+	case HIERARCHICAL_PUBLISH:
 		return true;
 	default:
 		return false;

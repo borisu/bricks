@@ -69,6 +69,12 @@ if (NOT NO_OATPP_PLUGIN)
     set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_oatpp)
 endif()  
 
+if (NOT NO_REDISPP_PLUGIN)
+    set(BRICKS_UT_INCLUDE ${BRICKS_UT_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_redispp/include)
+    set(BRICKS_UT_PLUGIN_TESTS_SRC ${BRICKS_UT_PLUGIN_TESTS_SRC} redispp_test.cpp)
+    set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_redispp)
+endif()  
+
 
 #
 # Target
@@ -88,6 +94,9 @@ if (NOT NO_ZEROMQ_PLUGIN)
 endif()  
 if (NOT NO_OATPP_PLUGIN)
     add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_oatpp>" $<TARGET_FILE_DIR:bricks_ut>)
+endif()  
+if (NOT NO_REDISPP_PLUGIN)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_redispp>" $<TARGET_FILE_DIR:bricks_ut>)
 endif()  
 
 #
