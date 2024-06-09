@@ -116,7 +116,7 @@ redispp_psubscriber_t::on_meta(Subscriber::MsgType type, OptionalString channel,
 
 
 void 
-redispp_psubscriber_t::on_topic(std::string channel, std::string msg)
+redispp_psubscriber_t::on_ptopic(std::string pattern, std::string channel, std::string msg)
 {
 	SYNCHRONIZED(mtx);
 
@@ -149,8 +149,7 @@ redispp_psubscriber_t::subscribe(const string& topic, const xtree_t* options)
 
 	try
 	{
-		auto fut= subscriber->psubscribe(topic + "*");
-		fut.wait();
+		subscriber->psubscribe(topic + "*");
 	}
 	catch (Error& e)
 	{
@@ -173,8 +172,7 @@ redispp_psubscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 
 	try
 	{
-		auto fut = subscriber->punsubscribe(topic + "*");
-		fut.wait();
+		subscriber->punsubscribe(topic + "*");
 	}
 	catch (Error& e)
 	{
@@ -196,8 +194,7 @@ redispp_psubscriber_t::unsubscribe(const xtree_t* options)
 	
 	try
 	{
-		auto fut = subscriber->unsubscribe();
-		fut.wait();
+		subscriber->unsubscribe();
 	}
 	catch (Error& e)
 	{
@@ -217,7 +214,7 @@ redispp_psubscriber_t::start()
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
-	subscriber->on_pmessage(std::bind(&redispp_psubscriber_t::on_topic,this,_1,_2));
+	subscriber->on_pmessage(std::bind(&redispp_psubscriber_t::on_ptopic,this,_1,_2,_3));
 	subscriber->on_meta(std::bind(&redispp_psubscriber_t::on_meta, this, _1, _2,_3));
 
 	return BRICKS_SUCCESS;

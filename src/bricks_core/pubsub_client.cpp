@@ -107,9 +107,15 @@ pubsub_client_t::issue_request(const char* buf, size_t size, response_cb_t clien
 				handle)) != BRICKS_SUCCESS)
 			break;
 	
-		ctxs[response_topic] = { client_cb, handle };
+		ctxs[response_topic] = { client_cb, handle, request_topic, response_topic,error_topic };
 		
 	} while(false);
+
+	if (err != BRICKS_SUCCESS)
+	{
+		subscriber->unsubscribe(response_topic);
+		subscriber->unsubscribe(error_topic);
+	}
 
 	return BRICKS_SUCCESS;
 }
@@ -139,13 +145,16 @@ void pubsub_client_t::timeout_cb(const string& topic)
 		return;
 	}
 
+	subscriber->unsubscribe(iter->second.response_topic);
+	subscriber->unsubscribe(iter->second.error_topic);
+
 	queue->enqueue(std::bind(iter->second.request_cb, BRICKS_TIMEOUT, nullptr, nullptr));
 	
 	ctxs.erase(iter);
 }
 
 void 
-pubsub_client_t::topic_cb(const string& topic, buffer_t *buf, xtree_t*)
+pubsub_client_t::topic_cb(const string& topic, buffer_t *buf, xtree_t* xt)
 {
 	SYNCHRONIZED(mtx);
 
@@ -155,8 +164,10 @@ pubsub_client_t::topic_cb(const string& topic, buffer_t *buf, xtree_t*)
 		return;
 	}
 
-	auto xt = create_xtree();
-	
+	subscriber->unsubscribe(iter->second.response_topic);
+	subscriber->unsubscribe(iter->second.error_topic);
+
+
 	queue->enqueue(std::bind(iter->second.request_cb, BRICKS_SUCCESS, buf, xt));
 
 	timer->cancel_timer(iter->second.handle);

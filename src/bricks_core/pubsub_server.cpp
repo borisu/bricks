@@ -114,7 +114,7 @@ pubsusb_server_t::topic_cb(const string& topic, buffer_t* buf, xtree_t* xt)
 	if (delimiter == string::npos || delimiter == (topic.length()-1))
 		return;
 
-	string response_postfix = response_topic_prefix + "/" + topic.substr(delimiter);
+	string response_postfix = response_topic_prefix + topic.substr(delimiter);
 	
 	response_proxy_cb_t p = std::bind(&pubsusb_server_t::response_proxy_cb, this, response_postfix, _1, _2, _3, _4);
 
@@ -137,6 +137,9 @@ pubsusb_server_t::response_proxy_cb(const string& topic, bricks_error_code_e err
 
 	if (err == BRICKS_SUCCESS)
 		publisher->publish(topic,data, size, options);
+
+	if (options)
+		options->release();
 	
 }
 

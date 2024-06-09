@@ -35,7 +35,7 @@ namespace bricks::plugins {
 
 	protected:
 
-		virtual void on_topic(std::string channel, std::string msg);
+		virtual void on_ptopic(std::string pattern, std::string channel, std::string msg);
 
 		virtual void on_meta(Subscriber::MsgType type, OptionalString channel, long long num);
 

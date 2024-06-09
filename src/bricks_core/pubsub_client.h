@@ -48,6 +48,9 @@ namespace bricks
 		{
 			response_cb_t request_cb;
 			int handle;
+			string request_topic;
+			string response_topic;
+			string error_topic;
 		};
 
 		map<string, request_ctx> ctxs;

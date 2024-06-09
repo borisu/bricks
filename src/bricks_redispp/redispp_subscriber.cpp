@@ -145,8 +145,7 @@ redispp_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 
 	try
 	{
-		auto fut= subscriber->subscribe(topic);
-		fut.wait();
+		subscriber->subscribe(topic);
 	}
 	catch (Error& e)
 	{
@@ -169,8 +168,7 @@ redispp_subscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 
 	try
 	{
-		auto fut = subscriber->unsubscribe(topic);
-		fut.wait();
+		subscriber->unsubscribe(topic);
 	}
 	catch (Error& e)
 	{
@@ -192,8 +190,7 @@ redispp_subscriber_t::unsubscribe(const xtree_t* options)
 	
 	try
 	{
-		auto fut = subscriber->unsubscribe();
-		fut.wait();
+		subscriber->unsubscribe();
 	}
 	catch (Error& e)
 	{

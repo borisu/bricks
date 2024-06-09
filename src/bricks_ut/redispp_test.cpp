@@ -97,6 +97,8 @@ TEST(redispp_case, meta_request_response_test) {
 		selector->init(cb_q.get());
 
 		brick_uptr<timer_t> timer(create_timer());
+		timer->init(cb_q.get());
+		timer->start();
 
 		brick_uptr<client_plugin_t>  client(create_pubsub_client(client_publisher.get(), client_subscriber.get(), timer.get(), "/bricks/meta/req", "/bricks/meta/rep", "/bricks/meta/err"));
 

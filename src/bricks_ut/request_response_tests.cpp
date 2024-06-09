@@ -48,7 +48,7 @@ request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, cli
 			client_send_xt));
 	}
 
-	this_thread::sleep_for(chrono::seconds(3600));
+	this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 
 	ASSERT_EQ(rsp_count, NUM_OF_ITERATIONS);
 	ASSERT_EQ(req_count, NUM_OF_ITERATIONS);
