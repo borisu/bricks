@@ -38,8 +38,6 @@ namespace bricks::plugins {
 
 		virtual void rmq_poll_loop();
 
-		virtual void on_topic(std::string pattern, std::string channel, std::string msg);
-
 		std::recursive_mutex mtx;
 
 		topic_cb_t msg_cb;
@@ -51,6 +49,8 @@ namespace bricks::plugins {
 		bool started = false;
 
 		string default_queue_name;
+
+		atomic<bool> shutdown = false;
 
 	};
 }

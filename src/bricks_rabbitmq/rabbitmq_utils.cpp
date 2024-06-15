@@ -13,7 +13,7 @@ bricks::plugins::check_amqp_error(amqp_rpc_reply_t x, char const* name, char con
         return BRICKS_SUCCESS;
 
     case AMQP_RESPONSE_NONE:
-        log1(BRICKS_ALARM, "%s %%%%%% %s:missing RPC reply type!", context, name);
+        log1(BRICKS_ALARM, "%s %%%%%% %s:missing RPC reply type!", name, context);
         break;
 
     case AMQP_RESPONSE_LIBRARY_EXCEPTION:

@@ -52,7 +52,9 @@ rabbitmq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 
 	ASSERT_NOT_INITIATED;
 
-	auto err = rabbitmq_base_t::handle_connect_options("/bricks/rabbitmq/publisher/init", queue, options);
+	name = get_opt<string>(options->get_property_value("/bricks/rabbitmq/publisher", "name"));
+
+	auto err = rabbitmq_base_t::handle_connect_options("/bricks/rabbitmq/publisher/init/connection", queue, options);
 
 	if (err == BRICKS_SUCCESS)
 	{
@@ -71,7 +73,7 @@ rabbitmq_publisher_t::describe_topic(const string& topic, const xtree_t* options
 	ASSERT_INITIATED;
 	ASSERT_NOT_STARTED;
 
-	return handle_exchange_declare_options("/bricks/rabbitmq/publisher/describe_topic", topic, options);
+	return handle_exchange_declare_options("/bricks/rabbitmq/publisher/describe_topic/exchange", topic, options);
 
 }
 

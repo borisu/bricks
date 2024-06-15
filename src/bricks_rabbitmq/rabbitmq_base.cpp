@@ -30,21 +30,24 @@ rabbitmq_base_t::handle_connect_options(const string& prefix, cb_queue_t* queue,
 	try
 	{
 		do {
-			name = get<string>(options->get_property_value(prefix.c_str(), "name").value());
-			hostname = get<string>(options->get_property_value((prefix + "/connection").c_str(), "hostname").value());
-			port = get<int>(options->get_property_value((prefix + "/connection").c_str(), "port").value());
+			
+			/* mandatory */
+			hostname = get<string>(options->get_property_value(prefix.c_str(), "hostname").value());
+			port = get<int>(options->get_property_value(prefix.c_str(), "port").value());
 			string method = get<string>(options->get_property_value((prefix + "/login").c_str(), "method").value());
 			if (method != "plain")
 			{
 				err = BRICKS_INVALID_PARAM;
 				break;
 			}
-
 			username = get<string>(options->get_property_value((prefix + "/login").c_str(), "username").value());
 			password = get<string>(options->get_property_value((prefix + "/login").c_str(), "password").value());
-			channel_max = get_opt<int>(options->get_property_value((prefix + "/login").c_str(), "channel_max").value(), 0);
-			frame_max = get_opt<int>(options->get_property_value((prefix + "/login").c_str(), "frame_max").value(), 131072);
-			heartbeat = get_opt<int>(options->get_property_value((prefix + "/login").c_str(), "heartbeat").value(), 0);
+
+
+			/* optional */
+			channel_max = get_opt<int>(options->get_property_value((prefix + "/login").c_str(), "channel_max"), 0);
+			frame_max   = get_opt<int>(options->get_property_value((prefix + "/login").c_str(), "frame_max"), 131072);
+			heartbeat   = get_opt<int>(options->get_property_value((prefix + "/login").c_str(), "heartbeat"), 0);
 
 			bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -62,8 +65,7 @@ rabbitmq_base_t::handle_connect_options(const string& prefix, cb_queue_t* queue,
 
 			if (BRICKS_SUCCESS != (err = check_amqp_error(amqp_login(amqp_conn, "/", channel_max, frame_max, heartbeat, AMQP_SASL_METHOD_PLAIN,
 				username.c_str(), password.c_str()),
-				name.c_str(), "amqp_login")))
-			{
+				name.c_str(), "amqp_login"))){
 				err = BRICKS_3RD_PARTY_ERROR;
 				break;
 			}
@@ -98,11 +100,11 @@ rabbitmq_base_t::handle_connect_options(const string& prefix, cb_queue_t* queue,
 
 
 bricks_error_code_e 
-rabbitmq_base_t::handle_queue_declare_options(const string& xtpath, string& queue_name, const xtree_t* options)
+rabbitmq_base_t::handle_queue_declare_options(const string& xtpath, string& out_queue_name, const xtree_t* options)
 {
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
-	string name  = "";
+	string queue_name  = "";
 	bool passive = false;
 	bool durable = false;
 	bool auto_delete = false;
@@ -111,25 +113,32 @@ rabbitmq_base_t::handle_queue_declare_options(const string& xtpath, string& queu
 
 	if (options)
 	{
-		name        = get_opt<string>(options->get_property_value(xtpath.c_str(), "name").value(), "");
-		declare     = get_opt<bool>(options->get_property_value(xtpath.c_str(), "declare").value(), false);
-		passive     = get_opt<bool>(options->get_property_value(xtpath.c_str(), "passive").value(), false);
-		durable     = get_opt<bool>(options->get_property_value(xtpath.c_str(), "durable").value(), false);
-		auto_delete = get_opt<bool>(options->get_property_value(xtpath.c_str(), "auto_delete").value(), false);
-		exclusive   = get_opt<bool>(options->get_property_value(xtpath.c_str(), "exclusive").value(), false);
+		queue_name  = get_opt<string>(options->get_property_value(xtpath.c_str(), "name"), "");
+		declare     = get_opt<bool>(options->get_property_value(xtpath.c_str(), "declare"), false);
+		passive     = get_opt<bool>(options->get_property_value(xtpath.c_str(), "passive"), false);
+		durable     = get_opt<bool>(options->get_property_value(xtpath.c_str(), "durable"), false);
+		auto_delete = get_opt<bool>(options->get_property_value(xtpath.c_str(), "auto_delete"), true);
+		exclusive   = get_opt<bool>(options->get_property_value(xtpath.c_str(), "exclusive"), false);
 	}
 
 	if (!declare)
 		return err;
 		
-	auto ok = amqp_queue_declare(amqp_conn, amqp_channel, amqp_cstring_bytes(name.c_str()), passive, durable, exclusive, auto_delete, amqp_empty_table);
+	auto declare_ok = amqp_queue_declare(amqp_conn, amqp_channel, amqp_cstring_bytes(queue_name.c_str()), passive, durable, exclusive, auto_delete, amqp_empty_table);
 
 	if (BRICKS_SUCCESS != (err = check_amqp_error(amqp_get_rpc_reply(amqp_conn), name.c_str(), "amqp_queue_declare/amqp_get_rpc_reply")))
 	{
 		return err;
 	}
+	out_queue_name = string((char*)declare_ok->queue.bytes, declare_ok->queue.len);
 
-	queue_name = string((char*)ok->queue.bytes, ok->queue.len);
+	auto consume_ok = amqp_basic_consume(amqp_conn, 1, amqp_cstring_bytes(queue_name.c_str()), amqp_empty_bytes, 0, 1, 0,amqp_empty_table);
+	if (BRICKS_SUCCESS != (err = check_amqp_error(amqp_get_rpc_reply(amqp_conn), name.c_str(), "amqp_basic_consume/amqp_get_rpc_reply")))
+	{
+		return err;
+	}
+
+	
 
 	return err;
 }
@@ -140,18 +149,18 @@ rabbitmq_base_t::handle_bind_options(const string& xtpath, const string& default
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	string binding_key;
-	string name = default_queue_name;
+	string queue_name = default_queue_name;
 
 	if (options)
 	{
-		binding_key = get_opt<string>(options->get_property_value(xtpath.c_str(), "binding_key").value(), "");
-		name        = get_opt<string>(options->get_property_value(xtpath.c_str(), "name").value(), "");
-		if (name == "")
-			name = default_queue_name;
+		binding_key = get_opt<string>(options->get_property_value(xtpath.c_str(), "binding_key"), "");
+		queue_name        = get_opt<string>(options->get_property_value(xtpath.c_str(), "name"), "");
+		if (queue_name == "")
+			queue_name = default_queue_name;
 
 	}
 
-	auto ok = amqp_queue_bind(amqp_conn, amqp_channel, amqp_cstring_bytes(name.c_str()), amqp_cstring_bytes(topic.c_str()),
+	auto ok = amqp_queue_bind(amqp_conn, amqp_channel, amqp_cstring_bytes(queue_name.c_str()), amqp_cstring_bytes(topic.c_str()),
 		amqp_cstring_bytes(binding_key.c_str()), amqp_empty_table);
 
 	if (BRICKS_SUCCESS != (err = check_amqp_error(amqp_get_rpc_reply(amqp_conn), name.c_str(), "amqp_queue_bind/amqp_get_rpc_reply")))
@@ -170,18 +179,18 @@ rabbitmq_base_t::handle_unbind_options(const string& xtpath, const string& defau
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	string binding_key;
-	string name = default_queue_name;
+	string queue_name = default_queue_name;
 	
 	if (options)
 	{
-			binding_key = get_opt<string>(options->get_property_value(xtpath.c_str(), "binding_key").value(), "");
-			name = get_opt<string>(options->get_property_value(xtpath.c_str(), "name").value(), "");
-			if (name == "")
-				name = default_queue_name;
+			binding_key = get_opt<string>(options->get_property_value(xtpath.c_str(), "binding_key"), "");
+			queue_name = get_opt<string>(options->get_property_value(xtpath.c_str(), "name"), "");
+			if (queue_name == "")
+				queue_name = default_queue_name;
 	}
 	
 
-	amqp_queue_unbind(amqp_conn, amqp_channel, amqp_cstring_bytes(name.c_str()), amqp_cstring_bytes(topic.c_str()),
+	amqp_queue_unbind(amqp_conn, amqp_channel, amqp_cstring_bytes(queue_name.c_str()), amqp_cstring_bytes(topic.c_str()),
 		amqp_cstring_bytes(binding_key.c_str()), amqp_empty_table);
 
 	if (BRICKS_SUCCESS != (err = check_amqp_error(amqp_get_rpc_reply(amqp_conn), name.c_str(), "amqp_queue_unbind/amqp_get_rpc_reply")))
@@ -207,15 +216,15 @@ rabbitmq_base_t::handle_exchange_declare_options(const string& xt_path, const st
 
 	if (options)
 	{
-		declare = get_opt<bool>(options->get_property_value(xt_path.c_str(), "declare").value(), false);
+		declare = get_opt<bool>(options->get_property_value(xt_path.c_str(), "declare"), false);
 		if (!declare)
 			return BRICKS_SUCCESS;
 
-		type = get_opt<string>(options->get_property_value(xt_path.c_str(), "type").value(), "topic");
-		passive = get_opt<bool>(options->get_property_value(xt_path.c_str(), "passive").value(), false);
-		durable = get_opt<bool>(options->get_property_value(xt_path.c_str(), "durable").value(), false);
-		auto_delete = get_opt<bool>(options->get_property_value(xt_path.c_str(), "auto_delete").value(), false);
-		internal = get_opt<bool>(options->get_property_value(xt_path.c_str(), "internal").value(), false);
+		type = get_opt<string>(options->get_property_value(xt_path.c_str(), "type"), "topic");
+		passive = get_opt<bool>(options->get_property_value(xt_path.c_str(), "passive"), false);
+		durable = get_opt<bool>(options->get_property_value(xt_path.c_str(), "durable"), false);
+		auto_delete = get_opt<bool>(options->get_property_value(xt_path.c_str(), "auto_delete"), false);
+		internal = get_opt<bool>(options->get_property_value(xt_path.c_str(), "internal"), false);
 
 	}
 	
@@ -245,10 +254,10 @@ rabbitmq_base_t::handle_publish_options(const string& publish_xtpath, const stri
 
 	if (options)
 	{
-		queue = get_opt<string>(options->get_property_value(publish_xtpath.c_str(), "queue").value());
-		routing_key = get_opt<string>(options->get_property_value(publish_xtpath.c_str(), "routing_key").value());
-		mandatory = get_opt<bool>(options->get_property_value(publish_xtpath.c_str(), "mandatory").value());
-		immediate = get_opt<bool>(options->get_property_value(publish_xtpath.c_str(), "immediate").value());
+		queue = get_opt<string>(options->get_property_value(publish_xtpath.c_str(), "queue"));
+		routing_key = get_opt<string>(options->get_property_value(publish_xtpath.c_str(), "routing_key"));
+		mandatory = get_opt<bool>(options->get_property_value(publish_xtpath.c_str(), "mandatory"));
+		immediate = get_opt<bool>(options->get_property_value(publish_xtpath.c_str(), "immediate"));
 	}
 
 	err = check_error(amqp_basic_publish(amqp_conn, 1, amqp_cstring_bytes(topic.c_str()),

@@ -34,6 +34,13 @@ rabbitmq_subscriber_t::destroy()
 {
 	SYNCHRONIZED(mtx);
 
+	shutdown = true;
+
+	if (rmq_poll_thread)
+		rmq_poll_thread->join();
+
+	delete rmq_poll_thread;
+
 	rabbitmq_base_t::destroy();
 }
 
@@ -52,7 +59,9 @@ rabbitmq_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t*
 
 	do {
 
-		if (BRICKS_SUCCESS != (err = rabbitmq_base_t::handle_connect_options("/bricks/rabbitmq/subscriber", queue, options)))
+		name = get_opt<string>(options->get_property_value("/bricks/rabbitmq/subscriber", "name"));
+
+		if (BRICKS_SUCCESS != (err = rabbitmq_base_t::handle_connect_options("/bricks/rabbitmq/subscriber/init/connection", queue, options)))
 		{
 			break;
 		}
@@ -116,7 +125,6 @@ rabbitmq_subscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	err = rabbitmq_base_t::handle_unbind_options("/bricks/rabbitmq/subscriber/queue", this->default_queue_name, topic, options);
-	return err;
 
 	return err;
 }
@@ -153,30 +161,6 @@ rabbitmq_subscriber_t::start()
 }
 
 void
-rabbitmq_subscriber_t::on_topic(std::string pattern, std::string channel, std::string msg)
-{
-	SYNCHRONIZED(mtx);
-
-	string opt = "";
-
-	auto xt = create_xtree_from_xml((opt +
-		"<bricks>" +
-		"  <event last=\"true\"/>" +
-		"</bricks>").c_str()
-	);
-
-
-	this->queue->enqueue(
-		std::bind(
-			msg_cb,
-			channel,
-			create_buffer((const char*)msg.data(), (int)msg.size()),
-			xt)
-	);
-}
-
-
-void
 rabbitmq_subscriber_t::rmq_poll_loop()
 {
 	amqp_frame_t frame;
@@ -186,13 +170,8 @@ rabbitmq_subscriber_t::rmq_poll_loop()
 	t.tv_usec = 500000;
 
 
-	for (;;) {
+	for (;!shutdown;) {
 		SYNCHRONIZED(mtx);
-		{
-			mtx.unlock();
-			std::this_thread::yield(); // give chance for subscribe unsubscribe
-			mtx.lock();
-		}
 
 		amqp_rpc_reply_t ret;
 		amqp_envelope_t envelope;
@@ -227,7 +206,7 @@ rabbitmq_subscriber_t::rmq_poll_loop()
 							return;
 						}
 
-						amqp_destroy_message(&message);
+						
 					}
 
 					break;
@@ -253,7 +232,7 @@ rabbitmq_subscriber_t::rmq_poll_loop()
 						return;
 
 					default:
-						fprintf(stderr, "An unexpected method was received %u\n",
+						log1(BRICKS_TRACE, "An unexpected method was received %u\n",
 							frame.payload.method.id);
 						return;
 					}
@@ -262,6 +241,24 @@ rabbitmq_subscriber_t::rmq_poll_loop()
 
 		}
 		else {
+			/*string opt = "";
+
+			auto xt = create_xtree_from_xml((opt +
+				"<bricks>" +
+				"  <event last=\"true\"/>" +
+				"</bricks>").c_str()
+			);
+
+
+			this->queue->enqueue(
+				std::bind(
+					msg_cb,
+					"",
+					create_buffer((const char*)message.body.bytes, (int)message.body.len),
+					xt));
+
+			amqp_destroy_message(&message);*/
+
 			amqp_destroy_envelope(&envelope);
 		}
 
