@@ -131,7 +131,7 @@ jester_publisher_t::start()
 }
 
 bricks_error_code_e 
-jester_publisher_t::add_topic(const string& topic, const xtree_t* options)
+jester_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 

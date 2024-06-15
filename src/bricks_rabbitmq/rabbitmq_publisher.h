@@ -1,19 +1,21 @@
 #pragma once
 #include "queue.h"
+#include "rabbitmq_base.h"
 
 using namespace std;
 using namespace bricks;
-using namespace sw::redis;
+
 
 
 namespace bricks::plugins {
 
-	class redispp_publisher_t : 
+	class rabbitmq_publisher_t : 
+		public rabbitmq_base_t,
 		public publisher_plugin_t
 	{
 	public:
 
-		redispp_publisher_t();
+		rabbitmq_publisher_t();
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
 
@@ -27,27 +29,17 @@ namespace bricks::plugins {
 
 		virtual void release() override { delete this; };
 
-		virtual ~redispp_publisher_t();
+		virtual ~rabbitmq_publisher_t();
 
 		void destroy();
 
 	protected:
 
-		cb_queue_t* queue = nullptr;
-
-		string name;
-
-		string url;
+		std::recursive_mutex mtx;
 
 		bool initiated = false;
 
 		bool started = false;
-
-		std::recursive_mutex mtx;
-
-		ConnectionOptions opts;
-
-		AsyncRedis* redis = nullptr;
 
 	};
 }

@@ -75,6 +75,12 @@ if (NOT NO_REDISPP_PLUGIN)
     set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_redispp)
 endif()  
 
+if (NOT NO_RABBITQ_PLUGIN)
+    set(BRICKS_UT_INCLUDE ${BRICKS_UT_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_rabbitmq/include)
+    set(BRICKS_UT_PLUGIN_TESTS_SRC ${BRICKS_UT_PLUGIN_TESTS_SRC} rabbitmq_test.cpp)
+    set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_rabbitmq)
+endif()  
+
 
 #
 # Target
@@ -98,6 +104,9 @@ endif()
 if (NOT NO_REDISPP_PLUGIN)
     add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_redispp>" $<TARGET_FILE_DIR:bricks_ut>)
 endif()  
+if (NOT NO_RABBITMQ_PLUGIN)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_rabbitmq>" $<TARGET_FILE_DIR:bricks_ut>)
+endif()
 
 #
 # Configuration

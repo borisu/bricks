@@ -52,7 +52,7 @@ redispp_publisher_t::check_capability(plugin_capabilities_e e)
 
 
 bricks_error_code_e 
-redispp_publisher_t::add_topic(const string& topic, const xtree_t* options)
+redispp_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 

@@ -12,6 +12,8 @@ option(NO_OATPP_PLUGIN "No Oatpp plugin" OFF)
 
 option(NO_REDSIPP_PLUGIN "No Redis-plus-plus plugin" OFF)
 
+option(NO_RABBITMQ_PLUGIN "No RabbitMq plugin" OFF)
+
 enable_testing()
 
 project(bricks)
@@ -44,6 +46,12 @@ if (NOT NO_REDSIPP_PLUGIN)
     add_subdirectory(bricks_redispp)
 else()
     add_compile_definitions(NO_REDSIPP_PLUGIN)
+endif()
+
+if (NOT NO_RABBITMQ_PLUGIN)
+    add_subdirectory(bricks_rabbitmq)
+else()
+    add_compile_definitions(NO_RABBITMQ_PLUGIN)
 endif()
 
 add_subdirectory(bricks_ut)

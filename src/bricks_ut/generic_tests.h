@@ -37,6 +37,14 @@ publish_subscribe_test_1(
 	xtree_t* subscribers_xt = nullptr);
 
 void
+publish_subscribe_test_2(
+	publisher_plugin_t* publisher,
+	subscriber_plugin_t* subscriber,
+	selector_t* selector,
+	xtree_t* xt = nullptr);
+
+
+void
 request_response_test_1(xtree_t* pxt, server_plugin_t* server, xtree_t* sxt, client_plugin_t* client, selector_t* selector, xtree_t* client_send_xt = nullptr,xtree_t* server_response_xt = nullptr);
 
 void

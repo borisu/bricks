@@ -94,7 +94,7 @@ pubsub_client_t::issue_request(const char* buf, size_t size, response_cb_t clien
 		if ((err = subscriber->subscribe(error_topic, options)) != BRICKS_SUCCESS)
 			break;
 
-		if ((err = publisher->add_topic(response_topic, options)) != BRICKS_SUCCESS)
+		if ((err = publisher->describe_topic(response_topic, options)) != BRICKS_SUCCESS)
 			break;
 
 		if ((err = publisher->publish(request_topic, buf,size, options)) != BRICKS_SUCCESS)

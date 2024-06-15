@@ -163,14 +163,7 @@ zeromq_subscriber_t::start()
 bool
 zeromq_subscriber_t::check_capability(plugin_capabilities_e e)
 {
-	switch (e)
-	{
-	case HIERARCHICAL_SUBSCRIBE:
-		return true;
-	default:
-		return false;
-	}
-
+	return false;
 }
 
 bricks_error_code_e

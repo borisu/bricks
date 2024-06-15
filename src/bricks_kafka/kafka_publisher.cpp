@@ -150,12 +150,10 @@ kafka_publisher_t::destroy()
 }
 
 bricks_error_code_e
-kafka_publisher_t::add_topic(const string& topic, const xtree_t* options)
+kafka_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
-
 	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 

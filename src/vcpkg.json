@@ -2,6 +2,7 @@
   "dependencies": [
     "librdkafka",
     "czmq",
-    {"name": "redis-plus-plus", "features": ["async","async-std"]}
+    {"name": "redis-plus-plus", "features": ["async","async-std"]},
+    "librabbitmq"
   ]
 }

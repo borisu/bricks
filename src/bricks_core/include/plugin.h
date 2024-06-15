@@ -28,7 +28,7 @@ namespace bricks {
 
 		virtual bricks_error_code_e init(cb_queue_t *queue, const xtree_t* options = nullptr) = 0;
 
-		virtual bricks_error_code_e add_topic(const string& topic, const xtree_t* options = nullptr) = 0;
+		virtual bricks_error_code_e describe_topic(const string& topic, const xtree_t* options = nullptr) = 0;
 
 		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, const xtree_t* options = nullptr) = 0;
 	};
