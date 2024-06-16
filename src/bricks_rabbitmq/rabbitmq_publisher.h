@@ -23,8 +23,6 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, const xtree_t* options)  override;
 
-		virtual bricks_error_code_e start()  override;
-
 		virtual void set_meta_cb(meta_cb_t) override;
 
 		virtual bool check_capability(plugin_capabilities_e) override;

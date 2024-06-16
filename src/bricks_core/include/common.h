@@ -42,10 +42,10 @@ namespace bricks
 		virtual void release() = 0;
 	};
 
-	class startable_brick_t : public brick_t
+	class BRICKS_API startable_brick_t : public brick_t
 	{
 	public:
-		virtual bricks_error_code_e start() = 0;
+		virtual bricks_error_code_e start() { return BRICKS_SUCCESS; };
 	};
 
 	void brick_destroy(brick_t* ptr);

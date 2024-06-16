@@ -3,6 +3,7 @@
     "librdkafka",
     "czmq",
     {"name": "redis-plus-plus", "features": ["async","async-std"]},
-    "librabbitmq"
+    "librabbitmq",
+    {"name": "libevent", "features": ["thread"]}
   ]
 }

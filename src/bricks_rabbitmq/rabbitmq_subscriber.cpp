@@ -208,16 +208,6 @@ rabbitmq_subscriber_t::do_unsubscribe2(std::promise<bricks_error_code_e>& p, con
 	p.set_value(err);
 }
 
-bricks_error_code_e 
-rabbitmq_subscriber_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_READY;
-
-	return BRICKS_SUCCESS;
-}
-
 void 
 rabbitmq_subscriber_t::set_meta_cb(meta_cb_t meta_cb)
 {

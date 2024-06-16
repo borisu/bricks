@@ -51,14 +51,12 @@ publish_subscribe_test_2(
 
 		ASSERT_EQ(BRICKS_SUCCESS, publisher->init(selector->queue(), xt));
 		ASSERT_EQ(BRICKS_SUCCESS, publisher->describe_topic(TEST_TOPIC, xt));
-		ASSERT_EQ(BRICKS_SUCCESS, publisher->start());
 
 		/*
 		* Prepare subscriber.
 		*/
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(selector->queue(), on_topic_cb, xt));
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(TEST_TOPIC, xt));
-		ASSERT_EQ(BRICKS_SUCCESS, subscriber->start());
 
 		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 

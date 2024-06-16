@@ -9,7 +9,7 @@ using namespace bricks::plugins;
 TEST(jester_case, publish_subscribe_test) 
 {
 
-	for (int i=0; i < 2 ; i++) 
+	for (int i=0; i < NUM_OF_TESTS; i++)
 	{
 		brick_uptr<brick_t> c(create_jester_pubsub_context());
 
@@ -23,7 +23,7 @@ TEST(jester_case, publish_subscribe_test)
 
 		selector->init(cb_q.get());
 
-		publish_subscribe_test_1(nullptr, publisher.get(), nullptr, subscriber.get(), selector.get());
+		publish_subscribe_test_2(publisher.get(), subscriber.get(), selector.get());
 	}
 
 	
@@ -34,7 +34,7 @@ TEST(jester_case, publish_subscribe_test)
 TEST(jester_case, bidi_test) 
 {
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < NUM_OF_TESTS; i++)
 	{
 
 		brick_uptr<brick_t> c(create_jester_bidi_context());
@@ -56,7 +56,7 @@ TEST(jester_case, bidi_test)
 
 TEST(jester_case, reqrep_test) {
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < NUM_OF_TESTS ; i++)
 	{
 
 		brick_uptr<brick_t> c(create_jester_reqrep_ctx());

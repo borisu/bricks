@@ -81,6 +81,12 @@ if (NOT NO_RABBITQ_PLUGIN)
     set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_rabbitmq)
 endif()  
 
+if (NOT NO_LIBEVENT_PLUGIN)
+    set(BRICKS_UT_INCLUDE ${BRICKS_UT_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../bricks_libevent/include)
+    set(BRICKS_UT_PLUGIN_TESTS_SRC ${BRICKS_UT_PLUGIN_TESTS_SRC} libevent_test.cpp)
+    set(BRICKS_UT_LIBS ${BRICKS_UT_LIBS} bricks_libevent)
+endif()  
+
 
 #
 # Target
@@ -106,6 +112,9 @@ if (NOT NO_REDISPP_PLUGIN)
 endif()  
 if (NOT NO_RABBITMQ_PLUGIN)
     add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_rabbitmq>" $<TARGET_FILE_DIR:bricks_ut>)
+endif()
+if (NOT NO_LIBEVENT_PLUGIN)
+    add_custom_command(TARGET bricks_ut POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "$<TARGET_FILE_DIR:bricks_libevent>" $<TARGET_FILE_DIR:bricks_ut>)
 endif()
 
 #

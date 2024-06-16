@@ -88,16 +88,6 @@ rabbitmq_publisher_t::describe_topic(const string& topic, const xtree_t* options
 }
 
 bricks_error_code_e 
-rabbitmq_publisher_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_READY;
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
 rabbitmq_publisher_t::publish(const string& topic, const char* data, size_t size, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
