@@ -11,7 +11,7 @@ using namespace bricks::plugins;
 
 TEST(rabbitmq_case, publish_subscribe_test) {
 
-    //for (int i = 0; i < NUM_OF_TESTS; i++) {
+    for (int i = 0; i < NUM_OF_TESTS; i++) {
 
         brick_uptr<xtree_t> options_xt(
             create_xtree_from_xml(
@@ -60,7 +60,7 @@ TEST(rabbitmq_case, publish_subscribe_test) {
         selector->init(cb_q.get());
 
         publish_subscribe_test_2(publisher.get(), subscriber.get(), selector.get(), options_xt.get());
-    //}
+    }
 
 }
 
