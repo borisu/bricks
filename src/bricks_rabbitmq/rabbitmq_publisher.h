@@ -25,6 +25,8 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e start()  override;
 
+		virtual void set_meta_cb(meta_cb_t) override;
+
 		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual void release() override { delete this; };
@@ -37,9 +39,11 @@ namespace bricks::plugins {
 
 		std::recursive_mutex mtx;
 
+		meta_cb_t meta_cb;
+
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 
 	};
 }

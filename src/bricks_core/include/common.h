@@ -7,6 +7,7 @@
 #include <memory>
 #include <list>
 #include <chrono>
+#include <future>
 
 #ifdef WIN32
  #ifdef BRICKS_EXPORTS
@@ -62,6 +63,10 @@ namespace bricks
 	using brick_uptr = std::unique_ptr<B, bricks_destroyer>;
 
 	typedef std::vector<char> vector_t;
+
+	typedef std::promise<bricks_error_code_e> bricks_promise_t;
+
+	typedef std::future<bricks_error_code_e> bricks_future_t;
 	
 }
 

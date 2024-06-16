@@ -24,6 +24,8 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e unsubscribe(const xtree_t* options ) override;
 
+		virtual void set_meta_cb(meta_cb_t) override;
+
 		virtual bricks_error_code_e start()  override;
 
 		virtual bool check_capability(plugin_capabilities_e) override;
@@ -32,25 +34,40 @@ namespace bricks::plugins {
 
 		virtual ~rabbitmq_subscriber_t();
 
+	protected:
+
+		virtual void do_subscribe(std::promise<bricks_error_code_e> &p, const string& topic, const xtree_t* options);
+
+		virtual void do_unsubscribe1(std::promise<bricks_error_code_e> &p, const string& topic, const xtree_t* options);
+
+		virtual void do_unsubscribe2(std::promise<bricks_error_code_e> &p, const xtree_t* options);
+
 		void destroy();
 
-	protected:
+		void destroy_s();
 
 		virtual void rmq_poll_loop();
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
 
 		topic_cb_t msg_cb;
+
+		meta_cb_t meta_cb;
 
 		thread* rmq_poll_thread = nullptr;
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 
 		string default_queue_name;
 
 		atomic<bool> shutdown = false;
+
+		cb_queue_t* rmq_queue = nullptr;
+
+		selector_t* rmq_selector = nullptr;
+
 
 	};
 }

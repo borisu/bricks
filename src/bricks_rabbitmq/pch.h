@@ -30,6 +30,7 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
+#include <future>
 
 #include "logger.h"
 #include "bricks.h"

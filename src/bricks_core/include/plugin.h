@@ -17,9 +17,20 @@ namespace bricks {
 		HIERARCHICAL_PUBLISH,
 	};
 
+	enum plugin_meta_event_e
+	{
+		PLUGIN_DESTROYED,
+	};
+
+	typedef	function<void(plugin_meta_event_e, xtree_t*)>
+		meta_cb_t;
+
 	class plugin_t : public startable_brick_t {
 	public:
+
 		virtual bool check_capability(plugin_capabilities_e) = 0;
+
+		virtual void set_meta_cb(meta_cb_t) {};
 	};
 
 	class publisher_plugin_t : public plugin_t
