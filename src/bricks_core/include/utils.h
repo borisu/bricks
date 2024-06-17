@@ -6,8 +6,8 @@
 #define ASSERT_STARTED if (!this->started) return BRICKS_INVALID_STATE
 #define ASSERT_NOT_STARTED if (this->started) return BRICKS_INVALID_STATE
 
-#define ASSERT_PREINIT if (this->initiated || this->destroyed) return BRICKS_INVALID_STATE
-#define ASSERT_READY if (!this->initiated || this->destroyed) return BRICKS_INVALID_STATE
+#define ASSERT_PREINIT do { if (this->destroyed) return BRICKS_OBJECT_DESTROYED; if ( this->initiated) return BRICKS_INVALID_STATE; } while (false)
+#define ASSERT_READY   do { if (this->destroyed) return BRICKS_OBJECT_DESTROYED; if (!this->initiated) return BRICKS_INVALID_STATE; } while (false)
 
 #define BRICKS_MAP_PAIR(x) {#x,x}
 

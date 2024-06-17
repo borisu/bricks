@@ -33,6 +33,9 @@ rabbitmq_subscriber_t::destroy_s()
 	SYNCHRONIZED(mtx);
 
 	destroy();
+
+	if (meta_cb)
+		this->queue->enqueue(std::bind(meta_cb, OBJECT_DESTROYED, nullptr));
 }
 
 void
@@ -58,8 +61,6 @@ rabbitmq_subscriber_t::destroy()
 	if (rmq_queue)
 		rmq_queue->release();
 
-	if (meta_cb)
-		this->queue->enqueue(std::bind(meta_cb,PLUGIN_DESTROYED, nullptr));
 }
 
 bricks_error_code_e

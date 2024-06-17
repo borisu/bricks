@@ -34,6 +34,7 @@ namespace bricks
 		BRICKS_TIMEOUT = 5,
 		BRICKS_NOT_SUPPORTED = 6,
 		BRICKS_REMOTE_ERROR = 7,
+		BRICKS_OBJECT_DESTROYED = 8,
 	};
 
 	class brick_t

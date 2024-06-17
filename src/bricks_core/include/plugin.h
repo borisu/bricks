@@ -19,7 +19,7 @@ namespace bricks {
 
 	enum plugin_meta_event_e
 	{
-		PLUGIN_DESTROYED,
+		OBJECT_DESTROYED,
 	};
 
 	typedef	function<void(plugin_meta_event_e, xtree_t*)>

@@ -8,6 +8,30 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
+#ifdef WIN32
 #include "framework.h"
+#endif
+
+#include <ctype.h>
+#include <signal.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+
+#include <functional>
+#include <string>
+#include <map>
+#include <atomic>
+#include <thread>
+#include <mutex>
+
+#include <event2/event.h>
+#include <event2/http.h>
+#include <event2/buffer.h>
+
+#include "logger.h"
+#include "bricks.h"
+#include "utils.h"
 
 #endif //PCH_H

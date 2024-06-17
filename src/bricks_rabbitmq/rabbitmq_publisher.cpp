@@ -33,7 +33,7 @@ rabbitmq_publisher_t::destroy()
 	rabbitmq_base_t::destroy();
 
 	if (meta_cb)
-		this->queue->enqueue(std::bind(meta_cb, PLUGIN_DESTROYED, nullptr));
+		this->queue->enqueue(std::bind(meta_cb, OBJECT_DESTROYED, nullptr));
 
 }
 
