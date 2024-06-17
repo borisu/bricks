@@ -50,7 +50,7 @@ jester_server_t::jester_server_t(jester_server_ctx_t* ctx)
 
 
 bricks_error_code_e 
-jester_server_t::init(cb_queue_t* queue, const xtree_t*)
+jester_server_t::init(cb_queue_t* queue, request_cb_t request_cb, const xtree_t*)
 {
 	SYNCHRONIZED(ctx->mtx);
 
@@ -60,32 +60,12 @@ jester_server_t::init(cb_queue_t* queue, const xtree_t*)
 
 	this->initiated = true;
 
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
-jester_server_t::register_request_cb(request_cb_t request_cb, const xtree_t* options)
-{
-	SYNCHRONIZED(ctx->mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
 	this->request_cb = request_cb;
+
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e 
-jester_server_t::start()
-{
-	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	this->started = true;
-	return BRICKS_SUCCESS;
-}
 
 bricks_error_code_e 
 jester_server_t::issue_request(response_proxy_cb_t proxy, const char* data, size_t size)
@@ -191,12 +171,3 @@ jester_client_t::client_response_proxy(response_cb_t response_cb, bricks_error_c
 
 }
 
-bricks_error_code_e 
-jester_client_t::start()
-{
-	SYNCHRONIZED(ctx->mtx);
-
-	this->started = true;
-
-	return BRICKS_SUCCESS;
-}

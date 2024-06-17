@@ -36,19 +36,17 @@ namespace bricks::plugins
 
 		jester_bidi_t(jester_bidi_ctx_t* ctx, int id);
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
-
-		virtual bricks_error_code_e register_event_cb(event_cb_t event_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, event_cb_t event_cb, const xtree_t* options) override;
 
 		virtual bricks_error_code_e send_event(const char*, size_t, const xtree_t* options ) override;
 
 		virtual bricks_error_code_e accept_event(const char*, size_t size);
 
-		virtual bricks_error_code_e start() override;
-
 		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual void release()  override { delete this; };
+
+		virtual void set_meta_cb(meta_cb_t) {};
 
 	private:
 

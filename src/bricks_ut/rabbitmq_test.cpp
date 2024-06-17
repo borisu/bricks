@@ -20,9 +20,8 @@ TEST(rabbitmq_case, publish_subscribe_test) {
                 "   <publisher name=\"publisher1\">"
                 "    <methods>"
                 "     <init>"
-                "	    <connection hostname=\"127.0.0.1\" port=\"5672\">"
-                "	     <login method=\"plain\" username=\"guest\" password=\"guest\" />"
-                "	    </connection>"
+                "	    <connection hostname=\"127.0.0.1\" port=\"5672\"/>"
+                "	    <login method=\"plain\" username=\"guest\" password=\"guest\"/>"
                 "     </init>"
                 "     <describe_topic>"
                 "	   <exchange declare=\"true\" type=\"topic\"/>"
@@ -32,9 +31,8 @@ TEST(rabbitmq_case, publish_subscribe_test) {
                 "   <subscriber name=\"subscriber1\">"
                 "   <methods>"
                 "    <init>"		
-                "	  <connection hostname=\"127.0.0.1\" port=\"5672\">"
-                "	   <login method=\"plain\" username=\"guest\" password=\"guest\"/>"
-                "	  </connection>"
+                "	  <connection hostname=\"127.0.0.1\" port=\"5672\"/>"
+                "	  <login method=\"plain\" username=\"guest\" password=\"guest\"/>"
                 "	  <queue name=\"\" declare=\"true\" />"
                 "    </init>"
                 "    <subscribe>"
@@ -58,6 +56,7 @@ TEST(rabbitmq_case, publish_subscribe_test) {
         brick_uptr<selector_t>  selector(create_selector());
 
         selector->init(cb_q.get());
+
 
         publish_subscribe_test_2(publisher.get(), subscriber.get(), selector.get(), options_xt.get());
     }

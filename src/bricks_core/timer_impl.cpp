@@ -33,25 +33,15 @@ timer_impl_t::init(cb_queue_t* queue, const xtree_t* options = nullptr)
 
     this->cb_queue = queue;
 
-    initiated = true;
-
-    return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
-timer_impl_t::start()
-{
-    std::unique_lock<std::mutex> lock(mtx);
-
-    ASSERT_INITIATED;
-    ASSERT_NOT_STARTED;
-
     worker_thread = std::thread(&timer_impl_t::worker, this);
+
+    initiated = true;
 
     started = true;
 
     return BRICKS_SUCCESS;
 }
+
 
 
 bricks_error_code_e

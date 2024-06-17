@@ -28,7 +28,7 @@ rabbitmq_subscriber_t::~rabbitmq_subscriber_t()
 }
 
 void 
-rabbitmq_subscriber_t::destroy_s()
+rabbitmq_subscriber_t::do_destroy()
 {
 	SYNCHRONIZED(mtx);
 
@@ -167,44 +167,18 @@ rabbitmq_subscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 	bricks_promise_t p;
 	auto f = p.get_future();
 
-	rmq_queue->enqueue(std::bind(&rabbitmq_subscriber_t::do_unsubscribe1, this, std::ref(p), topic, options));
+	rmq_queue->enqueue(std::bind(&rabbitmq_subscriber_t::do_unsubscribe, this, std::ref(p), topic, options));
 	f.wait();
 
 	return f.get();
 }
 
 void
-rabbitmq_subscriber_t::do_unsubscribe1(std::promise<bricks_error_code_e>& p, const string& topic, const xtree_t* options)
+rabbitmq_subscriber_t::do_unsubscribe(std::promise<bricks_error_code_e>& p, const string& topic, const xtree_t* options)
 {
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
 	err = handle_unbind_options("/bricks/rabbitmq/subscriber/methods/unsubscribe/queue", this->default_queue_name, topic, options);
-
-	p.set_value(err);
-}
-
-bricks_error_code_e
-rabbitmq_subscriber_t::unsubscribe(const xtree_t* options)
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_READY;
-
-	bricks_promise_t p;
-	auto f = p.get_future();
-
-	rmq_queue->enqueue(std::bind(&rabbitmq_subscriber_t::do_unsubscribe2, this, std::ref(p), options));
-	f.wait();
-
-	return f.get();
-}
-
-void  
-rabbitmq_subscriber_t::do_unsubscribe2(std::promise<bricks_error_code_e>& p, const xtree_t* options)
-{
-	bricks_error_code_e err = BRICKS_SUCCESS;
-	
-	err = handle_unbind_options("/bricks/rabbitmq/subscriber/methods/unsubscribe/queue", this->default_queue_name, "*", options);
 
 	p.set_value(err);
 }
@@ -327,5 +301,5 @@ rabbitmq_subscriber_t::rmq_poll_loop()
 	}
 
 	if (amqp_error)
-		this->queue->enqueue(std::bind(&rabbitmq_subscriber_t::destroy_s, this));
+		this->queue->enqueue(std::bind(&rabbitmq_subscriber_t::do_destroy, this));
 }

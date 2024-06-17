@@ -69,6 +69,11 @@ zeromq_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* o
 		// Create a ZMQ poll item
 		items[0] = { subscriber, 0, ZMQ_POLLIN, 0 };
 
+		rc = start_zmq_poll_loop();
+		if (rc == BRICKS_SUCCESS)
+		{
+			started = true;
+		}
 	
 		initiated = true;
 		
@@ -114,15 +119,6 @@ zeromq_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 
 }
 
-bricks_error_code_e
-zeromq_subscriber_t::unsubscribe(const xtree_t* options)
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	
-	return unsubscribe("", options);
-}
 
 bricks_error_code_e 
 zeromq_subscriber_t::unsubscribe(const std::string& topic, const xtree_t* options)
@@ -139,25 +135,6 @@ zeromq_subscriber_t::unsubscribe(const std::string& topic, const xtree_t* option
 	}
 
 	return BRICKS_SUCCESS;
-}
-
-
-bricks_error_code_e 
-zeromq_subscriber_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	auto rc = start_zmq_poll_loop();
-	if (rc == BRICKS_SUCCESS)
-	{
-		started = true;
-	}
-
-	return rc;
-
 }
 
 bool

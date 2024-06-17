@@ -59,19 +59,7 @@ redispp_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e 
-redispp_publisher_t::start()
-{
-	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	started = true;
-
-	return BRICKS_SUCCESS;
-
-}
 bricks_error_code_e
 redispp_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {

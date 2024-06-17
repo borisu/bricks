@@ -73,6 +73,10 @@ redispp_psubscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t*
 
 		subscriber = new AsyncSubscriber(redis->subscriber());
 
+		subscriber->on_pmessage(std::bind(&redispp_psubscriber_t::on_ptopic, this, _1, _2, _3));
+
+		subscriber->on_meta(std::bind(&redispp_psubscriber_t::on_meta, this, _1, _2, _3));
+
 		initiated = true;
 	}
 	catch (Error& e)
@@ -183,40 +187,3 @@ redispp_psubscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 	return err;
 }
 
-bricks_error_code_e  
-redispp_psubscriber_t::unsubscribe(const xtree_t* options)
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-
-	bricks_error_code_e err = BRICKS_SUCCESS;
-	
-	try
-	{
-		subscriber->unsubscribe();
-	}
-	catch (Error& e)
-	{
-		err = BRICKS_3RD_PARTY_ERROR;
-		log1(BRICKS_ALARM, "%s %%%%%% Failed to unsubscribe : '%s'.\n", this->name.c_str(), e.what());
-	}
-
-	return err;
-}
-
-
-bricks_error_code_e 
-redispp_psubscriber_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	subscriber->on_pmessage(std::bind(&redispp_psubscriber_t::on_ptopic,this,_1,_2,_3));
-	subscriber->on_meta(std::bind(&redispp_psubscriber_t::on_meta, this, _1, _2,_3));
-
-	return BRICKS_SUCCESS;
-
-}

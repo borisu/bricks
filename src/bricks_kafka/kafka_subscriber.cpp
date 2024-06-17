@@ -65,30 +65,19 @@ kafka_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* op
 	}
 
 	rd_kafka_poll_set_consumer(rd_kafka_h);
-	
-	initiated = true;
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
-kafka_subscriber_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
 
 	if (start_rd_poll_loop() != BRICKS_SUCCESS)
 	{
 		destroy();
 		return BRICKS_FAILURE_GENERIC;
 	}
-
-	started = true;
+	
+	initiated = true;
 
 	return BRICKS_SUCCESS;
 }
+
+
 
 void
 kafka_subscriber_t::destroy()
@@ -163,7 +152,7 @@ kafka_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 		
 		found = false;
 		for (int i = 0; i < rd_part_list_h->cnt; i++) {
-			if (topic == rd_part_list_h->elems[i].topic)
+			if (topic == rd_part_list_h->elems[i].topic || topic == "")
 			{
 				rd_kafka_topic_partition_list_del_by_idx(rd_part_list_h, i);
 				found = true;
@@ -185,29 +174,6 @@ kafka_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 
 	return BRICKS_SUCCESS;
 }
-
-bricks_error_code_e 
-kafka_subscriber_t::unsubscribe(const xtree_t* options)
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-
-	while (rd_part_list_h->cnt > 0)
-	{
-		rd_kafka_topic_partition_list_del_by_idx(rd_part_list_h, 0);
-	}
-
-	auto rd_err = rd_kafka_unsubscribe(rd_kafka_h);
-	if (rd_err) {
-		log1(BRICKS_ALARM, "%s %%%%%% Error unsubscribing to topics(%d): %s.\n", this->name.c_str(), rd_err, rd_kafka_err2str(rd_err));
-		return BRICKS_3RD_PARTY_ERROR;
-	}
-
-	return BRICKS_SUCCESS;
-
-}
-
 
 bricks_error_code_e
 kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)

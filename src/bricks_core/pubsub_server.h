@@ -14,19 +14,17 @@ namespace bricks
 			const char* reponse_topic_prefix,
 			const char* error_topic_prefix);
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
-
-		virtual bricks_error_code_e register_request_cb(request_cb_t request, const xtree_t* options = nullptr)  override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, request_cb_t request, const xtree_t* options) override;
 
 		virtual void topic_cb(const string&, buffer_t*, xtree_t*);
 
 		virtual void response_proxy_cb(const string& topic, bricks_error_code_e, const char*, size_t, xtree_t*);
 		
-		virtual bricks_error_code_e start() override;
-
 		virtual void release()  override { delete this; };
 
 		virtual bool check_capability(plugin_capabilities_e) override;
+
+		virtual void set_meta_cb(meta_cb_t) { }
 
 	protected:
 

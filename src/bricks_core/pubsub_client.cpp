@@ -120,20 +120,6 @@ pubsub_client_t::issue_request(const char* buf, size_t size, response_cb_t clien
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e 
-pubsub_client_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	bricks_error_code_e err = BRICKS_SUCCESS;
-	if ((err = subscriber->start()) != BRICKS_SUCCESS)
-		return err;
-
-	if ((err = publisher->start()) != BRICKS_SUCCESS)
-		return err;
-
-	return BRICKS_SUCCESS;
-}
 
 void pubsub_client_t::timeout_cb(const string& topic)
 {

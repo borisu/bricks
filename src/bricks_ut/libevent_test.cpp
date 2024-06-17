@@ -9,7 +9,7 @@ using namespace std;
 using namespace bricks;
 using namespace bricks::plugins;
 
-TEST(libevent_case, publish_subscribe_test) {
+TEST(libevent_case, request_response_test) {
 
     for (int i = 0; i < NUM_OF_TESTS; i++) {
 
@@ -17,19 +17,18 @@ TEST(libevent_case, publish_subscribe_test) {
             create_xtree_from_xml(
                 "<bricks>"
                 "  <libevent>"
-                "   <publisher name=\"publisher1\">"
+                "   <server name=\"libevent_server1\" debug=\"\">"
                 "    <methods>"
                 "     <init>"
                 "	    <connection hostname=\"127.0.0.1\" port=\"5672\">"
-                "	     <login method=\"plain\" username=\"guest\" password=\"guest\" />"
-                "	    </connection>"
+                "	    <login method=\"plain\" username=\"guest\" password=\"guest\" />"
                 "     </init>"
                 "     <describe_topic>"
                 "	   <exchange declare=\"true\" type=\"topic\"/>"
                 "     </describe_topic>"
                 "    </methods>"
-                "   </publisher>"
-                "   <subscriber name=\"subscriber1\">"
+                "   </server>"
+                "   <client name=\"libevent_client1\">"
                 "   <methods>"
                 "    <init>"		
                 "	  <connection hostname=\"127.0.0.1\" port=\"5672\">"
@@ -49,17 +48,17 @@ TEST(libevent_case, publish_subscribe_test) {
             )
         );
         
-        brick_uptr<publisher_plugin_t>  publisher(create_libevent_server());
+        brick_uptr<server_plugin_t>  server(create_libevent_server());
 
-        brick_uptr<subscriber_plugin_t>  subscriber(create_libevent_client());
+        brick_uptr<client_plugin_t>  client(create_libevent_client());
 
         brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
 
         brick_uptr<selector_t>  selector(create_selector());
 
         selector->init(cb_q.get());
-
-        publish_subscribe_test_2(publisher.get(), subscriber.get(), selector.get(), options_xt.get());
+       
+        request_response_test_2(server.get(), client.get(), selector.get(), options_xt.get());
     }
 
 }

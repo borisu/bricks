@@ -12,7 +12,7 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options) override;
 
-		virtual bricks_error_code_e register_request_cb(request_cb_t request, const xtree_t* options ) override;
+		virtual bricks_error_code_e register_request_handler(request_cb_t request, const xtree_t* options ) override;
 
 		virtual bricks_error_code_e start() override;
 

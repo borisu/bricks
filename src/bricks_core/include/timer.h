@@ -12,7 +12,7 @@ namespace bricks
 
 	typedef clock_t::time_point time_point_t;
 
-	class BRICKS_API timer_t : public startable_brick_t
+	class timer_t : public brick_t
 	{
 	public:
 		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options = nullptr) = 0;

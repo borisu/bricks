@@ -35,18 +35,13 @@ namespace bricks
 		BRICKS_NOT_SUPPORTED = 6,
 		BRICKS_REMOTE_ERROR = 7,
 		BRICKS_OBJECT_DESTROYED = 8,
+		BRICKS_NOT_IMPLEMENTED = 9,
 	};
 
 	class brick_t
 	{
 	public:
 		virtual void release() = 0;
-	};
-
-	class BRICKS_API startable_brick_t : public brick_t
-	{
-	public:
-		virtual bricks_error_code_e start() { return BRICKS_SUCCESS; };
 	};
 
 	void brick_destroy(brick_t* ptr);

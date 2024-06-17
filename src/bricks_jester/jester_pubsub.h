@@ -46,9 +46,9 @@ namespace bricks::plugins {
 
 		virtual bool check_capability(plugin_capabilities_e) override;
 
-		virtual bricks_error_code_e start() override;
-
 		virtual void release()  override { delete this; };
+
+		virtual void set_meta_cb(meta_cb_t) {};
 
 
 	protected:
@@ -76,10 +76,6 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e unsubscribe(const string& topic, const xtree_t* options) override;
 
-		virtual bricks_error_code_e unsubscribe(const xtree_t* options ) override;
-
-		virtual bricks_error_code_e start() override;
-
 		virtual void release()  override { delete this; };
 
 		virtual bool check_capability(plugin_capabilities_e) override;
@@ -87,6 +83,8 @@ namespace bricks::plugins {
 		virtual bricks_error_code_e topic_cb(const char *topic, const char* data, size_t size);
 
 		virtual ~jester_subscriber_t();
+
+		virtual void set_meta_cb(meta_cb_t) {};
 
 	protected:
 

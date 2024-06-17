@@ -58,29 +58,16 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
-	initiated = true;
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
-kafka_publisher_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	
-	bricks_error_code_e err = BRICKS_SUCCESS;
-
 	if ((err = start_rd_poll_loop()) == BRICKS_SUCCESS)
 	{
 		started = true;
 	}
 
-	return err;
+	initiated = true;
+
+	return BRICKS_SUCCESS;
 }
+
 
 bricks_error_code_e
 kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, const xtree_t* options)

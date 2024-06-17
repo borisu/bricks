@@ -43,7 +43,7 @@ zeromq_bidi_t::destroy()
 }
 
 bricks_error_code_e
-zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
+zeromq_bidi_t::init(cb_queue_t* queue, event_cb_t event_cb, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
@@ -87,6 +87,14 @@ zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 
 		items[0] = { pair, 0, ZMQ_POLLIN, 0 };
 
+		rc = start_zmq_poll_loop();
+		if (rc == BRICKS_SUCCESS)
+		{
+			started = true;
+		}
+
+		this->event_cb = event_cb;
+
 		initiated = true;
 	}
 	catch (std::bad_optional_access&)
@@ -110,17 +118,6 @@ zeromq_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
 
 }
 
-bricks_error_code_e 
-zeromq_bidi_t::register_event_cb( event_cb_t event_cb, const xtree_t* options)
-{
-	SYNCHRONIZED(mtx);
-
-	this->event_cb = event_cb;
-
-	return BRICKS_SUCCESS;
-
-}
-
 bricks_error_code_e
 zeromq_bidi_t::send_event(const char* buf, size_t size, const xtree_t* options)
 {
@@ -137,23 +134,6 @@ zeromq_bidi_t::send_event(const char* buf, size_t size, const xtree_t* options)
 
 }
 
-bricks_error_code_e
-zeromq_bidi_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	auto rc = start_zmq_poll_loop();
-	if (rc == BRICKS_SUCCESS)
-	{
-		started = true;
-	}
-
-	return rc;
-
-}
 
 bricks_error_code_e
 zeromq_bidi_t::do_zmq_poll(int milliseconds, bool last_call)

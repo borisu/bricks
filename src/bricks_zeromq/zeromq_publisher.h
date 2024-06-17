@@ -22,13 +22,13 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e do_zmq_poll(int, bool) override { return BRICKS_NOT_SUPPORTED; }
 
-		virtual bricks_error_code_e start() override ;
-
 		virtual void release() override { delete this; };
 
 		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual ~zeromq_publisher_t();
+
+		virtual void set_meta_cb(meta_cb_t) override {};
 
 	private:
 

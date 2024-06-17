@@ -37,7 +37,7 @@ pubsusb_server_t::pubsusb_server_t(
 }
 
 bricks_error_code_e
-pubsusb_server_t::init(cb_queue_t* queue,  const xtree_t* options)
+pubsusb_server_t::init(cb_queue_t* queue, request_cb_t request, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
@@ -63,43 +63,9 @@ pubsusb_server_t::init(cb_queue_t* queue,  const xtree_t* options)
 		return err;
 	}
 
-	initiated = true;
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e
-pubsusb_server_t::register_request_cb(request_cb_t request_cb, const xtree_t* options)
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-	
 	this->request_cb = request_cb;
 
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e
-pubsusb_server_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	bricks_error_code_e err = BRICKS_SUCCESS;
-
-	if ((err = subscriber->start()) != BRICKS_SUCCESS)
-		return err;
-
-	if ((err = publisher->start()) != BRICKS_SUCCESS)
-	{
-		return err;
-	}
-
-	started = true;
+	initiated = true;
 
 	return BRICKS_SUCCESS;
 }

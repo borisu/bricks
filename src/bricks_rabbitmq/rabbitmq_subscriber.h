@@ -22,8 +22,6 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e unsubscribe(const string& topic, const xtree_t* options ) override;
 
-		virtual bricks_error_code_e unsubscribe(const xtree_t* options ) override;
-
 		virtual void set_meta_cb(meta_cb_t) override;
 
 		virtual bool check_capability(plugin_capabilities_e) override;
@@ -36,13 +34,11 @@ namespace bricks::plugins {
 
 		virtual void do_subscribe(std::promise<bricks_error_code_e> &p, const string& topic, const xtree_t* options);
 
-		virtual void do_unsubscribe1(std::promise<bricks_error_code_e> &p, const string& topic, const xtree_t* options);
-
-		virtual void do_unsubscribe2(std::promise<bricks_error_code_e> &p, const xtree_t* options);
+		virtual void do_unsubscribe(std::promise<bricks_error_code_e> &p, const string& topic, const xtree_t* options);
 
 		void destroy();
 
-		void destroy_s();
+		void do_destroy();
 
 		virtual void rmq_poll_loop();
 

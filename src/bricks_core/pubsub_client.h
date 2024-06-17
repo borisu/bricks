@@ -20,11 +20,11 @@ namespace bricks
 
 		virtual bricks_error_code_e issue_request(const char*, size_t, response_cb_t, const xtree_t* options ) override;
 		
-		virtual bricks_error_code_e start() override;
-
 		virtual void release()  override { delete this; };
 
 		virtual bool check_capability(plugin_capabilities_e) override;
+
+		virtual void set_meta_cb(meta_cb_t) { }
 
 	protected:	
 

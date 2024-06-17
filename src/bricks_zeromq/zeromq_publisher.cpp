@@ -131,16 +131,6 @@ zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size, 
 
 }
 
-bricks_error_code_e zeromq_publisher_t::start()
-{
-	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	started = true;
-
-	return BRICKS_SUCCESS;
-}
 
 
