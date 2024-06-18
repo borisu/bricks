@@ -19,14 +19,18 @@ namespace bricks::plugins
 
 		virtual void set_meta_cb(meta_cb_t) override {};
 
-
+	
 	private:
 
 		virtual void destroy();
 
-		void libevent_poll_loop();
+		static void do_term(evutil_socket_t sig, short events, void* arg);
+
+		static void do_handle_request(struct evhttp_request* req, void* arg);
+
+		static void do_handle_response(evutil_socket_t sig, short events, void* arg);
 	
-		void static request_proxy(struct evhttp_request* req, void* arg);
+		void libevent_poll_loop();
 
 		int counter = 0;
 
@@ -53,6 +57,8 @@ namespace bricks::plugins
 		atomic<bool> shutdown = false;
 
 		request_cb_t request;
+
+		event* term = nullptr;
 
 	};
 

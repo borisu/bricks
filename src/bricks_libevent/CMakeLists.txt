@@ -10,6 +10,8 @@ libevent_server.h
 libevent_server.cpp
 libevent_client.h
 libevent_client.cpp
+libevent_base.h
+libevent_base.cpp
 pch.cpp
 pch.h
 )
