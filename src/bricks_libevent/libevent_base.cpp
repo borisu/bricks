@@ -35,7 +35,7 @@ static void log_cb(int severity, const char* msg)
 }
 
 bricks_error_code_e
-bricks::plugins::libevent_init()
+bricks::plugins::libevent_init(bool debug)
 {
 #ifdef _WIN32
 	{
@@ -50,6 +50,9 @@ bricks::plugins::libevent_init()
 	}
 #endif
 
+	if (debug)
+		event_enable_debug_logging(EVENT_DBG_ALL);
+
 	event_set_log_callback(log_cb);
 
 #ifdef EVTHREAD_USE_WINDOWS_THREADS_IMPLEMENTED
@@ -57,7 +60,7 @@ bricks::plugins::libevent_init()
 #elif ifdef EVTHREAD_USE_PTHREADS_IMPLEMENTED
 	int evthread_use_pthreads(void);
 #else
-
+	#error no multithreading library defined
 #endif
 
 	return BRICKS_SUCCESS;

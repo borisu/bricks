@@ -28,11 +28,9 @@ namespace bricks::plugins
 
 		static void do_handle_request(struct evhttp_request* req, void* arg);
 
-		static void do_handle_response(evutil_socket_t sig, short events, void* arg);
+		void do_handle_response(struct evhttp_request* req, bricks_error_code_e, const char*, size_t, xtree_t*);
 	
 		void libevent_poll_loop();
-
-		int counter = 0;
 
 		string name;
 
@@ -59,6 +57,8 @@ namespace bricks::plugins
 		request_cb_t request;
 
 		event* term = nullptr;
+
+		cb_queue_t* queue = nullptr;
 
 	};
 

@@ -68,7 +68,7 @@ request_response_test_2(server_plugin_t* server, client_plugin_t* client, select
 		{
 			buf->release();
 
-			proxy(BRICKS_SUCCESS, "pong", 4, request_xt);
+			proxy(BRICKS_SUCCESS, "pong", 5, request_xt);
 
 			req_count++;
 		};

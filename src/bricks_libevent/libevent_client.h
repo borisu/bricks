@@ -22,7 +22,60 @@ namespace bricks::plugins
 
 	protected:
 
+		void libevent_poll_loop();
+
+		static void do_term(evutil_socket_t sig, short events, void* arg);
+
+		static void timeout_cb(evutil_socket_t fd, short what, void* arg);
+
+		static void http_request_done(evhttp_request* conn, void* arg);
+
+		void destroy();
+
 		meta_cb_t meta_cb;
+
+		thread* libevent_poll_thread = nullptr;
+
+		atomic<bool> shutdown = false;
+
+		string name;
+
+		std::recursive_mutex mtx;
+
+		cb_queue_t* queue = nullptr;
+
+		bool initiated = false;
+
+		bool destroyed = false;
+
+		event_config* cfg = nullptr;
+
+		event_base* base = nullptr;
+
+		int timeout_ms = 10000;
+
+		event* term = nullptr;
+
+		int counter = 0;
+
+		struct req_ctx
+		{
+			int counter; 
+
+			libevent_client_t* This;
+
+			evhttp_connection* conn;
+
+			evhttp_request* req;
+
+			event* timeout_event;
+
+			response_cb_t response_cb;
+
+		};
+
+		map<int, req_ctx*> ctxs;
+
 	};
 
 }

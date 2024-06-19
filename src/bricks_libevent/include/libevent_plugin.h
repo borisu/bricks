@@ -15,7 +15,7 @@
 namespace bricks::plugins {
 
 	BRICKSLIBEVENT_API bricks_error_code_e
-		libevent_init();
+		libevent_init(bool debug = false);
 
 	BRICKSLIBEVENT_API client_plugin_t*
 		create_libevent_client();

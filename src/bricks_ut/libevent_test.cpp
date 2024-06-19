@@ -11,7 +11,7 @@ using namespace bricks::plugins;
 
 TEST(libevent_case, request_response_test) {
 
-    ASSERT_EQ(BRICKS_SUCCESS, libevent_init());
+    ASSERT_EQ(BRICKS_SUCCESS, libevent_init(false));
 
     for (int i = 0; i < NUM_OF_TESTS; i++) {
 
@@ -19,18 +19,20 @@ TEST(libevent_case, request_response_test) {
             create_xtree_from_xml(
                 "<bricks>"
                 " <libevent>"
-                "  <server name=\"libevent_server1\" debug=\"true\">"
+                "  <server name=\"libevent_server1\">"
                 "   <methods>"
                 "    <init>"
                 "     <connection address=\"127.0.0.1\" port=\"8080\"/>"
                 "    </init>"
                 "   </methods>"
                 "  </server>"
-                "  <client name=\"libevent_client1\" debug=\"true\">"
+                "  <client name=\"libevent_client1\">"
                 "   <methods>"
                 "    <init>"		
-                "	   <connection url=\"127.0.0.1\" port=\"5672\"/>"
                 "    </init>"
+                "    <issue_request>"
+                "	   <http address=\"127.0.0.1\" port=\"8080\" path=\"/api\" />"
+                "    </issue_request>"
                 "   </methods>"
                 "  </client>"
                 " </libevent>"
