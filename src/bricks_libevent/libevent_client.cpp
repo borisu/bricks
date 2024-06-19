@@ -20,7 +20,9 @@ libevent_client_t::libevent_client_t()
 
 libevent_client_t::~libevent_client_t()
 {
+	SYNCHRONIZED(mtx);
 
+	destroy();
 }
 
 void 
@@ -179,7 +181,7 @@ libevent_client_t::http_request_done(evhttp_request* req, void* arg)
 
 	ctx->This->ctxs.erase(ctx->counter);
 
-	event_del(ctx->timeout_event);
+	event_free(ctx->timeout_event);
 
 	evhttp_connection_free(ctx->conn);
 
