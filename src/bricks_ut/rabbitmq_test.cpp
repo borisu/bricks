@@ -57,7 +57,6 @@ TEST(rabbitmq_case, publish_subscribe_test) {
 
         selector->init(cb_q.get());
 
-
         publish_subscribe_test_2(publisher.get(), subscriber.get(), selector.get(), options_xt.get());
     }
 

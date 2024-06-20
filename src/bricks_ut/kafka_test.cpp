@@ -10,79 +10,51 @@ using namespace bricks;
 using namespace bricks::plugins;
 
 TEST(kafka_case, publish_subscribe_test) {
+
 	for (int i = 0; i < NUM_OF_TESTS ; i++)
 	{
-		brick_uptr<xtree_t> publisher_xt(
+		brick_uptr<xtree_t> options_xt(
 			create_xtree_from_xml(
 				"<bricks>"
 				" <rdkafka>"
-				"  <rdlog enabled=\"true\"/>"
-				"  <producer name=\"producer1\">"
-				"   <configuration>"
-				"    <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
-//				"    <property name = \"debug\" value=\"all\"/>"
-				"   </configuration>"
-				"  </producer>"
-				" </rdkafka>"
-				"</bricks>"
-			));
-
-		brick_uptr<xtree_t> publisher_topic_xt(
-			create_xtree_from_xml(
-				"<bricks>"
-				" <rdkafka>"
-				"  <producer>"
-				"   <topic>"
-				"    <configuration>"
-				"     <property name = \"acks\" value=\"all\"/>"
-				"    </configuration>"
-				"   </topic>"
-				"  </producer>"
-				" </rdkafka>"
-				"</bricks>"
-			));
-
-		brick_uptr<xtree_t> publish_xt(
-			create_xtree_from_xml(
-				"<bricks>"
-				" <rdkafka>"
-				"  <producer>"
-				"   <key>YnJpY2tzLnRlc3Qua2V5</key>" // bricks.test.key (base64)
-				"  </producer>"
-				" </rdkafka>"
-				"</bricks>"
-			));
-
-		brick_uptr<xtree_t> subscriber_xt(
-			create_xtree_from_xml(
-				"<bricks>"
-				" <rdkafka>"
-				"  <rdlog enabled=\"true\"/>"
-				"  <consumer name=\"consumer1\">"
-				"   <configuration>"
-				"    <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
-				"    <property name = \"group.id\" value=\"bricks.test.group\"/>"
-//				"    <property name = \"debug\" value=\"all\"/>"
-				"   </configuration>"
-				"  </consumer>"
-				" </rdkafka>"
-				"</bricks>"
-			));
-
-		
-
-		brick_uptr<xtree_t> subscriber_topic_xt(
-			create_xtree_from_xml(
-				"<bricks>"
-				" <rdkafka>"
-				"  <consumer>"
-				"   <topic>"
+				"  <publisher name=\"rdkafka_producer1\">"
+				"   <rdlog enabled=\"true\"/>"
+				"   <methods>"
+				"	 <init>"
+				"     <configuration>"
+				"      <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+				"      <property name = \"debug\" value=\"all\"/>"
+				"     </configuration>"
+				"    </init>"
+				"    <describe_topic>"
+				"     <configuration>"
+				"      <property name = \"acks\" value=\"all\"/>"
+				"     </configuration>"
+				"    </describe_topic>"
+				"    <publish>"
+				"      <key>YnJpY2tzLnRlc3Qua2V5</key>" 
+				"    </publish>"
+				"   </methods>"
+				"  </publisher>"
+				"  <subscriber name=\"rdkafka_consumer1\">"
+				"   <rdlog enabled=\"true\"/>"
+				"   <methods>"
+				"	 <init>"
+				"     <configuration>"
+				"      <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+				"      <property name = \"group.id\" value=\"bricks.test.group\"/>"
+				"      <property name = \"debug\" value=\"all\"/>"
+				"     </configuration>"
+				"    </init>"
+				"    <subscribe>"
 				"     <partition value=\"0\"/>"
-				"   </topic>"
-				"  </consumer>"
+				"    </subscribe>"
+				"   </methods>"
+				"  </subscriber>"
 				" </rdkafka>"
 				"</bricks>"
-			));
+			)
+		);
 
 		brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
 
@@ -94,15 +66,11 @@ TEST(kafka_case, publish_subscribe_test) {
 
 		selector->init(cb_q.get());
 
-		publish_subscribe_test_1(
-			publisher_xt.get(),
+		publish_subscribe_test_2(
 			publisher.get(),
-			subscriber_xt.get(),
 			subscriber.get(),
 			selector.get(),
-			publisher_topic_xt.get(),
-			subscriber_topic_xt.get(),
-			publish_xt.get());
+			options_xt.get());
 	}
 
 }

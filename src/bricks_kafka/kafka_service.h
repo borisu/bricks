@@ -29,9 +29,9 @@ namespace bricks::plugins{
 
 		static void rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf);
 
-		atomic<bool> initiated = false;
+		bool initiated = false;
 
-		atomic<bool> started = false;
+		bool destroyed = false;
 
 		atomic<bool> shutdown = false;
 		
@@ -41,7 +41,7 @@ namespace bricks::plugins{
 
 		string name;
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
 
 	};
 }

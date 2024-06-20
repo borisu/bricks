@@ -23,7 +23,7 @@ namespace bricks::plugins {
 
 		virtual void release()  override { delete this; };
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
 
 	protected:
 
@@ -55,7 +55,7 @@ namespace bricks::plugins {
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 
 		jester_pubsub_ctx_t* ctx = nullptr;
 
@@ -90,7 +90,7 @@ namespace bricks::plugins {
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 
 		topic_cb_t msg_cb;
 

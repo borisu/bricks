@@ -57,9 +57,13 @@ jester_bidi_t::init(cb_queue_t* queue, event_cb_t event_cb, const xtree_t* optio
 {
 	SYNCHRONIZED(ctx->mtx);
 
+	ASSERT_PREINIT;
+
 	this->queue = queue;
 
 	this->event_cb = event_cb;
+
+	initiated = true;
 
 	return BRICKS_SUCCESS;
 }
@@ -78,6 +82,8 @@ bricks_error_code_e
 jester_bidi_t::send_event(const char* data, size_t size, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_READY;
 
 	return this->ctx->send_event(this->id == 0 ? 1 : 0, data, size);
 }

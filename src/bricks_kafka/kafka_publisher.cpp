@@ -20,8 +20,7 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
-	ASSERT_NOT_STARTED;
+	ASSERT_PREINIT;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -48,7 +47,6 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 		destroy();
 		return err;
 	}
-
 	
 	// Create producer instance
 	rd_producer_h = rd_kafka_new(RD_KAFKA_PRODUCER, rd_conf_h, NULL, 0);
@@ -58,9 +56,11 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
-	if ((err = start_rd_poll_loop()) == BRICKS_SUCCESS)
+	if ((err = start_rd_poll_loop()) != BRICKS_SUCCESS)
 	{
-		started = true;
+		log1(BRICKS_ALARM, "%s %%%%%%% Error starting kafka thread.", this->name.c_str());
+		destroy();
+		return BRICKS_3RD_PARTY_ERROR;
 	}
 
 	initiated = true;
@@ -74,8 +74,7 @@ kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, co
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 	
 	auto it = rd_topics.find(topic);
 	if (it == rd_topics.end())
@@ -123,6 +122,8 @@ kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, co
 void
 kafka_publisher_t::destroy()
 {
+	destroyed = true;
+
 	stop_rd_poll_loop();
 
 	for (auto p : rd_topics)
@@ -140,7 +141,7 @@ bricks_error_code_e
 kafka_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 

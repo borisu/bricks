@@ -54,7 +54,7 @@ jester_server_t::init(cb_queue_t* queue, request_cb_t request_cb, const xtree_t*
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
@@ -72,8 +72,7 @@ jester_server_t::issue_request(response_proxy_cb_t proxy, const char* data, size
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 
 	auto buf = create_buffer(data, size);
 	auto xt  = create_xtree();
@@ -94,8 +93,7 @@ jester_server_t::response_proxy(response_proxy_cb_t proxy, bricks_error_code_e e
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 
 	proxy(e, data, size, xt);
 
@@ -128,7 +126,7 @@ jester_client_t::init(cb_queue_t* queue, int timeout_ms, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
@@ -144,8 +142,7 @@ jester_client_t::issue_request(const char* data, size_t size, response_cb_t resp
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 	
 	response_proxy_cb_t proxy = std::bind(&jester_client_t::client_response_proxy, this, response_cb, _1, _2, _3, _4);
 
@@ -160,14 +157,11 @@ jester_client_t::client_response_proxy(response_cb_t response_cb, bricks_error_c
 	SYNCHRONIZED(ctx->mtx);
 
 	auto buf = create_buffer(data, size);
-
 	
 	callback_t cb = std::bind(response_cb, err, buf, xt);
 
 	queue->enqueue(cb);
 	
-	
 	return BRICKS_SUCCESS;
-
 }
 

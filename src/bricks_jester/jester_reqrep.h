@@ -24,7 +24,7 @@ namespace bricks::plugins {
 
 		virtual void set_meta_cb(meta_cb_t) {};
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
 
 	protected:
 
@@ -60,7 +60,7 @@ namespace bricks::plugins {
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 		
 	};
 
@@ -92,7 +92,7 @@ namespace bricks::plugins {
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 
 	};
 }

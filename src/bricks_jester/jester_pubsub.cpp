@@ -25,8 +25,6 @@ bricks::plugins::create_jester_subscriber(brick_t* ctx)
 	return new jester_subscriber_t((jester_pubsub_ctx_t*)ctx);
 }
 
-
-
 bricks_error_code_e 	
 jester_pubsub_ctx_t::publish(const char* topic, const char*data, size_t size)
 {
@@ -97,7 +95,6 @@ jester_pubsub_ctx_t::unsubscribe(jester_subscriber_t* s)
 	return BRICKS_SUCCESS;
 }
 
-
 jester_publisher_t::jester_publisher_t(jester_pubsub_ctx_t* ctx) :ctx(ctx)
 {
 
@@ -108,7 +105,7 @@ jester_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
@@ -123,7 +120,7 @@ jester_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	return BRICKS_SUCCESS;
 }
@@ -133,8 +130,7 @@ jester_publisher_t::publish(const string& topic, const char* data, size_t size, 
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 
 	ctx->publish(topic.c_str(), data, size);
 
@@ -166,7 +162,7 @@ jester_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* o
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 	this->msg_cb = msg_cb;
@@ -181,7 +177,7 @@ jester_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	if (topic == "")
 	{
@@ -206,7 +202,7 @@ jester_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 	
 	ctx->subscribe(topic.c_str(), this);
 
@@ -216,11 +212,6 @@ jester_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 bricks_error_code_e 
 jester_subscriber_t::topic_cb(const char* topic, const char* data, size_t size)
 {
-	SYNCHRONIZED(ctx->mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
-
 	auto xtree = create_xtree();
 
 	queue->enqueue(std::bind(msg_cb,topic,create_buffer(data, size), xtree));

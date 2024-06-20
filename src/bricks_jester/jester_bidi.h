@@ -22,7 +22,7 @@ namespace bricks::plugins
 
 		virtual void release()  override { delete this; };
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
 
 	protected:
 
@@ -58,6 +58,9 @@ namespace bricks::plugins
 
 		event_cb_t event_cb = nullptr;
 
+		bool initiated = false;
+
+		bool destroyed = false;
 		
 	};
 

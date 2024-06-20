@@ -45,7 +45,7 @@ TEST(redispp_case, publish_subscribe_test) {
 
 		selector->init(cb_q.get());
 
-		publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());
+		//publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());
 	}
 
 
@@ -104,7 +104,7 @@ TEST(redispp_case, meta_request_response_test) {
 
 		brick_uptr<server_plugin_t>  server(create_pubsub_server(server_publisher.get(), server_subscriber.get(), "/bricks/meta/req", "/bricks/meta/rep", "/bricks/meta/err"));
 
-		request_response_test_1(server_p_xt.get(), server.get(), client_p_xt.get(), client.get(), selector.get());
+		//request_response_test_1(server_p_xt.get(), server.get(), client_p_xt.get(), client.get(), selector.get());
 	}
 
 

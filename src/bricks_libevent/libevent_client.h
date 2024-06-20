@@ -40,7 +40,7 @@ namespace bricks::plugins
 
 		string name;
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
 
 		cb_queue_t* queue = nullptr;
 

@@ -47,6 +47,13 @@ libevent_client_t::destroy()
 	if (libevent_poll_thread)
 		libevent_poll_thread->join();
 
+	for (auto ctx : ctxs)
+	{
+		evhttp_cancel_request(ctx.second->req);
+		evhttp_connection_free(ctx.second->conn);
+		event_free(ctx.second->timeout_event);
+	}
+
 	if (cfg)
 		event_config_free(cfg);
 
@@ -194,6 +201,7 @@ libevent_client_t::http_request_done(evhttp_request* req, void* arg)
 	ctx->This->queue->enqueue(
 		std::bind(ctx->response_cb, evhttp_request_get_response_code(req) == 200 ? BRICKS_SUCCESS : BRICKS_REMOTE_ERROR, buf, response_xt));
 
+
 	delete ctx;
 	
 }
@@ -214,6 +222,8 @@ libevent_client_t::timeout_cb(evutil_socket_t fd, short what, void* arg)
 	ctx->This->queue->enqueue(std::bind(ctx->response_cb,BRICKS_TIMEOUT, nullptr, nullptr));
 
 	ctx->This->ctxs.erase(ctx->counter);
+
+	event_free(ctx->timeout_event);
 
 	delete ctx;
 	

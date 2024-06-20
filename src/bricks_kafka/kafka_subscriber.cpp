@@ -82,6 +82,8 @@ kafka_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* op
 void
 kafka_subscriber_t::destroy()
 {
+	destroyed = true;
+
 	initiated = false;
 	started = false;
 
