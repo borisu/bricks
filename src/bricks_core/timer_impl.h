@@ -52,9 +52,9 @@ namespace bricks
 
 		cb_queue_t* cb_queue = nullptr;
 
-		atomic<bool> initiated = false;
+		bool initiated = false;
 
-		atomic<bool> started = false;
+		bool destroyed = false;
 
 		int handle_counter = 0;
 

@@ -42,13 +42,13 @@ namespace bricks
 
 		map<string, response_cb_t> clients;
 
-		atomic<bool> initiated = false;
-
-		atomic<bool> started = false;
-
 		request_cb_t request_cb;
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
+
+		bool initiated = false;
+
+		bool destroyed = false;
 
 	};
 }

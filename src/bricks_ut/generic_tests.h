@@ -33,10 +33,10 @@ publish_subscribe_test_2(
 	xtree_t* xt = nullptr);
 
 void
-request_response_test_2(server_plugin_t* server, client_plugin_t* client, selector_t* selector, xtree_t* xt);
+request_response_test_2(server_plugin_t* server, client_plugin_t* client, selector_t* selector, xtree_t* server_xt, xtree_t* client_xt, xtree_t* issue_xt);
 
 void
 request_response_test_timeout(server_plugin_t* server, client_plugin_t* client, selector_t* selector, xtree_t* xt);
 
 void
-bidi_test_1(xtree_t* xt1, bidi_plugin_t* p1, xtree_t* xt2, bidi_plugin_t* p2, selector_t* selector);
+bidi_test_2(bidi_plugin_t* p1, bidi_plugin_t* p2, selector_t* selector, xtree_t* xt1, xtree_t* xt2);

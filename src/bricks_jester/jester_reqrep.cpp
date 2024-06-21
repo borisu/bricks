@@ -70,8 +70,6 @@ jester_server_t::init(cb_queue_t* queue, request_cb_t request_cb, const xtree_t*
 bricks_error_code_e 
 jester_server_t::issue_request(response_proxy_cb_t proxy, const char* data, size_t size)
 {
-	SYNCHRONIZED(ctx->mtx);
-
 	ASSERT_READY;
 
 	auto buf = create_buffer(data, size);

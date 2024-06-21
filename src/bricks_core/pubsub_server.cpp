@@ -41,9 +41,8 @@ pubsusb_server_t::init(cb_queue_t* queue, request_cb_t request, const xtree_t* o
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
-	ASSERT_NOT_STARTED;
-
+	ASSERT_PREINIT;
+	
 	this->queue = queue;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;

@@ -55,15 +55,15 @@ namespace bricks
 
 		map<string, request_ctx> ctxs;
 
-		atomic<bool> initiated = false;
-
-		atomic<bool> started = false;
-
 		timer_t *timer = nullptr;
 
 		int timeout_ms = BRICKS_DEFAULT_CLIENT_TIMEOUT ;
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
+
+		bool initiated = false;
+
+		bool destroyed = false;
 		
 	};
 }

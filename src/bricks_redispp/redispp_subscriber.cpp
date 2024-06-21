@@ -51,7 +51,7 @@ redispp_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* 
 
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
@@ -140,7 +140,7 @@ redispp_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -163,7 +163,7 @@ redispp_subscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 

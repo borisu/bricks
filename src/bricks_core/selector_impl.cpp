@@ -31,13 +31,15 @@ selector_impl_t::poll(int milliseconds)
 
 	callback_t cb = nullptr;
 	bricks_error_code_e err;
-	if ((err = q->try_dequeue(cb, milliseconds)) != BRICKS_SUCCESS)
+	int event_id = 0;
+	if ((err = q->try_dequeue(cb, milliseconds, &event_id)) != BRICKS_SUCCESS)
 	{
 		return BRICKS_TIMEOUT;
 	}
 
-	
+	printf("handling evid=%d\n", event_id);
 	cb();
+	printf("handled evid=%d\n", event_id);
 	
 	
 	return BRICKS_SUCCESS;

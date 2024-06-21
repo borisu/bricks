@@ -22,6 +22,13 @@ zeromq_bidi_t::check_capability(plugin_capabilities_e e)
 }
 
 void
+zeromq_bidi_t::set_meta_cb(meta_cb_t meta_cb)
+{
+	this->meta_cb = meta_cb;
+}
+
+
+void
 zeromq_bidi_t::destroy()
 {
 	destroyed = true;
@@ -87,7 +94,7 @@ zeromq_bidi_t::init(cb_queue_t* queue, event_cb_t event_cb, const xtree_t* optio
 		items[0] = { pair, 0, ZMQ_POLLIN, 0 };
 
 		rc = start_zmq_poll_loop();
-		if (rc == BRICKS_SUCCESS)
+		if (rc != BRICKS_SUCCESS)
 		{
 			throw std::exception();
 		}

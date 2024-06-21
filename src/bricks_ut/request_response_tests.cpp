@@ -7,7 +7,7 @@
 using namespace bricks;
 
 void
-request_response_test_2(server_plugin_t* server, client_plugin_t* client, selector_t* selector, xtree_t* xt)
+request_response_test_2(server_plugin_t* server, client_plugin_t* client, selector_t* selector, xtree_t* server_xt, xtree_t* client_xt, xtree_t* issue_xt)
 {
 	brick_uptr<brick_t> c(create_poller(BRICKS_DEFAULT_CLIENT_TIMEOUT, selector));
 
@@ -21,8 +21,8 @@ request_response_test_2(server_plugin_t* server, client_plugin_t* client, select
 
 			req_count++;
 		};
-	ASSERT_EQ(BRICKS_SUCCESS, server->init(selector->queue(), cb, xt));
-	ASSERT_EQ(BRICKS_SUCCESS, client->init(selector->queue(), BRICKS_DEFAULT_CLIENT_TIMEOUT, xt));
+	ASSERT_EQ(BRICKS_SUCCESS, server->init(selector->queue(), cb, server_xt));
+	ASSERT_EQ(BRICKS_SUCCESS, client->init(selector->queue(), BRICKS_DEFAULT_CLIENT_TIMEOUT, client_xt));
 
 	this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 
@@ -35,7 +35,7 @@ request_response_test_2(server_plugin_t* server, client_plugin_t* client, select
 				if (xt) xt->release();
 				rsp_count++;
 			},
-			xt));
+			issue_xt));
 	}
 
 	this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));

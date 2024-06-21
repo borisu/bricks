@@ -42,7 +42,7 @@ TEST(jester_case, bidi_test)
 
 		selector->init(cb_q.get());
 
-		bidi_test_1(nullptr, p1.get(), nullptr, p2.get(), selector.get());
+		bidi_test_2(p1.get(), p2.get(), selector.get(), nullptr, nullptr);
 	}
 
 }
@@ -63,6 +63,6 @@ TEST(jester_case, reqrep_test)
 
 		selector->init(cb_q.get());
 
-		request_response_test_2(server.get(), client.get(), selector.get(), nullptr);
+		request_response_test_2(server.get(), client.get(), selector.get(), nullptr, nullptr, nullptr);
 	}
 }

@@ -52,6 +52,8 @@ pubsub_client_t::init(cb_queue_t* queue, int timeout_ms, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
+	ASSERT_PREINIT;
+
 	this->queue = queue;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
@@ -66,6 +68,8 @@ pubsub_client_t::init(cb_queue_t* queue, int timeout_ms, const xtree_t* options)
 		return err;
 	}
 
+	initiated = true;
+
 	return BRICKS_SUCCESS;
 }
 
@@ -73,6 +77,8 @@ bricks_error_code_e
 pubsub_client_t::issue_request(const char* buf, size_t size, response_cb_t client_cb, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
+
+	ASSERT_READY;
 
 	int64_t req_handle = distrib(gen);
 

@@ -14,10 +14,16 @@ TEST(zeromq_case, bidi_test) {
             create_xtree_from_xml(
                 "<bricks>"
                 "  <zmq>"
-                "	<bidi name=\"zmq_p1\" url=\"tcp://127.0.0.1:7858\" is_server=\"true\">"
-                "	 <sockopt id=\"ZMQ_BACKLOG\" value=\"100\" />"
-                "	 <sockopt id=\"ZMQ_MAXMSGSIZE\" value=\"%L:-1\" />"
-                "	</bidi>"
+                "	<bidi name=\"zmq_p1\">"
+                "    <methods>"
+                "     <init>"
+                "      <socket url=\"tcp://127.0.0.1:7858\" is_server=\"true\">"
+                "	    <sockopt id=\"ZMQ_BACKLOG\" value=\"100\" />"
+                "	    <sockopt id=\"ZMQ_MAXMSGSIZE\" value=\"%L:-1\" />"
+                "      </socket>"
+                "     </init>"
+                "    </methods>"
+                "   </bidi>"
                 "  </zmq>"
                 "</bricks>"
             ));
@@ -26,9 +32,17 @@ TEST(zeromq_case, bidi_test) {
             create_xtree_from_xml(
                 "<bricks>"
                 "  <zmq>"
-                "   <bidi name=\"zmq_p2\" url=\"tcp://127.0.0.1:7858\" port=\"7858\" is_server=\"false\">"
-                "   </bidi>"
-                "  </zmq>"
+                "	<bidi name=\"zmq_p2\">"
+                "    <methods>"
+                "    <init>"
+                "     <socket url=\"tcp://127.0.0.1:7858\" is_server=\"false\">"
+                "	   <sockopt id=\"ZMQ_BACKLOG\" value=\"100\" />"
+                "	   <sockopt id=\"ZMQ_MAXMSGSIZE\" value=\"%L:-1\" />"
+                "     </socket>"
+                "    </init>"
+                "   </methods>"
+                "  </bidi>"
+                " </zmq>"
                 "</bricks>"
             ));
 
@@ -43,7 +57,7 @@ TEST(zeromq_case, bidi_test) {
 
         selector->init(cb_q.get());
 
-        bidi_test_1(xt1.get(), p1.get(), xt2.get(), p2.get(), selector.get());
+        bidi_test_2(p1.get(), p2.get(), selector.get(), xt1.get(), xt2.get());
     }
 
 }

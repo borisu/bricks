@@ -72,8 +72,6 @@ jester_bidi_t::init(cb_queue_t* queue, event_cb_t event_cb, const xtree_t* optio
 bricks_error_code_e 
 jester_bidi_t::accept_event(const char* data, size_t size)
 {
-	SYNCHRONIZED(ctx->mtx);
-
 	return this->queue->enqueue(std::bind(this->event_cb, create_buffer(data, size), nullptr));
 }
 

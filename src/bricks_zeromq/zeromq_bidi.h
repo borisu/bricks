@@ -25,7 +25,7 @@ namespace bricks::plugins
 		
 		virtual ~zeromq_bidi_t();
 
-		virtual void set_meta_cb(meta_cb_t) override {};
+		virtual void set_meta_cb(meta_cb_t) override ;
 
 	protected:
 

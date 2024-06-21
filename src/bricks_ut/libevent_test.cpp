@@ -50,7 +50,7 @@ TEST(libevent_case, request_response_test) {
 
         brick_uptr<client_plugin_t>  client(create_libevent_client());
        
-        request_response_test_2(server.get(), client.get(), selector.get(), options_xt.get());
+        request_response_test_2(server.get(), client.get(), selector.get(), options_xt.get(), options_xt.get(), options_xt.get());
 
         libevent_destroy();
     }

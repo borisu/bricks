@@ -103,15 +103,6 @@ TEST(redispp_case, meta_request_response_test) {
 				"</bricks>"
 			)
 		);
-		
-
-		brick_uptr<publisher_plugin_t>  client_publisher(create_redispp_publisher());
-
-		brick_uptr<subscriber_plugin_t>  client_subscriber(create_redispp_subscriber());
-
-		brick_uptr<publisher_plugin_t>   server_publisher(create_redispp_publisher());
-
-		brick_uptr<subscriber_plugin_t>  server_subscriber(create_redispp_psubscriber());
 
 		brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
 
@@ -122,11 +113,20 @@ TEST(redispp_case, meta_request_response_test) {
 		brick_uptr<timer_t> timer(create_timer());
 		timer->init(cb_q.get());
 		
+
+		brick_uptr<publisher_plugin_t>  client_publisher(create_redispp_publisher());
+
+		brick_uptr<subscriber_plugin_t>  client_subscriber(create_redispp_subscriber());
+
+		brick_uptr<publisher_plugin_t>   server_publisher(create_redispp_publisher());
+
+		brick_uptr<subscriber_plugin_t>  server_subscriber(create_redispp_psubscriber());
+
 		brick_uptr<client_plugin_t>  client(create_pubsub_client(client_publisher.get(), client_subscriber.get(), timer.get(), "/bricks/meta/req", "/bricks/meta/rep", "/bricks/meta/err"));
 
 		brick_uptr<server_plugin_t>  server(create_pubsub_server(server_publisher.get(), server_subscriber.get(), "/bricks/meta/req", "/bricks/meta/rep", "/bricks/meta/err"));
 
-		request_response_test_2(server.get(), client.get(), selector.get(), );
+		request_response_test_2(server.get(), client.get(), selector.get(), server_options_xt.get(), client_options_xt.get(), nullptr);
 	}
 
 
