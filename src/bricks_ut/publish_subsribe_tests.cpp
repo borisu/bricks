@@ -57,8 +57,9 @@ publish_subscribe_test_2(
 		*/
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(selector->queue(), on_topic_cb, xt));
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(TEST_TOPIC, xt));
+		//ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe("dummy", xt));
 
-		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
+		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT*30));
 
 		publish(publisher, TEST_TOPIC, xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
 

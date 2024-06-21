@@ -34,6 +34,8 @@ namespace bricks::plugins
 
 		virtual void destroy();
 
+		virtual void do_destroy() override;
+
 		rd_kafka_conf_t* rd_conf_h = nullptr;
 
 		rd_kafka_t* rd_producer_h = nullptr;

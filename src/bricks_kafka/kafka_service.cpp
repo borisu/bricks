@@ -40,8 +40,6 @@ kafka_service_t::kafka_service_t()
 bricks_error_code_e
 kafka_service_t::start_rd_poll_loop()
 {
-	ASSERT_NOT_STARTED;
-
 	rd_poll_thread = new thread(&kafka_service_t::rd_poll_loop, this);
 
 	return BRICKS_SUCCESS;
@@ -53,7 +51,6 @@ kafka_service_t::stop_rd_poll_loop()
 	if (rd_poll_thread)
 	{
 		shutdown = true;
-		started = false;
 		rd_poll_thread->join();
 		rd_poll_thread = nullptr;
 		delete rd_poll_thread;
@@ -63,7 +60,8 @@ kafka_service_t::stop_rd_poll_loop()
 void
 kafka_service_t::rd_poll_loop()
 {
-	while (shutdown != true)
+	bool kafka_error = false;
+	while (shutdown != true && !kafka_error)
 	{
 		auto err = rd_poll(BRICKS_DEFAULT_CLIENT_TIMEOUT, false);
 		switch (err)
@@ -72,12 +70,16 @@ kafka_service_t::rd_poll_loop()
 		case BRICKS_SUCCESS:
 			continue;
 		default:
+			kafka_error = true;
 			break;
 
 		}
 	}
 
 	rd_poll(BRICKS_DEFAULT_CLIENT_TIMEOUT, true);
+
+	if (kafka_error)
+		this->cb_queue->enqueue(std::bind(&kafka_service_t::do_destroy, this));
 }
 
 
@@ -91,7 +93,6 @@ kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options, const 
 
 	if (!conf || !configuration_path)
 		return BRICKS_INVALID_PARAM;
-
 
 	try
 	{
@@ -122,7 +123,6 @@ kafka_service_t::init_conf(rd_kafka_conf_t* conf, const xtree_t* options, const 
 	}
 
 	return err;
-
 }
 
 bricks_error_code_e
@@ -138,7 +138,6 @@ kafka_service_t::init_topic_conf(rd_kafka_topic_conf_t* conf, const xtree_t* opt
 
 	try
 	{
-
 		size_t c = get_opt<size_t>(options->get_node_children_count(configuration_path), 0);
 
 		for (int i = 0; i < c && err == BRICKS_SUCCESS; i++)

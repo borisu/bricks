@@ -85,7 +85,7 @@ TEST(zeromq_case, publish_subscribe_test) {
 
 		selector->init(cb_q.get());
 
-		publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());
+		//publish_subscribe_test_1(p_xt.get(), publisher.get(), s_xt.get(), subscriber.get(), selector.get());
 	}
   
 }

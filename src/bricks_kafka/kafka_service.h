@@ -21,6 +21,8 @@ namespace bricks::plugins{
 
 		virtual void rd_poll_loop();
 
+		virtual void do_destroy() = 0;
+
 		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) = 0;
 
 		virtual bricks_error_code_e start_rd_poll_loop();
@@ -42,6 +44,8 @@ namespace bricks::plugins{
 		string name;
 
 		std::mutex mtx;
+
+		meta_cb_t meta_cb;
 
 	};
 }

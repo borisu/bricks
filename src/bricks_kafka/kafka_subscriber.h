@@ -25,13 +25,15 @@ namespace bricks::plugins {
 
 		virtual void release() override { delete this; };
 
-		virtual void set_meta_cb(meta_cb_t) override {};
+		virtual void set_meta_cb(meta_cb_t meta_cb) override;
 
 		virtual ~kafka_subscriber_t();
 
 	private:
 
 		virtual void destroy();
+
+		virtual void do_destroy() override;
 
 		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) override;
 
@@ -42,6 +44,9 @@ namespace bricks::plugins {
 		rd_kafka_topic_partition_list_t* rd_part_list_h = nullptr;
 
 		topic_cb_t msg_cb;
+
+		
+
 
 	};
 
