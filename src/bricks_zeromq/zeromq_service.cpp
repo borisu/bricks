@@ -93,11 +93,7 @@ zeromq_service_t::zeromq_service_t()
 bricks_error_code_e
 zeromq_service_t::start_zmq_poll_loop()
 {
-	ASSERT_NOT_STARTED;
-
 	zmq_poll_thread = new thread(&zeromq_service_t::zmq_poll_loop, this);
-
-	started = true;
 
 	return BRICKS_SUCCESS;
 }
@@ -118,7 +114,8 @@ zeromq_service_t::stop_zmq_poll_loop()
 void
 zeromq_service_t::zmq_poll_loop()
 {
-	while (shutdown != true)
+	bool zmq_error = false;
+	while (shutdown != true && !zmq_error)
 	{
 		auto err = do_zmq_poll(ZMQ_POLL_TIMEOUT, false);
 		switch (err)
@@ -127,12 +124,16 @@ zeromq_service_t::zmq_poll_loop()
 		case BRICKS_SUCCESS:
 			continue;
 		default:
+			zmq_error = true;
 			break;
 
 		}
 	}
 
 	do_zmq_poll(ZMQ_POLL_TIMEOUT, true);
+
+	if (zmq_error)
+		this->cb_queue->enqueue(std::bind(&zeromq_service_t::do_destroy, this));
 
 }
 

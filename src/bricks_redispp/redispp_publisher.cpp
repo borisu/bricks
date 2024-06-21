@@ -29,11 +29,7 @@ redispp_publisher_t::~redispp_publisher_t()
 void
 redispp_publisher_t::destroy()
 {
-	SYNCHRONIZED(mtx);
-
-	initiated = false;
-
-	started = false;
+	destroyed = true;
 
 	if (redis)
 	{
@@ -66,7 +62,7 @@ redispp_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
@@ -76,7 +72,7 @@ redispp_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 	{
 		name = get<string>(options->get_property_value("/bricks/redispp/publisher", "name").value());
 
-		url = get<string>(options->get_property_value("/bricks/redispp/publisher", "url").value());
+		url = get<string>(options->get_property_value("/bricks/redispp/publisher/methods/init/connection", "url").value());
 
 		redis = new AsyncRedis(url.c_str());
 
@@ -105,8 +101,7 @@ redispp_publisher_t::publish(const string& topic, const char* data, size_t size,
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 

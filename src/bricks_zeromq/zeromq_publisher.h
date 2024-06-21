@@ -28,11 +28,13 @@ namespace bricks::plugins
 
 		virtual ~zeromq_publisher_t();
 
-		virtual void set_meta_cb(meta_cb_t) override {};
+		virtual void set_meta_cb(meta_cb_t) override ;
 
 	private:
 
 		void destroy();
+
+		virtual void do_destroy() override;
 	
 		void* context = nullptr;
 
@@ -40,9 +42,7 @@ namespace bricks::plugins
 
 		string url;
 
-		cb_queue_t* cb_queue = nullptr;
-
-		string bname;
+		meta_cb_t meta_cb;
 
 	};
 

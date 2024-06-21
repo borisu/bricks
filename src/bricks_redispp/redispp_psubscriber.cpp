@@ -32,9 +32,7 @@ redispp_psubscriber_t::destroy()
 {
 	SYNCHRONIZED(mtx);
 
-	initiated = false;
-
-	started = false;
+	destroyed = true;
 
 	if (subscriber)
 	{
@@ -55,7 +53,7 @@ redispp_psubscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t*
 
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
@@ -67,7 +65,7 @@ redispp_psubscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t*
 	{
 		name = get<string>(options->get_property_value("/bricks/redispp/subscriber", "name").value());
 
-		url = get<string>(options->get_property_value("/bricks/redispp/subscriber", "url").value());
+		url = get<string>(options->get_property_value("/bricks/redispp/subscriber/methods/init/connection", "url").value());
 
 		redis = new AsyncRedis(url.c_str());
 
@@ -147,7 +145,7 @@ redispp_psubscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -170,7 +168,7 @@ redispp_psubscriber_t::unsubscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 

@@ -42,8 +42,8 @@ TEST(kafka_case, publish_subscribe_test) {
 				"	 <init>"
 				"     <configuration>"
 				"      <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
-				"      <property name = \"group.id\" value=\"bricks.test.group.2\"/>"
-				//"      <property name = \"debug\" value=\"all\"/>"
+				"      <property name = \"group.id\" value=\"bricks.test.group.6\"/>"
+				"      <property name = \"debug\" value=\"all\"/>"
 				"     </configuration>"
 				"    </init>"
 				"    <subscribe>"
@@ -71,6 +71,7 @@ TEST(kafka_case, publish_subscribe_test) {
 			subscriber.get(),
 			selector.get(),
 			options_xt.get());
+
 	}
 
 }

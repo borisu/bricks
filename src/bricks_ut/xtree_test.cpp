@@ -177,7 +177,7 @@ TEST(xtree_case, xtree_enforce_type)
 {
 	xtree_t* xt = create_xtree_from_xml(
 		"<configuration>"
-		" <property int_value=\"%i:5\"  longlong_value=\"%L:5\" double_value=\"%d:5\" string_value=\"%s:5\" bool_value1=\"%b:true\" bool_value2=\"%b:valse\"/>"
+		" <property int_value=\"%i:5\"  longlong_value=\"%L:5\" double_value=\"%d:5\" string_value=\"%s:5\" bool_value1=\"%b:true\" bool_value2=\"%b:valse\" hex_int=\"%x:aabb\" hex_longlong=\"%X:aabb\" />"
 		"</configuration>");
 
 	EXPECT_EQ(get<int>(xt->get_property_value("/configuration/property", "int_value").value()), 5);
@@ -186,6 +186,9 @@ TEST(xtree_case, xtree_enforce_type)
 	EXPECT_EQ(get<string>(xt->get_property_value("/configuration/property", "string_value").value()), "5");
 	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value1").value()), true);
 	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value2").value()), false);
+
+	EXPECT_EQ(get<int>(xt->get_property_value("/configuration/property", "hex_int").value()), 0xaabb);
+	EXPECT_EQ(get<long long>(xt->get_property_value("/configuration/property", "hex_longlong").value()), 0xaabb);
 
 	xt->release();
 

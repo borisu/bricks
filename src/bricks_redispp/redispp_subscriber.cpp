@@ -30,11 +30,7 @@ redispp_subscriber_t::~redispp_subscriber_t()
 void
 redispp_subscriber_t::destroy()
 {
-	SYNCHRONIZED(mtx);
-
-	initiated = false;
-
-	started = false;
+	destroyed = true;
 
 	if (subscriber)
 	{
@@ -67,7 +63,7 @@ redispp_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* 
 	{
 		name = get<string>(options->get_property_value("/bricks/redispp/subscriber", "name").value());
 
-		url = get<string>(options->get_property_value("/bricks/redispp/subscriber", "url").value());
+		url = get<string>(options->get_property_value("/bricks/redispp/subscriber/methods/init/connection", "url").value());
 
 		redis = new AsyncRedis(url.c_str());
 

@@ -10,6 +10,12 @@ zeromq_publisher_t::zeromq_publisher_t()
 
 };
 
+void
+zeromq_publisher_t::set_meta_cb(meta_cb_t meta_cb)
+{
+	this->meta_cb = meta_cb;
+}
+
 bool 
 zeromq_publisher_t::check_capability(plugin_capabilities_e e)
 {
@@ -28,7 +34,7 @@ zeromq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -40,13 +46,13 @@ zeromq_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 
 	try
 	{
-		set_sockopt(options, "/bricks/zmq/publisher", publisher);
-
 		name = get<string>(options->get_property_value("/bricks/zmq/publisher", "name").value());
 
-		auto url = get<string>(options->get_property_value("/bricks/zmq/publisher", "url").value());
+		set_sockopt(options, "/bricks/zmq/publisher/methods/init/socket", publisher);
 
-		auto is_server = get<bool>(options->get_property_value("/bricks/zmq/publisher", "is_server").value());
+		auto url = get<string>(options->get_property_value("/bricks/zmq/publisher/methods/init/socket", "url").value());
+
+		auto is_server = get<bool>(options->get_property_value("/bricks/zmq/publisher/methods/init/socket", "is_server").value());
 
 		int rc =  is_server  ? zmq_bind(publisher, url.c_str()) : zmq_connect(publisher, url.c_str());
 
@@ -101,7 +107,7 @@ zeromq_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;;
 
 	return BRICKS_SUCCESS;
 
@@ -112,8 +118,7 @@ zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size, 
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 
 	auto rc = zmq_send(publisher, topic.c_str(), strlen(topic.c_str()), ZMQ_SNDMORE);
 	if (rc == -1) {
@@ -132,5 +137,13 @@ zeromq_publisher_t::publish(const string& topic, const char* buf , size_t size, 
 }
 
 
+void
+zeromq_publisher_t::do_destroy()
+{
+	SYNCHRONIZED(mtx);
 
+	destroy();
 
+	if (meta_cb)
+		this->cb_queue->enqueue(std::bind(meta_cb, OBJECT_DESTROYED, nullptr));
+}

@@ -45,9 +45,9 @@ namespace bricks::plugins {
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
 
 		ConnectionOptions opts;
 

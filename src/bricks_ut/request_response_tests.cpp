@@ -22,7 +22,6 @@ request_response_test_2(server_plugin_t* server, client_plugin_t* client, select
 			req_count++;
 		};
 	ASSERT_EQ(BRICKS_SUCCESS, server->init(selector->queue(), cb, xt));
-	
 	ASSERT_EQ(BRICKS_SUCCESS, client->init(selector->queue(), BRICKS_DEFAULT_CLIENT_TIMEOUT, xt));
 
 	this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));

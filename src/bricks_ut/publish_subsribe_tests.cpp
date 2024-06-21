@@ -39,7 +39,6 @@ publish_subscribe_test_2(
 
 		brick_uptr<brick_t> c(create_poller(BRICKS_DEFAULT_CLIENT_TIMEOUT, selector));
 
-
 		auto on_topic_cb = [&](const string& topic, buffer_t* buf, xtree_t* xt)
 			{
 				all_rcv_messages.push_back(new msg_info{ topic, buf, xt });
@@ -48,7 +47,6 @@ publish_subscribe_test_2(
 		/*
 		* Prepare publisher
 		*/
-
 		ASSERT_EQ(BRICKS_SUCCESS, publisher->init(selector->queue(), xt));
 		ASSERT_EQ(BRICKS_SUCCESS, publisher->describe_topic(TEST_TOPIC, xt));
 
@@ -57,9 +55,8 @@ publish_subscribe_test_2(
 		*/
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(selector->queue(), on_topic_cb, xt));
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(TEST_TOPIC, xt));
-		//ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe("dummy", xt));
 
-		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT*30));
+		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT*5));
 
 		publish(publisher, TEST_TOPIC, xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
 
@@ -72,7 +69,6 @@ publish_subscribe_test_2(
 		publish(publisher, TEST_TOPIC, xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
 
 		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
-
 	}
 
 	ASSERT_EQ(all_rcv_messages.size(), NUM_OF_ITERATIONS);

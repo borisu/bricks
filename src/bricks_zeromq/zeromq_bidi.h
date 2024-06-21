@@ -31,9 +31,9 @@ namespace bricks::plugins
 
 		void destroy();
 
-		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) override;
+		virtual void do_destroy() override;
 
-		cb_queue_t* cb_queue = nullptr;
+		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) override;
 
 		zmq_pollitem_t items[1] = { 0 };
 
@@ -46,6 +46,8 @@ namespace bricks::plugins
 		event_cb_t event_cb = nullptr;
 
 		string url;
+
+		meta_cb_t meta_cb;
 
 	};
 }
