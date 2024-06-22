@@ -40,7 +40,7 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e init(cb_queue_t* queue, request_cb_t request_cb, const xtree_t* ) override;
 
-		virtual bricks_error_code_e issue_request(response_proxy_cb_t proxy, const char* data, size_t size) ;
+		virtual bricks_error_code_e accept_request(response_proxy_cb_t proxy, const char* data, size_t size) ;
 
 		virtual bricks_error_code_e response_proxy(response_proxy_cb_t proxy, bricks_error_code_e, const char*, size_t, xtree_t*);
 

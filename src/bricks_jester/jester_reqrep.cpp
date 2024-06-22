@@ -38,7 +38,7 @@ jester_server_ctx_t::set_server(jester_server_t* server)
 bricks_error_code_e 
 jester_server_ctx_t::issue_request(response_proxy_cb_t proxy, const char* data, size_t size)
 {
-	return this->server->issue_request(proxy, data, size);
+	return this->server->accept_request(proxy, data, size);
 }
 
 
@@ -68,7 +68,7 @@ jester_server_t::init(cb_queue_t* queue, request_cb_t request_cb, const xtree_t*
 
 
 bricks_error_code_e 
-jester_server_t::issue_request(response_proxy_cb_t proxy, const char* data, size_t size)
+jester_server_t::accept_request(response_proxy_cb_t proxy, const char* data, size_t size)
 {
 	ASSERT_READY;
 

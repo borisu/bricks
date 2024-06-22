@@ -43,14 +43,12 @@ redispp_subscriber_t::destroy()
 		}
 		catch (std::exception&) {};
 		delete subscriber;
-		this_thread::sleep_for(chrono::seconds(5));
 		subscriber = nullptr;
 	}
 
 	if (redis)
 	{
 		delete redis;
-		this_thread::sleep_for(chrono::seconds(5));
 		redis = nullptr;
 	}
 }
