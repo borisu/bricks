@@ -8,7 +8,7 @@
 #define BRICKSLIBEVENT_API __declspec(dllimport)
 #endif
 #else
-#define BRICKSKAFKA_API
+#define BRICKSLIBEVENT_API
 #endif 
 
 
