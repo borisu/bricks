@@ -53,45 +53,35 @@ jester_bidi_t::jester_bidi_t(jester_bidi_ctx_t* ctx, int id):ctx(ctx),id(id)
 }
 
 bricks_error_code_e 
-jester_bidi_t::init(cb_queue_t* queue, const xtree_t* options)
+jester_bidi_t::init(cb_queue_t* queue, event_cb_t event_cb, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
-jester_bidi_t::register_event_cb(event_cb_t event_cb, const xtree_t* options)
-{
-	SYNCHRONIZED(ctx->mtx);
-
 	this->event_cb = event_cb;
 
+	initiated = true;
+
 	return BRICKS_SUCCESS;
 }
+
 
 bricks_error_code_e 
 jester_bidi_t::accept_event(const char* data, size_t size)
 {
-	SYNCHRONIZED(ctx->mtx);
-
 	return this->queue->enqueue(std::bind(this->event_cb, create_buffer(data, size), nullptr));
 }
 
-bricks_error_code_e 
-jester_bidi_t::start()
-{
-	SYNCHRONIZED(ctx->mtx);
-
-	return BRICKS_SUCCESS;
-}
 
 bricks_error_code_e 
 jester_bidi_t::send_event(const char* data, size_t size, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
+
+	ASSERT_READY;
 
 	return this->ctx->send_event(this->id == 0 ? 1 : 0, data, size);
 }

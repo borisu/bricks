@@ -25,8 +25,6 @@ bricks::plugins::create_jester_subscriber(brick_t* ctx)
 	return new jester_subscriber_t((jester_pubsub_ctx_t*)ctx);
 }
 
-
-
 bricks_error_code_e 	
 jester_pubsub_ctx_t::publish(const char* topic, const char*data, size_t size)
 {
@@ -97,7 +95,6 @@ jester_pubsub_ctx_t::unsubscribe(jester_subscriber_t* s)
 	return BRICKS_SUCCESS;
 }
 
-
 jester_publisher_t::jester_publisher_t(jester_pubsub_ctx_t* ctx) :ctx(ctx)
 {
 
@@ -108,7 +105,7 @@ jester_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 
@@ -117,25 +114,13 @@ jester_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e
-jester_publisher_t::start()
-{
-	SYNCHRONIZED(ctx->mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	started = true;
-
-	return BRICKS_SUCCESS;
-}
 
 bricks_error_code_e 
-jester_publisher_t::add_topic(const string& topic, const xtree_t* options)
+jester_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	return BRICKS_SUCCESS;
 }
@@ -145,8 +130,7 @@ jester_publisher_t::publish(const string& topic, const char* data, size_t size, 
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 
 	ctx->publish(topic.c_str(), data, size);
 
@@ -178,7 +162,7 @@ jester_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* o
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_NOT_INITIATED;
+	ASSERT_PREINIT;
 
 	this->queue = queue;
 	this->msg_cb = msg_cb;
@@ -193,28 +177,24 @@ jester_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
-	auto new_end = std::remove(topics.begin(), topics.end(), topic);
-	topics.erase(new_end, topics.end());
+	if (topic == "")
+	{
+		topics.clear();
+		ctx->unsubscribe(this);
+	}
+	else
+	{
+		auto new_end = std::remove(topics.begin(), topics.end(), topic);
+		topics.erase(new_end, topics.end());
 
-	ctx->remove_subscription(topic.c_str(), this);
+		ctx->remove_subscription(topic.c_str(), this);
 
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e jester_subscriber_t::unsubscribe(const xtree_t* options)
-{
-	SYNCHRONIZED(ctx->mtx);
-
-	ASSERT_INITIATED;
-
-	topics.clear();
-	ctx->unsubscribe(this);
+	}
 
 	return BRICKS_SUCCESS;
 }
-
 
 
 bricks_error_code_e 
@@ -222,27 +202,9 @@ jester_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(ctx->mtx);
 
-	ASSERT_INITIATED;
+	ASSERT_READY;
 	
-	topics.push_back(topic);
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e
-jester_subscriber_t::start()
-{
-	SYNCHRONIZED(ctx->mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	for (auto& t : topics)
-	{
-		ctx->subscribe(t.c_str(), this);
-	}
-
-	this->started = true;
+	ctx->subscribe(topic.c_str(), this);
 
 	return BRICKS_SUCCESS;
 }
@@ -250,11 +212,6 @@ jester_subscriber_t::start()
 bricks_error_code_e 
 jester_subscriber_t::topic_cb(const char* topic, const char* data, size_t size)
 {
-	SYNCHRONIZED(ctx->mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
-
 	auto xtree = create_xtree();
 
 	queue->enqueue(std::bind(msg_cb,topic,create_buffer(data, size), xtree));

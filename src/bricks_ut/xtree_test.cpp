@@ -177,7 +177,7 @@ TEST(xtree_case, xtree_enforce_type)
 {
 	xtree_t* xt = create_xtree_from_xml(
 		"<configuration>"
-		" <property int_value=\"%i:5\"  longlong_value=\"%L:5\" double_value=\"%d:5\" string_value=\"%s:5\" bool_value1=\"%b:true\" bool_value2=\"%b:valse\"/>"
+		" <property int_value=\"%i:5\"  longlong_value=\"%L:5\" double_value=\"%d:5\" string_value=\"%s:5\" bool_value1=\"%b:true\" bool_value2=\"%b:valse\" hex_int=\"%x:aabb\" hex_longlong=\"%X:aabb\" />"
 		"</configuration>");
 
 	EXPECT_EQ(get<int>(xt->get_property_value("/configuration/property", "int_value").value()), 5);
@@ -186,6 +186,9 @@ TEST(xtree_case, xtree_enforce_type)
 	EXPECT_EQ(get<string>(xt->get_property_value("/configuration/property", "string_value").value()), "5");
 	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value1").value()), true);
 	EXPECT_EQ(get<bool>(xt->get_property_value("/configuration/property", "bool_value2").value()), false);
+
+	EXPECT_EQ(get<int>(xt->get_property_value("/configuration/property", "hex_int").value()), 0xaabb);
+	EXPECT_EQ(get<long long>(xt->get_property_value("/configuration/property", "hex_longlong").value()), 0xaabb);
 
 	xt->release();
 
@@ -254,4 +257,58 @@ TEST(xtree_case, xtree_create_1_level)
 }
 
 
+TEST(xtree_case, xtree_add_kafka_property)
+{
+	char hex_buffer[64];
+	generate_random_64hex_str(hex_buffer);
 
+	brick_uptr<xtree_t> options_xt(
+		create_xtree_from_xml(
+			"<bricks>"
+			" <rdkafka>"
+			"  <publisher name=\"rdkafka_producer1\">"
+			"   <rdlog enabled=\"true\"/>"
+			"   <methods>"
+			"	 <init>"
+			"     <configuration>"
+			"      <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+			//"      <property name = \"debug\" value=\"all\"/>"
+			"     </configuration>"
+			"    </init>"
+			"    <describe_topic>"
+			"     <configuration>"
+			//"      <property name = \"acks\" value=\"all\"/>"
+			"     </configuration>"
+			"    </describe_topic>"
+			"    <publish>"
+			//"      <key>YnJpY2tzLnRlc3Qua2V5</key>" 
+			"    </publish>"
+			"   </methods>"
+			"  </publisher>"
+			"  <subscriber name=\"rdkafka_consumer1\">"
+			"   <rdlog enabled=\"true\"/>"
+			"   <methods>"
+			"	 <init>"
+			"     <configuration>"
+			"      <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
+			//	"      <property name = \"group.id\" value=\"bricks.test.group.777\"/>"
+			//	"      <property name = \"debug\" value=\"all\"/>"
+			"     </configuration>"
+			"    </init>"
+			"    <subscribe>"
+			"     <partition value=\"0\"/>"
+			"    </subscribe>"
+			"   </methods>"
+			"  </subscriber>"
+			" </rdkafka>"
+			"</bricks>"
+		)
+	);
+
+	// we need to randomize kafka groups to exclude interference between tests as 
+	// in group the offset of the group is persistent
+	auto node = options_xt->add_node("/bricks/rdkafka/subscriber/methods/init/configuration/property", true);
+	options_xt->set_property_value(node.value(), "name", string("group.id"));
+	options_xt->set_property_value(node.value(), "value", string("bricks.test.group.888"));
+
+}

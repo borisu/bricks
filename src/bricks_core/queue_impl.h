@@ -8,15 +8,24 @@ namespace bricks
 	{
 	public:
 
-		virtual bricks_error_code_e enqueue(callback_t);
+		virtual bricks_error_code_e enqueue(callback_t, int* event_id = nullptr) override;
 
-		virtual bricks_error_code_e try_dequeue(callback_t&, int milliseconds);
+		virtual bricks_error_code_e try_dequeue(callback_t&, int milliseconds, int* event_id = nullptr) override;
 
 		virtual void release() override { delete this; };
 
 	private:
 
-		LockingQueue<callback_t> cb_queue;
+		atomic<int> counter = 0;
+
+		struct cb_ctx_t
+		{
+			int counter;
+
+			callback_t cb;
+		};
+
+		LockingQueue<cb_ctx_t> cb_queue;
 
 	};
 

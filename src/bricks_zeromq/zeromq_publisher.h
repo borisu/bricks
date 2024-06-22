@@ -16,13 +16,11 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e init(cb_queue_t* queue,  const xtree_t* options) override;
 
-		virtual bricks_error_code_e add_topic(const string& topic, const xtree_t* options) override;
+		virtual bricks_error_code_e describe_topic(const string& topic, const xtree_t* options) override;
 
 		virtual bricks_error_code_e publish(const string& topic, const char*, size_t, const xtree_t* options)  override;
 
 		virtual bricks_error_code_e do_zmq_poll(int, bool) override { return BRICKS_NOT_SUPPORTED; }
-
-		virtual bricks_error_code_e start() override ;
 
 		virtual void release() override { delete this; };
 
@@ -30,10 +28,13 @@ namespace bricks::plugins
 
 		virtual ~zeromq_publisher_t();
 
+		virtual void set_meta_cb(meta_cb_t) override ;
+
 	private:
 
 		void destroy();
 
+		virtual void do_destroy() override;
 	
 		void* context = nullptr;
 
@@ -41,11 +42,7 @@ namespace bricks::plugins
 
 		string url;
 
-		string topic;
-
-		cb_queue_t* cb_queue = nullptr;
-
-		string bname;
+		meta_cb_t meta_cb;
 
 	};
 

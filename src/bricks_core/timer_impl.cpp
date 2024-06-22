@@ -26,35 +26,26 @@ timer_impl_t::~timer_impl_t() {
 bricks_error_code_e 
 timer_impl_t::init(cb_queue_t* queue, const xtree_t* options = nullptr)
 {
-    ASSERT_NOT_INITIATED;
-    ASSERT_NOT_STARTED;
+    std::unique_lock<std::mutex> lock(mtx);
+
+    ASSERT_PREINIT;
 
     this->cb_queue = queue;
 
-    initiated = true;
-
-    return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
-timer_impl_t::start()
-{
-    ASSERT_INITIATED;
-    ASSERT_NOT_STARTED;
-
     worker_thread = std::thread(&timer_impl_t::worker, this);
 
-    started = true;
+    initiated = true;
+
 
     return BRICKS_SUCCESS;
 }
+
 
 
 bricks_error_code_e
 timer_impl_t::schedule_timer(const callback_t& callback, const duration_t& delay, int& handle)
 {
-    ASSERT_INITIATED;
-    ASSERT_STARTED;
+    ASSERT_READY;
 
     {
         time_point_t expiration = clock_t::now() + delay;
@@ -72,6 +63,8 @@ timer_impl_t::schedule_timer(const callback_t& callback, const duration_t& delay
 bricks_error_code_e 
 timer_impl_t::cancel_timer(int& handle)
 {
+    ASSERT_READY;
+    
     std::unique_lock<std::mutex> lock(mtx);
     for (auto& t : timer_queue)
     {

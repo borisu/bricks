@@ -7,6 +7,7 @@
 #include <memory>
 #include <list>
 #include <chrono>
+#include <future>
 
 #ifdef WIN32
  #ifdef BRICKS_EXPORTS
@@ -32,19 +33,15 @@ namespace bricks
 		BRICKS_3RD_PARTY_ERROR = 4,
 		BRICKS_TIMEOUT = 5,
 		BRICKS_NOT_SUPPORTED = 6,
-		BRICKS_REMOTE_ERROR = 3,
+		BRICKS_REMOTE_ERROR = 7,
+		BRICKS_OBJECT_DESTROYED = 8,
+		BRICKS_NOT_IMPLEMENTED = 9,
 	};
 
 	class brick_t
 	{
 	public:
 		virtual void release() = 0;
-	};
-
-	class startable_brick_t : public brick_t
-	{
-	public:
-		virtual bricks_error_code_e start() = 0;
 	};
 
 	void brick_destroy(brick_t* ptr);
@@ -62,6 +59,14 @@ namespace bricks
 	using brick_uptr = std::unique_ptr<B, bricks_destroyer>;
 
 	typedef std::vector<char> vector_t;
+
+	typedef std::promise<bricks_error_code_e> bricks_promise_t;
+
+	typedef std::future<bricks_error_code_e> bricks_future_t;
+
+	typedef char hex64_str_t[64];
+
+	void BRICKS_API generate_random_64hex_str(hex64_str_t s);
 	
 }
 

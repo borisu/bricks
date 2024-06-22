@@ -209,10 +209,24 @@ SaxHandler::VisitEnter(const tinyxml2::XMLElement& element, const tinyxml2::XMLA
                 if (pos != strlen(attr->Value() + BRICKS_PREFIX_LEN))
                     return false;
             }
+            else if (strncmp(attr->Value(), "%x:", BRICKS_PREFIX_LEN) == 0)
+            {
+                size_t pos;
+                p = (int)std::stol(attr->Value() + BRICKS_PREFIX_LEN, &pos,16);
+                if (pos != strlen(attr->Value() + BRICKS_PREFIX_LEN))
+                    return false;
+            }
             else if (strncmp(attr->Value(), "%L:", BRICKS_PREFIX_LEN) == 0)
             {
                 size_t pos;
                 p = std::stoll (attr->Value() + BRICKS_PREFIX_LEN, &pos);
+                if (pos != strlen(attr->Value() + BRICKS_PREFIX_LEN))
+                    return false;
+            }
+            else if (strncmp(attr->Value(), "%X:", BRICKS_PREFIX_LEN) == 0)
+            {
+                size_t pos;
+                p = std::stoll(attr->Value() + BRICKS_PREFIX_LEN, &pos,16);
                 if (pos != strlen(attr->Value() + BRICKS_PREFIX_LEN))
                     return false;
             }

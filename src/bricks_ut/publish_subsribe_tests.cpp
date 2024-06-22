@@ -25,18 +25,12 @@ publish(publisher_plugin_t* publisher, const char *topic, xtree_t* publish_xt, l
 }
 
 void
-publish_subscribe_test_1(
-	xtree_t *publisher_xt, 
-	publisher_plugin_t* publisher, 
-	xtree_t* subscriber_xt, 
-	subscriber_plugin_t* subscriber, 
-	selector_t *selector,
-	xtree_t* publisher_topic_xt,
-	xtree_t* subscriber_topic_xt,
-	xtree_t* publish_xt,
-	xtree_t* subscribe_xt)
+publish_subscribe_test_2(
+	publisher_plugin_t* publisher,
+	subscriber_plugin_t* subscriber,
+	selector_t* selector,
+	xtree_t* xt)
 {
-
 	list<string>   all_snd_messages;
 	list<msg_info*> all_rcv_messages;
 
@@ -45,9 +39,6 @@ publish_subscribe_test_1(
 
 		brick_uptr<brick_t> c(create_poller(BRICKS_DEFAULT_CLIENT_TIMEOUT, selector));
 
-		/*
-		* Prepare subscriber.
-		*/
 		auto on_topic_cb = [&](const string& topic, buffer_t* buf, xtree_t* xt)
 			{
 				all_rcv_messages.push_back(new msg_info{ topic, buf, xt });
@@ -56,40 +47,35 @@ publish_subscribe_test_1(
 		/*
 		* Prepare publisher
 		*/
+		ASSERT_EQ(BRICKS_SUCCESS, publisher->init(selector->queue(), xt));
+		ASSERT_EQ(BRICKS_SUCCESS, publisher->describe_topic(TEST_TOPIC, xt));
 
-		//printf("$$$ === Init Publisher ===\n");
+		/*
+		* Prepare subscriber.
+		*/
+		ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(selector->queue(), on_topic_cb, xt));
+		ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(TEST_TOPIC, xt));
 
-		ASSERT_EQ(BRICKS_SUCCESS, publisher->init(selector->queue(), publisher_xt));
-		ASSERT_EQ(BRICKS_SUCCESS, publisher->add_topic(TEST_TOPIC, publisher_topic_xt));
-		ASSERT_EQ(BRICKS_SUCCESS, publisher->start());
+		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT*5));
+
+		publish(publisher, TEST_TOPIC, xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
 
 		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
-
-		ASSERT_EQ(BRICKS_SUCCESS, subscriber->init(selector->queue(), on_topic_cb, subscriber_xt));
-		ASSERT_EQ(BRICKS_SUCCESS, subscriber->subscribe(TEST_TOPIC, subscriber_topic_xt));
-		ASSERT_EQ(BRICKS_SUCCESS, subscriber->start());
-
-		this_thread::sleep_for(chrono::milliseconds(6*STABILIZATION_TIMEOUT));
-
-		publish(publisher, TEST_TOPIC, publish_xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
-
-		this_thread::sleep_for(chrono::milliseconds( STABILIZATION_TIMEOUT));
 
 		ASSERT_EQ(BRICKS_SUCCESS, subscriber->unsubscribe(TEST_TOPIC));
 
-		this_thread::sleep_for(chrono::milliseconds(5 * STABILIZATION_TIMEOUT));
-
-		publish(publisher, TEST_TOPIC, publish_xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
-
 		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 
+		publish(publisher, TEST_TOPIC, xt, all_snd_messages, NUM_OF_ITERATIONS, offset);
+
+		this_thread::sleep_for(chrono::milliseconds(STABILIZATION_TIMEOUT));
 	}
-	
+
 	ASSERT_EQ(all_rcv_messages.size(), NUM_OF_ITERATIONS);
 
 	for (auto i : all_rcv_messages)
 	{
 		delete i;
 	}
-	
 }
+

@@ -25,9 +25,11 @@ namespace bricks::plugins
 
 		void stop_zmq_poll_loop();
 
-		atomic<bool> initiated = false;
+		virtual void do_destroy() = 0;
 
-		atomic<bool> started = false;
+		bool initiated = false;
+
+		bool destroyed = false;
 
 		atomic<bool> shutdown = false;
 
@@ -35,7 +37,9 @@ namespace bricks::plugins
 
 		string name;
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
+
+		cb_queue_t* cb_queue = nullptr;
 
 	};
 }

@@ -9,9 +9,9 @@ namespace bricks
 	{
 	public:
 
-		virtual bricks_error_code_e enqueue(callback_t) = 0;
+		virtual bricks_error_code_e enqueue(callback_t,  int* event_id = nullptr) = 0;
 
-		virtual bricks_error_code_e try_dequeue(callback_t&, int milliseconds) = 0;
+		virtual bricks_error_code_e try_dequeue(callback_t&, int milliseconds, int* event_id = nullptr) = 0;
 
 	};
 

@@ -20,8 +20,7 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
-	ASSERT_NOT_STARTED;
+	ASSERT_PREINIT;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -33,22 +32,21 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 
 	if (options)
 	{
-		auto enabled = get_opt<bool>(options->get_property_value("/bricks/rdkafka/rdlog", "enabled"));
+		auto enabled = get_opt<bool>(options->get_property_value("/bricks/rdkafka/publisher/rdlog", "enabled"));
 		if (enabled)
 		{
 			rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::rd_log);
 		}
 	
-		this->name = get_opt<string>(options->get_property_value("/bricks/rdkafka/producer", "name"), "kafka-producer");
+		this->name = get_opt<string>(options->get_property_value("/bricks/rdkafka/publisher/", "name"), "kafka-producer");
 
 	}
 
-	if ((err = init_conf(rd_conf_h, options, "bricks/rdkafka/producer/configuration")) != BRICKS_SUCCESS)
+	if ((err = init_conf(rd_conf_h, options, "/bricks/rdkafka/publisher/methods/init/configuration")) != BRICKS_SUCCESS)
 	{
 		destroy();
 		return err;
 	}
-
 	
 	// Create producer instance
 	rd_producer_h = rd_kafka_new(RD_KAFKA_PRODUCER, rd_conf_h, NULL, 0);
@@ -58,37 +56,25 @@ kafka_publisher_t::init(cb_queue_t* queue, const xtree_t* options)
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 
+	if ((err = start_rd_poll_loop()) != BRICKS_SUCCESS)
+	{
+		log1(BRICKS_ALARM, "%s %%%%%%% Error starting kafka thread.", this->name.c_str());
+		destroy();
+		return BRICKS_3RD_PARTY_ERROR;
+	}
+
 	initiated = true;
 
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e 
-kafka_publisher_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	
-	bricks_error_code_e err = BRICKS_SUCCESS;
-
-	if ((err = start_rd_poll_loop()) == BRICKS_SUCCESS)
-	{
-		started = true;
-	}
-
-	return err;
-}
 
 bricks_error_code_e
 kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
-	ASSERT_STARTED;
+	ASSERT_READY;
 	
 	auto it = rd_topics.find(topic);
 	if (it == rd_topics.end())
@@ -102,7 +88,7 @@ kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, co
 
 	if (options)
 	{
-		auto key_opt = options->get_node_value("/bricks/rdkafka/producer/key");
+		auto key_opt = options->get_node_value("/bricks/rdkafka/publisher/methods/publish/key");
 		if (key_opt.has_value())
 		{
 			key = (void*) & (*key_opt.value())[0];
@@ -134,8 +120,21 @@ kafka_publisher_t::publish(const string& topic, const char* buf, size_t size, co
 }
 
 void
+kafka_publisher_t::do_destroy()
+{
+	SYNCHRONIZED(mtx);
+
+	destroy();
+
+	if (meta_cb)
+		this->cb_queue->enqueue(std::bind(meta_cb, OBJECT_DESTROYED, nullptr));
+}
+
+void
 kafka_publisher_t::destroy()
 {
+	destroyed = true;
+
 	stop_rd_poll_loop();
 
 	for (auto p : rd_topics)
@@ -150,12 +149,10 @@ kafka_publisher_t::destroy()
 }
 
 bricks_error_code_e
-kafka_publisher_t::add_topic(const string& topic, const xtree_t* options)
+kafka_publisher_t::describe_topic(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -171,7 +168,7 @@ kafka_publisher_t::add_topic(const string& topic, const xtree_t* options)
 	if (options)
 	{
 		topic_conf = rd_kafka_topic_conf_new();
-		if ((err = init_topic_conf(topic_conf, options, "/bricks/rdkafka/producer/topic/configuration")) != BRICKS_SUCCESS)
+		if ((err = init_topic_conf(topic_conf, options, "/bricks/rdkafka/publisher/methods/describe_topic/configuration")) != BRICKS_SUCCESS)
 		{
 			return err;
 		}

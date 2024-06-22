@@ -18,17 +18,17 @@ namespace bricks::plugins
 
 		virtual bricks_error_code_e subscribe(const string& topic, const xtree_t* options) override;
 
-		virtual bricks_error_code_e start() override;
-
 		virtual ~zeromq_subscriber_t();
 
 		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual bricks_error_code_e unsubscribe(const std::string&, const xtree_t* options) override;
 
-		virtual bricks_error_code_e unsubscribe(const xtree_t* options) override;
-
 		virtual void release() override { delete this; };
+
+		virtual void set_meta_cb(meta_cb_t meta_cb) override;
+
+		virtual void do_destroy() override;
 
 	protected:
 
@@ -44,11 +44,11 @@ namespace bricks::plugins
 
 		void* subscriber = nullptr;
 
-		cb_queue_t* cb_queue = nullptr;
-
 		zmq_pollitem_t items[1] = { 0 };
 
 		string url;
+
+		meta_cb_t meta_cb;
 
 	};
 }

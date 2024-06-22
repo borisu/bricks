@@ -21,6 +21,8 @@ namespace bricks::plugins{
 
 		virtual void rd_poll_loop();
 
+		virtual void do_destroy() = 0;
+
 		virtual bricks_error_code_e rd_poll(int milliseconds, bool last_call) = 0;
 
 		virtual bricks_error_code_e start_rd_poll_loop();
@@ -29,9 +31,9 @@ namespace bricks::plugins{
 
 		static void rd_log(const rd_kafka_t* rk, int level, const char* fac, const char* buf);
 
-		atomic<bool> initiated = false;
+		bool initiated = false;
 
-		atomic<bool> started = false;
+		bool destroyed = false;
 
 		atomic<bool> shutdown = false;
 		
@@ -41,7 +43,9 @@ namespace bricks::plugins{
 
 		string name;
 
-		std::recursive_mutex mtx;
+		std::mutex mtx;
+
+		meta_cb_t meta_cb;
 
 	};
 }

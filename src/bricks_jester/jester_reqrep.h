@@ -22,7 +22,9 @@ namespace bricks::plugins {
 
 		virtual void release()  override { delete this; };
 
-		std::recursive_mutex mtx;
+		virtual void set_meta_cb(meta_cb_t) {};
+
+		std::mutex mtx;
 
 	protected:
 
@@ -36,19 +38,17 @@ namespace bricks::plugins {
 
 		jester_server_t(jester_server_ctx_t* ctx);
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* ) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, request_cb_t request_cb, const xtree_t* ) override;
 
-		virtual bricks_error_code_e register_request_cb(request_cb_t request_cb, const xtree_t* options) override;
-
-		virtual bricks_error_code_e start() override;
-
-		virtual bricks_error_code_e issue_request(response_proxy_cb_t proxy, const char* data, size_t size) ;
+		virtual bricks_error_code_e accept_request(response_proxy_cb_t proxy, const char* data, size_t size) ;
 
 		virtual bricks_error_code_e response_proxy(response_proxy_cb_t proxy, bricks_error_code_e, const char*, size_t, xtree_t*);
 
 		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual void release()  override { delete this; };
+
+		virtual void set_meta_cb(meta_cb_t) override {};
 
 	protected:
 
@@ -60,7 +60,7 @@ namespace bricks::plugins {
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 		
 	};
 
@@ -74,13 +74,13 @@ namespace bricks::plugins {
 
 		virtual bricks_error_code_e issue_request(const char* , size_t , response_cb_t, const xtree_t* options ) override;
 
-		virtual bricks_error_code_e start() override;
-
 		virtual bricks_error_code_e client_response_proxy(response_cb_t response_cb, bricks_error_code_e, const char*, size_t, xtree_t*);
 
 		virtual bool check_capability(plugin_capabilities_e) override;
 
 		virtual void release()  override { delete this; };
+
+		virtual void set_meta_cb(meta_cb_t) override {};
 
 	protected:
 
@@ -92,7 +92,7 @@ namespace bricks::plugins {
 
 		bool initiated = false;
 
-		bool started = false;
+		bool destroyed = false;
 
 	};
 }

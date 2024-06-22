@@ -12,30 +12,37 @@ server_plugin_t* bricks::create_pubsub_server(
 	publisher_plugin_t* publisher,
 	subscriber_plugin_t* subscriber,
 	const char* request_topic_prefix,
-	const char* reponse_topic_prefix)
+	const char* response_topic_prefix,
+	const char* error_topic_prefix)
 {
-	return new pubsusb_server_t(publisher, subscriber, request_topic_prefix, reponse_topic_prefix);
+    if (!subscriber->check_capability(HIERARCHICAL_SUBSCRIBE))
+		return nullptr;
+
+	return new pubsusb_server_t(publisher, subscriber, request_topic_prefix, response_topic_prefix, error_topic_prefix);
 }
 
 pubsusb_server_t::pubsusb_server_t(
 	publisher_plugin_t* publisher,
 	subscriber_plugin_t* subscriber,
 	const char* request_topic_prefix,
-	const char* reponse_topic_prefix) :
+	const char* response_topic_prefix,
+	const char* error_topic_prefix) :
 	publisher(publisher),
 	subscriber(subscriber),
 	request_topic_prefix(request_topic_prefix),
-	response_topic_prefix(response_topic_prefix)
+	response_topic_prefix(response_topic_prefix),
+	error_topic_prefix(error_topic_prefix)
 {
 
 }
 
 bricks_error_code_e
-pubsusb_server_t::init(cb_queue_t* queue,  const xtree_t* options)
+pubsusb_server_t::init(cb_queue_t* queue, request_cb_t request, const xtree_t* options)
 {
-	ASSERT_NOT_INITIATED;
-	ASSERT_NOT_STARTED;
+	SYNCHRONIZED(mtx);
 
+	ASSERT_PREINIT;
+	
 	this->queue = queue;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
@@ -55,39 +62,9 @@ pubsusb_server_t::init(cb_queue_t* queue,  const xtree_t* options)
 		return err;
 	}
 
+	this->request_cb = request;
+
 	initiated = true;
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e
-pubsusb_server_t::register_request_cb(request_cb_t request_cb, const xtree_t* options)
-{
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-	
-	this->request_cb = request_cb;
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e
-pubsusb_server_t::start()
-{
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
-
-	bricks_error_code_e err = BRICKS_SUCCESS;
-
-	if ((err = subscriber->start()) != BRICKS_SUCCESS)
-		return err;
-
-	if ((err = publisher->start()) != BRICKS_SUCCESS)
-	{
-		return err;
-	}
-
-	started = true;
 
 	return BRICKS_SUCCESS;
 }
@@ -96,21 +73,24 @@ pubsusb_server_t::start()
 void
 pubsusb_server_t::topic_cb(const string& topic, buffer_t* buf, xtree_t* xt)
 {
+	SYNCHRONIZED(mtx);
+
 	size_t delimiter = topic.find_last_of("/");
 	if (delimiter == string::npos || delimiter == (topic.length()-1))
 		return;
 
-	string response_postfix = response_topic_prefix + "/" + topic.substr(delimiter);
+	string response_postfix = response_topic_prefix + topic.substr(delimiter);
 	
-	response_proxy_cb_t p = std::bind(&pubsusb_server_t::response_proxy_cb, this, response_postfix, _1, _2, _3, _4);
+	response_proxy_cb_t response_proxy_cb = std::bind(&pubsusb_server_t::response_proxy_cb, this, response_postfix, _1, _2, _3, _4);
 
 	callback_t cb = std::bind(
 		request_cb,
-		p,
+		response_proxy_cb,
 		buf,
 		xt);
 
-	queue->enqueue(cb);
+	int event_id;
+	queue->enqueue(cb, &event_id);
 
 	return;
 
@@ -119,13 +99,20 @@ pubsusb_server_t::topic_cb(const string& topic, buffer_t* buf, xtree_t* xt)
 void 
 pubsusb_server_t::response_proxy_cb(const string& topic, bricks_error_code_e err, const char* data, size_t size, xtree_t* options)
 {
+	SYNCHRONIZED(mtx);
+
 	if (err == BRICKS_SUCCESS)
 		publisher->publish(topic,data, size, options);
+
+	if (options)
+		options->release();
 	
 }
 
 bool 
 pubsusb_server_t::check_capability(plugin_capabilities_e)
 {
+	SYNCHRONIZED(mtx);
+
 	return false;
 }

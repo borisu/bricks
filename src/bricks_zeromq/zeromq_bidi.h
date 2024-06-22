@@ -15,13 +15,9 @@ namespace bricks::plugins
 
 		zeromq_bidi_t();
 
-		virtual bricks_error_code_e init(cb_queue_t* queue, const xtree_t* options ) override;
-
-		virtual bricks_error_code_e register_event_cb( event_cb_t event_cb, const xtree_t* options) override;
+		virtual bricks_error_code_e init(cb_queue_t* queue, event_cb_t event_cb, const xtree_t* options ) override;
 
 		virtual bricks_error_code_e send_event(const char*, size_t, const xtree_t* options ) override;
-
-		virtual bricks_error_code_e	start() override;
 
 		virtual void release() override { delete this; };
 
@@ -29,13 +25,15 @@ namespace bricks::plugins
 		
 		virtual ~zeromq_bidi_t();
 
+		virtual void set_meta_cb(meta_cb_t) override ;
+
 	protected:
 
 		void destroy();
 
-		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) override;
+		virtual void do_destroy() override;
 
-		cb_queue_t* cb_queue = nullptr;
+		virtual bricks_error_code_e do_zmq_poll(int milliseconds, bool last_call) override;
 
 		zmq_pollitem_t items[1] = { 0 };
 
@@ -48,6 +46,8 @@ namespace bricks::plugins
 		event_cb_t event_cb = nullptr;
 
 		string url;
+
+		meta_cb_t meta_cb;
 
 	};
 }

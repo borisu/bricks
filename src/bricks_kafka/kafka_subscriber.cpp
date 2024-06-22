@@ -23,8 +23,7 @@ kafka_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* op
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_NOT_INITIATED;
-	ASSERT_NOT_STARTED;
+	ASSERT_PREINIT;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -38,16 +37,16 @@ kafka_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* op
 
 	if (options)
 	{
-		auto enabled = get_opt<bool>(options->get_property_value("/bricks/rdkafka/rdlog", "enabled"));
+		auto enabled = get_opt<bool>(options->get_property_value("/bricks/rdkafka/subscriber/rdlog", "enabled"));
 		if (enabled)
 		{
 			rd_kafka_conf_set_log_cb(rd_conf_h, kafka_service_t::rd_log);
 		}
 
-		this->name = get_opt<string>(options->get_property_value("/bricks/rdkafka/consumer", "name"), "kafka-consumer");
+		this->name = get_opt<string>(options->get_property_value("/bricks/rdkafka/subscriber", "name"), "kafka-consumer");
 	}
 
-	if ((err = init_conf(rd_conf_h, options, "/bricks/rdkafka/consumer/configuration")) != BRICKS_SUCCESS)
+	if ((err = init_conf(rd_conf_h, options, "/bricks/rdkafka/subscriber/methods/init/configuration")) != BRICKS_SUCCESS)
 	{
 		destroy();
 		return err;
@@ -65,36 +64,24 @@ kafka_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* op
 	}
 
 	rd_kafka_poll_set_consumer(rd_kafka_h);
-	
-	initiated = true;
-
-	return BRICKS_SUCCESS;
-}
-
-bricks_error_code_e 
-kafka_subscriber_t::start()
-{
-	SYNCHRONIZED(mtx);
-
-	ASSERT_INITIATED;
-	ASSERT_NOT_STARTED;
 
 	if (start_rd_poll_loop() != BRICKS_SUCCESS)
 	{
 		destroy();
 		return BRICKS_FAILURE_GENERIC;
 	}
-
-	started = true;
+	
+	initiated = true;
 
 	return BRICKS_SUCCESS;
 }
 
+
+
 void
 kafka_subscriber_t::destroy()
 {
-	initiated = false;
-	started = false;
+	destroyed = true;
 
 	stop_rd_poll_loop();
 
@@ -121,7 +108,7 @@ bricks_error_code_e
 kafka_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 {
 	SYNCHRONIZED(mtx);
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	bricks_error_code_e err = BRICKS_SUCCESS;
 
@@ -129,7 +116,7 @@ kafka_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 
 	if (options)
 	{
-		partition = get_opt<int>(options->get_property_value("/bricks/rdkafka/consumer/topic/partition", "value").value(),0);
+		partition = get_opt<int>(options->get_property_value("/bricks/rdkafka/subscriber/methods/subscribe/partition", "value").value(),0);
 	}
 
 	rd_kafka_topic_partition_list_add(
@@ -139,7 +126,7 @@ kafka_subscriber_t::subscribe(const string& topic, const xtree_t* options)
 
 	auto rd_err = rd_kafka_subscribe(rd_kafka_h, rd_part_list_h);
 
-	if (rd_err) {
+	if (rd_err != RD_KAFKA_RESP_ERR_NO_ERROR) {
 		log1(BRICKS_ALARM, "%s %%%%%% Error subscribing to topics(%d): %s.\n", this->name.c_str(), rd_err, rd_kafka_err2str(rd_err));
 		return BRICKS_3RD_PARTY_ERROR;
 	}
@@ -154,7 +141,7 @@ bricks_error_code_e
 kafka_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 {
 	SYNCHRONIZED(mtx);
-	ASSERT_INITIATED;
+	ASSERT_READY;
 
 	
 	bool found = false;
@@ -163,7 +150,7 @@ kafka_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 		
 		found = false;
 		for (int i = 0; i < rd_part_list_h->cnt; i++) {
-			if (topic == rd_part_list_h->elems[i].topic)
+			if (topic == rd_part_list_h->elems[i].topic || topic == "")
 			{
 				rd_kafka_topic_partition_list_del_by_idx(rd_part_list_h, i);
 				found = true;
@@ -186,28 +173,13 @@ kafka_subscriber_t::unsubscribe(const string& topic, const xtree_t* options )
 	return BRICKS_SUCCESS;
 }
 
-bricks_error_code_e 
-kafka_subscriber_t::unsubscribe(const xtree_t* options)
+void 
+kafka_subscriber_t::set_meta_cb(meta_cb_t meta_cb)
 {
 	SYNCHRONIZED(mtx);
 
-	ASSERT_INITIATED;
-
-	while (rd_part_list_h->cnt > 0)
-	{
-		rd_kafka_topic_partition_list_del_by_idx(rd_part_list_h, 0);
-	}
-
-	auto rd_err = rd_kafka_unsubscribe(rd_kafka_h);
-	if (rd_err) {
-		log1(BRICKS_ALARM, "%s %%%%%% Error unsubscribing to topics(%d): %s.\n", this->name.c_str(), rd_err, rd_kafka_err2str(rd_err));
-		return BRICKS_3RD_PARTY_ERROR;
-	}
-
-	return BRICKS_SUCCESS;
-
+	this->meta_cb = meta_cb;
 }
-
 
 bricks_error_code_e
 kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
@@ -227,7 +199,6 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 	if (msg->err)
 	{
 		log1(BRICKS_ALARM, "%s %%%%%% Error consuming rdkafka messages(%d): %s.",  this->name.c_str(), msg->err, rd_kafka_err2str(msg->err));
-		started = false;
 		return BRICKS_3RD_PARTY_ERROR;
 	}
 	else
@@ -240,6 +211,17 @@ kafka_subscriber_t::rd_poll(int milliseconds, bool last_call)
 	rd_kafka_message_destroy(msg);
 
 	return err;
+}
+
+void 
+kafka_subscriber_t::do_destroy()
+{
+	SYNCHRONIZED(mtx);
+
+	destroy();
+
+	if (meta_cb)
+		this->cb_queue->enqueue(std::bind(meta_cb, OBJECT_DESTROYED, nullptr));
 }
 
 
