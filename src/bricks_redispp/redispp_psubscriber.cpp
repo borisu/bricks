@@ -38,7 +38,7 @@ redispp_psubscriber_t::destroy()
 	if (subscriber)
 	{
 		try {
-			auto f = subscriber->unsubscribe();
+			auto f = subscriber->punsubscribe();
 			f.wait();
 		}
 		catch (std::exception&) {};
@@ -50,6 +50,7 @@ redispp_psubscriber_t::destroy()
 	if (redis)
 	{
 		delete redis;
+		this_thread::sleep_for(chrono::seconds(5));
 		redis = nullptr;
 	}
 }

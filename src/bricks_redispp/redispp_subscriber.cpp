@@ -50,6 +50,7 @@ redispp_subscriber_t::destroy()
 	if (redis)
 	{
 		delete redis;
+		this_thread::sleep_for(chrono::seconds(5));
 		redis = nullptr;
 	}
 }
