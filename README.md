@@ -67,7 +67,7 @@ One intresting directions that abstraction is taking us is implementation of ser
 </table>
 
 ## Example of Redis Sub Plugin 
-```
+```cpp
 /* create configuration for plugin */
 auto xt = create_xtree_from_xml(
 	"<bricks>"
@@ -124,7 +124,7 @@ All specific communication engine peculiarities are handled by xtree data struct
 
 The flexibility of the engines introduces the challenge of consistent thread model. In such way, that replacing Kafka engine with ZeromMQ engine will not change the threading architecture of your program. The solution is to communciate with the engine via abstract queue of simple callbacks. To receive callback as result of topic subscription for example, one has to supply queue object when initiating the plugin and then "pump" the queue from the chosen thread. The callbacks in this case are promised to be called from the the same thread that is pumping the queue. Classes poller and selector are  provided to automate the task of waiting on queue and invoking the callbacks. :-
 
-```
+```cpp
 void
 poller_impl_t::run()
 {
