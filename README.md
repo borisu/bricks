@@ -26,7 +26,9 @@ auto xt = create_xtree_from_xml(
 	" </redispp>"
 	"</bricks>"
 );
+auto subscriber = create_redispp_subscriber(); 
 
+/* !!! from here the code is generic and should not change for any other plugin !!! */
 /* create callback queue selector and start poller thread */
 auto cb_q = create_callback_queue();
 auto selector = create_selector();
@@ -41,7 +43,7 @@ auto on_topic_cb = [&](const string& topic, buffer_t* buf, xtree_t* xt)
 		/* do something on topic update */
 	};
 
-auto subscriber = create_redispp_subscriber();
+
 subscriber->init(selector->queue(), on_topic_cb, xt);
 auto rc = subscriber->subscribe("some.interesting.topic", xt);
 
