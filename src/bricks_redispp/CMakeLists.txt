@@ -35,14 +35,15 @@ add_library(bricks_redispp SHARED ${BRICKS_REDISPP_API} ${BRICKS_REDISPP_SRC} ${
 #
 # vcpkg
 #
-find_package(redis++ CONFIG REQUIRED)
 if(WIN32)
+find_package(redis++ CONFIG REQUIRED)
 target_link_libraries(bricks_redispp PRIVATE  redis++::redis++ bricks_core bricks_logger)
 endif()
 if(UNIX)
-target_link_libraries(bricks_redispp PRIVATE  redis++::redis++_static bricks_core bricks_logger)
-endif()
-#
+find_package(redis++ CONFIG REQUIRED)
+find_package(libuv CONFIG REQUIRED)
+target_link_libraries(bricks_redispp PRIVATE  redis++::redis++_static $<IF:$<TARGET_EXISTS:libuv::uv_a>,libuv::uv_a,libuv::uv> bricks_core bricks_logger)
+endif()#
 # Configuration
 #
 set_property(TARGET bricks_redispp PROPERTY CXX_STANDARD 17)
