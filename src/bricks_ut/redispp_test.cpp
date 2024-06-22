@@ -110,7 +110,7 @@ TEST(redispp_case, meta_request_response_test) {
 
 		selector->init(cb_q.get());
 
-		brick_uptr<timer_t> timer(create_timer());
+		brick_uptr<bricks::timer_t> timer(create_timer());
 		timer->init(cb_q.get());
 		
 

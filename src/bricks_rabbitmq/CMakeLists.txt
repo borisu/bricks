@@ -41,7 +41,7 @@ find_package(rabbitmq-c CONFIG REQUIRED)
 if(WIN32)
 target_link_libraries(bricks_rabbitmq PRIVATE rabbitmq::rabbitmq bricks_core bricks_logger)
 endif()
-if (LINUX)
+if(LINUX)
 target_link_libraries(bricks_rabbitmq PRIVATE rabbitmq::rabbitmq-static bricks_core bricks_logger)
 endif()
 
