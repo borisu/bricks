@@ -19,8 +19,10 @@ Current supported communication paradigms are :-
 - Publish/Subscribe (aka producer/consumer).
 - P2P (a.k.a Bidi, a.k.a Pair) 
 - Request/Response 
-Following table summarizes currently available plugins and their capabilities :-
+
 One intresting directions that abstraction is taking us is implementation of service on top of other services for example we can create request/response communication pattern on top of abstract publish/subscribe. That what is called meta plugin. Currently only one such plugin implemented pubsub_client and pubsub_server, both are tested with redis. 
+
+Following table summarizes currently available plugins and their capabilities :-
 <table>
   <tr>
     <th>Plugin</th>
