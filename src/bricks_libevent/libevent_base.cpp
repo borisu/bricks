@@ -57,7 +57,7 @@ bricks::plugins::libevent_init(bool debug)
 
 #ifdef EVTHREAD_USE_WINDOWS_THREADS_IMPLEMENTED
 	evthread_use_windows_threads();
-#elif ifdef EVTHREAD_USE_PTHREADS_IMPLEMENTED
+#elif EVTHREAD_USE_PTHREADS_IMPLEMENTED
 	int evthread_use_pthreads(void);
 #else
 	#error no multithreading library defined
