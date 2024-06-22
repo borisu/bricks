@@ -161,6 +161,7 @@ export VCPKG_ROOT=<vcpkg root>
 git clone https://github.com/borisu/bricks.git
 cd bricks
 git submodule update --init --recursive
+```
 
 4. Build bricks
 ```
