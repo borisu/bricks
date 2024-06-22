@@ -3,7 +3,7 @@
 <img alt="bricks logo" src="https://github.com/borisu/bricks/assets/7937935/63ad0a60-5d7b-40ff-89bf-748ba04bd2c7" width="400px"/>
 </div>
 
-# bricks
+# BRICKS
 
 Set of C++ abstract interfaces and pluggable implementations for microservices network services patterns.
 
