@@ -5,7 +5,7 @@ using namespace std;
 
 namespace bricks
 {
-	class timer_impl_t : public qtimer_t
+	class timer_impl_t : public timer_t
 	{
 	public:
 	

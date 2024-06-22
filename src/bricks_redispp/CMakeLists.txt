@@ -39,7 +39,7 @@ find_package(redis++ CONFIG REQUIRED)
 if(WIN32)
 target_link_libraries(bricks_redispp PRIVATE  redis++::redis++ bricks_core bricks_logger)
 endif()
-if(LINUX)
+if(UNIX)
 target_link_libraries(bricks_redispp PRIVATE  redis++::redis++_static bricks_core bricks_logger)
 endif()
 #
