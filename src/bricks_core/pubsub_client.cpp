@@ -18,9 +18,7 @@ client_plugin_t* bricks::create_pubsub_client(
 	return new pubsub_client_t(publisher, subscriber, timer, request_topic_prefix, response_topic_prefix, error_topic_prefix);
 }
 
-std::random_device rd; // Obtain a random number from hardware
-std::mt19937_64 gen(rd()); // Seed the generator (Mersenne Twister for 64-bit numbers)
-std::uniform_int_distribution<uint64_t> distrib(1, UINT64_MAX); // Define the rang
+
 
 pubsub_client_t::pubsub_client_t(
 	publisher_plugin_t* publisher,
@@ -80,11 +78,8 @@ pubsub_client_t::issue_request(const char* buf, size_t size, response_cb_t clien
 
 	ASSERT_READY;
 
-	int64_t req_handle = distrib(gen);
-
 	char hex_buffer[64];
-
-	snprintf(hex_buffer, 64, "0x%" PRIx64, req_handle);
+	generate_random_64hex_str(hex_buffer);
 
 	string request_topic	= request_topic_prefix + "/"  + hex_buffer;
 	string response_topic	= response_topic_prefix + "/" + hex_buffer;

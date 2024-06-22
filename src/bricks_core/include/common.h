@@ -63,6 +63,10 @@ namespace bricks
 	typedef std::promise<bricks_error_code_e> bricks_promise_t;
 
 	typedef std::future<bricks_error_code_e> bricks_future_t;
+
+	typedef char hex64_str_t[64];
+
+	void generate_random_64hex_str(hex64_str_t s);
 	
 }
 

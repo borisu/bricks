@@ -38,7 +38,7 @@ void console_logger(bricks_debug_level_e log_level, const char* l)
 
 logger_t ext_logger = nullptr;
 
-std::atomic<bricks_debug_level_e> curr_log_level = BRICKS_TRACE;
+std::atomic<bricks_debug_level_e> curr_log_level = BRICKS_ALARM;
 
 void
 bricks::log1(bricks_debug_level_e log_level, const char* format, ...)
