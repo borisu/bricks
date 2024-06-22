@@ -19,7 +19,7 @@ auto xt = create_xtree_from_xml(
 	"   <subscriber name=\"redispp_server_subscriber\" >"
 	"     <methods>"
 	"     <init>"
-	"		<connection url=\"tcp://127.0.0.1:6379\" />"
+	"	<connection url=\"tcp://127.0.0.1:6379\" />"
 	"     </init>"
 	"    </methods>"
 	"   </subscriber>"
