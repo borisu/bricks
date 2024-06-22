@@ -72,14 +72,15 @@ request_response_test_timeout(server_plugin_t* server, client_plugin_t* client, 
 			{
 				if (buf) buf->release();
 				if (xt) xt->release();
-				rsp_count++;
+				if (err == BRICKS_SUCCESS)
+					rsp_count++;
 			},
 			xt));
 	}
 
 	this_thread::sleep_for(chrono::milliseconds(NUM_OF_ITERATIONS * BRICKS_DEFAULT_CLIENT_TIMEOUT));
 
-	ASSERT_EQ(rsp_count, NUM_OF_ITERATIONS);
+	ASSERT_EQ(rsp_count, 0);
 	ASSERT_EQ(req_count, NUM_OF_ITERATIONS);
 
 }

@@ -66,7 +66,7 @@ namespace bricks
 
 	typedef char hex64_str_t[64];
 
-	void generate_random_64hex_str(hex64_str_t s);
+	void BRICKS_API generate_random_64hex_str(hex64_str_t s);
 	
 }
 

@@ -62,11 +62,10 @@ TEST(kafka_case, publish_subscribe_test) {
 
 		// we need to randomize kafka groups to exclude interference between tests as 
 		// in group the offset of the group is persistent
-		auto node = options_xt->add_node("/bricks/rdkafka/subscribers/methods/init/property",true);
-		options_xt->set_property_value(node.value(),"name", "group.id");
-		options_xt->set_property_value(node.value(),"value", "bricks.test.group.888");
-		
-
+		auto node = options_xt->add_node("/bricks/rdkafka/subscriber/methods/init/configuration/property", true);
+		options_xt->set_property_value(node.value(), "name", string("group.id"));
+		options_xt->set_property_value(node.value(), "value", string("bricks.test.group.") + hex_buffer);
+	
 		brick_uptr<cb_queue_t>  cb_q(create_callback_queue());
 
 		brick_uptr<selector_t>  selector(create_selector());
