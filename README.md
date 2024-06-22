@@ -7,11 +7,11 @@
 
 Set of C++ abstract interfaces and pluggable implementations for microservices network services patterns.
 
-❗The project is in early stages under active development. Help if you you think it is valuable.❗
+❗The project is in early stages under active development. Help, if you think it is valuable.❗
 
 ## About 
 
-The goal of the bricks project is to abstract the microservices communication patterns. By using abstract interface which hides the actual provider, developer is enabled to replace the communication engine at any time, use several engines in parallel in a uniform manner, avoid vendor lock-in, and mostly important replace networking services by mock objects which improves drastically the testability of your services.
+The goal of the bricks project is to suggest API framework and POC implementations for the microservices communication patterns. By using abstract interface which hides the actual provider, developer is enabled to replace the communication engine at any time, use several engines in parallel in a uniform manner, avoid vendor lock-in, and mostly important replace networking services by mock objects, which improves drastically the testability of your C++ network services applications.
 
 Current supported communication paradigms are :-
 - Publish/Subscribe (aka producer/consumer).
@@ -73,10 +73,10 @@ Interface of the plugins was designed around following principles :-
   
 ### Memory Handling
 
-All brick object are created with the help of factory methods and released via brick_t::release interface. This is to ensure, that plugin implemntors can choose the allocation and deallocation mechanism of their own, similar to MS COM interfaces design.
+All brick object are created with the help of factory methods and released via brick_t::release interface. This is to ensure, that plugin implementors can choose the memory handling mechanisms of their own, similar to MS COM interfaces design.
 
 ### XTree 
-All specific communication engine peculiarities are handled by xtree data structures which is passed as optional object to most of the interface methods. Xtree is conceptually an XML or alternatively hierarhcical FS  in OOP, e.g. tree like data structures where nodes can be accessed by string path, have set of properties of predefined list of types and can hold a single char buffer as a value (text in XML). XTree is not bound to XML in a way other than concept.
+All specific communication engine peculiarities are handled by xtree data structures which is passed as optional object to most of the interface methods. Xtree is conceptually an XML or alternatively hierarchical FS in OOP, e.g. tree like data structures where nodes can be accessed by string path, have set of properties of predefined list of types and can hold a single large char buffer as a value. XTree is not bound to XML in a way other than concept.
 
 An example of xtree created directly from XML for ZeroMQ plugin intialization :-
 
