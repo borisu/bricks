@@ -138,7 +138,7 @@ All public plugin methods are thread safe
 
 ### Plugins 
 
-Best way to see plugin usage is looking at implementation and their usgae in bricks_ut project
+Best way to learn about plugin usage is looking at their usage in bricks_ut project.
 
 ## How To Build
 
