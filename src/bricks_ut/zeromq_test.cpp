@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include "zeromq_plugin.h"
 #include "generic_tests.h"
+#include "logger.h"
 
 using namespace bricks::plugins;
 
