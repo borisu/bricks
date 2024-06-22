@@ -9,6 +9,46 @@ Set of C++ abstract interfaces and pluggable implementations for microservices n
 
 ❗The project is in early stages under active development. Help, if you think it is valuable.❗
 
+## Example of Redis Sub Plugin 
+
+```
+/* create configuration for plugin */
+auto xt = create_xtree_from_xml(
+	"<bricks>"
+	" <redispp>"
+	"   <subscriber name=\"redispp_server_subscriber\" >"
+	"     <methods>"
+	"     <init>"
+	"		<connection url=\"tcp://127.0.0.1:6379\" />"
+	"     </init>"
+	"    </methods>"
+	"   </subscriber>"
+	" </redispp>"
+	"</bricks>"
+);
+
+/* create callback queue selector and start poller thread */
+auto cb_q = create_callback_queue();
+auto selector = create_selector();
+selector->init(cb_q);
+auto poller = create_poller(10000, selector);
+
+/* create callback for handling topic */
+auto on_topic_cb = [&](const string& topic, buffer_t* buf, xtree_t* xt)
+	{
+
+		printf("Received msg on topic %s\n", topic.c_str());
+		/* do something on topic update */
+	};
+
+auto subscriber = create_redispp_subscriber();
+subscriber->init(selector->queue(), on_topic_cb, xt);
+auto rc = subscriber->subscribe("some.interesting.topic", xt);
+
+/* proceed to application logic and don't forget to release memory */
+```
+
+
 ## About 
 
 The goal of the bricks project is to suggest API framework and POC implementations for the microservices communication patterns. By using abstract interface which hides the actual provider, developer is enabled to replace the communication engine at any time, use several engines in parallel in a uniform manner, avoid vendor lock-in, and mostly important replace networking services by mock objects, which improves drastically the testability of your C++ network services applications.
@@ -18,7 +58,7 @@ Current supported communication paradigms are :-
 - P2P (a.k.a Bidi, a.k.a Pair) 
 - Request/Response 
 Following table summarizes currently available plugins and their capabilities :-
-
+One intresting directions that abstraction is taking us is implementation of service on top of other services for example we can create request/response communication pattern on top of abstract publish/subscribe. That what is called meta plugin. Currently only one such plugin implemented pubsub_client and pubsub_server, both are tested with redis. 
 <table>
   <tr>
     <th>Plugin</th>
@@ -78,27 +118,6 @@ All brick object are created with the help of factory methods and released via b
 ### XTree 
 All specific communication engine peculiarities are handled by xtree data structures which is passed as optional object to most of the interface methods. Xtree is conceptually an XML or alternatively hierarchical FS in OOP, e.g. tree like data structures where nodes can be accessed by string path, have set of properties of predefined list of types and can hold a single large char buffer as a value. XTree is not bound to XML in a way other than concept.
 
-An example of xtree created directly from XML for ZeroMQ plugin intialization :-
-
-```
- brick_uptr<xtree_t> xt1(
-     create_xtree_from_xml(
-         "<bricks>"
-         "  <zmq>"
-         "	<bidi name=\"zmq_p1\">"
-         "    <methods>"
-         "     <init>"
-         "      <socket url=\"tcp://127.0.0.1:7858\" is_server=\"true\">"
-         "	    <sockopt id=\"ZMQ_BACKLOG\" value=\"100\" />"
-         "	    <sockopt id=\"ZMQ_MAXMSGSIZE\" value=\"%L:-1\" />"
-         "      </socket>"
-         "     </init>"
-         "    </methods>"
-         "   </bidi>"
-         "  </zmq>"
-         "</bricks>"
-     ));
-```
 ### Threading Model And Safety
 
 The flexibility of the engines introduces the challenge of consistent thread model. In such way, that replacing Kafka engine with ZeromMQ engine will not change the threading architecture of your program. The solution is to communciate with the engine via abstract queue of simple callbacks. To receive callback as result of topic subscription for example, one has to supply queue object when initiating the plugin and then "pump" the queue from the chosen thread. The callbacks in this case are promised to be called from the the same thread that is pumping the queue. Classes poller and selector are  provided to automate the task of waiting on queue and invoking the callbacks. :-
