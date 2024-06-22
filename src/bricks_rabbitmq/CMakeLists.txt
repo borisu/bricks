@@ -38,7 +38,12 @@ add_library(bricks_rabbitmq SHARED ${BRICKS_RABBITMQ_API} ${BRICKS_RABBITMQ_SRC}
 # vcpkg
 #
 find_package(rabbitmq-c CONFIG REQUIRED)
+if(WIN32)
 target_link_libraries(bricks_rabbitmq PRIVATE rabbitmq::rabbitmq bricks_core bricks_logger)
+endif()
+if (LINUX)
+target_link_libraries(bricks_rabbitmq PRIVATE rabbitmq::rabbitmq-static bricks_core bricks_logger)
+endif()
 
 #
 # Configuration
