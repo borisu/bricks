@@ -9,46 +9,6 @@ Set of C++ abstract interfaces and pluggable implementations for microservices n
 
 ❗The project is in early stages under active development. Help, if you think it is valuable.❗
 
-## Example of Redis Sub Plugin 
-
-```
-/* create configuration for plugin */
-auto xt = create_xtree_from_xml(
-	"<bricks>"
-	" <redispp>"
-	"   <subscriber name=\"redispp_server_subscriber\" >"
-	"     <methods>"
-	"     <init>"
-	"	<connection url=\"tcp://127.0.0.1:6379\" />"
-	"     </init>"
-	"    </methods>"
-	"   </subscriber>"
-	" </redispp>"
-	"</bricks>"
-);
-auto subscriber = create_redispp_subscriber(); 
-
-/* !!! from here the code is generic and should not change for any other plugin !!! */
-/* create callback queue selector and start poller thread */
-auto cb_q = create_callback_queue();
-auto selector = create_selector();
-selector->init(cb_q);
-auto poller = create_poller(10000, selector);
-
-/* create callback for handling topic */
-auto on_topic_cb = [&](const string& topic, buffer_t* buf, xtree_t* xt)
-	{
-
-		printf("Received msg on topic %s\n", topic.c_str());
-		/* do something on topic update */
-	};
-
-
-subscriber->init(selector->queue(), on_topic_cb, xt);
-auto rc = subscriber->subscribe("some.interesting.topic", xt);
-
-/* proceed to application logic and don't forget to release memory */
-```
 
 
 ## About 
@@ -105,6 +65,46 @@ One intresting directions that abstraction is taking us is implementation of ser
     <td>V</td>
   </tr>
 </table>
+
+## Example of Redis Sub Plugin 
+```
+/* create configuration for plugin */
+auto xt = create_xtree_from_xml(
+	"<bricks>"
+	" <redispp>"
+	"   <subscriber name=\"redispp_server_subscriber\" >"
+	"     <methods>"
+	"     <init>"
+	"	<connection url=\"tcp://127.0.0.1:6379\" />"
+	"     </init>"
+	"    </methods>"
+	"   </subscriber>"
+	" </redispp>"
+	"</bricks>"
+);
+auto subscriber = create_redispp_subscriber(); 
+
+/* !!! from here the code is generic and should not change for any other plugin !!! */
+/* create callback queue selector and start poller thread */
+auto cb_q = create_callback_queue();
+auto selector = create_selector();
+selector->init(cb_q);
+auto poller = create_poller(10000, selector);
+
+/* create callback for handling topic */
+auto on_topic_cb = [&](const string& topic, buffer_t* buf, xtree_t* xt)
+	{
+
+		printf("Received msg on topic %s\n", topic.c_str());
+		/* do something on topic update */
+	};
+
+
+subscriber->init(selector->queue(), on_topic_cb, xt);
+auto rc = subscriber->subscribe("some.interesting.topic", xt);
+
+/* proceed to application logic and don't forget to release memory */
+```
 
 ## Plugin Interface Design 
 
