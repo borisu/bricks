@@ -123,7 +123,7 @@ pubsub_client_t::issue_request(const char* buf, size_t size, response_cb_t clien
 		subscriber->unsubscribe(error_topic);
 	}
 
-	return BRICKS_SUCCESS;
+	return err;
 }
 
 
@@ -158,7 +158,6 @@ pubsub_client_t::topic_cb(const string& topic, buffer_t *buf, xtree_t* xt)
 
 	subscriber->unsubscribe(iter->second.response_topic);
 	subscriber->unsubscribe(iter->second.error_topic);
-
 
 	queue->enqueue(std::bind(iter->second.request_cb, BRICKS_SUCCESS, buf, xt));
 

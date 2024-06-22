@@ -37,10 +37,14 @@ selector_impl_t::poll(int milliseconds)
 		return BRICKS_TIMEOUT;
 	}
 
-	printf("handling evid=%d\n", event_id);
-	cb();
-	printf("handled evid=%d\n", event_id);
-	
+	try
+	{
+		cb();
+	}
+	catch (std::exception &e)
+	{
+		printf("selector_impl_t::poll exception - %s\n", e.what());
+	};
 	
 	return BRICKS_SUCCESS;
 }

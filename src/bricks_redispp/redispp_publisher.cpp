@@ -29,8 +29,11 @@ redispp_publisher_t::~redispp_publisher_t()
 void
 redispp_publisher_t::destroy()
 {
-	destroyed = true;
+	if (destroyed)
+		return;
 
+	destroyed = true;
+	
 	if (redis)
 	{
 		delete redis;

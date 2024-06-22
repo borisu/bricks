@@ -62,7 +62,7 @@ pubsusb_server_t::init(cb_queue_t* queue, request_cb_t request, const xtree_t* o
 		return err;
 	}
 
-	this->request_cb = request_cb;
+	this->request_cb = request;
 
 	initiated = true;
 
@@ -81,15 +81,16 @@ pubsusb_server_t::topic_cb(const string& topic, buffer_t* buf, xtree_t* xt)
 
 	string response_postfix = response_topic_prefix + topic.substr(delimiter);
 	
-	response_proxy_cb_t p = std::bind(&pubsusb_server_t::response_proxy_cb, this, response_postfix, _1, _2, _3, _4);
+	response_proxy_cb_t response_proxy_cb = std::bind(&pubsusb_server_t::response_proxy_cb, this, response_postfix, _1, _2, _3, _4);
 
 	callback_t cb = std::bind(
 		request_cb,
-		p,
+		response_proxy_cb,
 		buf,
 		xt);
 
-	queue->enqueue(cb);
+	int event_id;
+	queue->enqueue(cb, &event_id);
 
 	return;
 

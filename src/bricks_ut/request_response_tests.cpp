@@ -15,6 +15,8 @@ request_response_test_2(server_plugin_t* server, client_plugin_t* client, select
 	int req_count = 0;
 	auto cb = [&](response_proxy_cb_t proxy, buffer_t* buf, xtree_t* request_xt)
 		{
+			printf("pubsusb_server_t::REQUEST HANDLER\n");
+
 			buf->release();
 
 			proxy(BRICKS_SUCCESS, "pong", 5, request_xt);

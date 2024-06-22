@@ -37,6 +37,8 @@ namespace bricks::plugins {
 
 		virtual void on_meta(Subscriber::MsgType type, OptionalString channel, long long num);
 
+		virtual void on_error(std::exception_ptr e);
+
 		cb_queue_t* queue = nullptr;
 
 		string name;

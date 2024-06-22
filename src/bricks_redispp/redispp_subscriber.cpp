@@ -30,11 +30,20 @@ redispp_subscriber_t::~redispp_subscriber_t()
 void
 redispp_subscriber_t::destroy()
 {
+	if (destroyed)
+		return;
+
 	destroyed = true;
 
 	if (subscriber)
 	{
+		try {
+			auto f = subscriber->unsubscribe();
+			f.wait();
+		}
+		catch (std::exception&) {};
 		delete subscriber;
+		this_thread::sleep_for(chrono::seconds(5));
 		subscriber = nullptr;
 	}
 
@@ -69,10 +78,11 @@ redispp_subscriber_t::init(cb_queue_t* queue, topic_cb_t msg_cb, const xtree_t* 
 
 		subscriber = new AsyncSubscriber(redis->subscriber());
 
-
 		subscriber->on_message(std::bind(&redispp_subscriber_t::on_topic, this, _1, _2));
 
 		subscriber->on_meta(std::bind(&redispp_subscriber_t::on_meta, this, _1, _2, _3));
+
+		subscriber->on_error(std::bind(&redispp_subscriber_t::on_error, this, _1));
 
 		initiated = true;
 	}
@@ -111,6 +121,20 @@ redispp_subscriber_t::on_meta(Subscriber::MsgType type, OptionalString channel, 
 	log1(BRICKS_DEBUG, "%s %%%%%% Event %d on topic (where relevant) '%s' (%d).\n", this->name.c_str(), type, channel ? channel.value().c_str():"", num);
 }
 
+void 
+redispp_subscriber_t::on_error(std::exception_ptr eptr)
+{
+	try
+	{
+		if (eptr)
+			std::rethrow_exception(eptr);
+	}
+	catch (const std::exception& e)
+	{
+		log1(BRICKS_DEBUG, "%s %%%%%% Exception %s \n", this->name.c_str(), e.what());
+	}
+	
+}
 
 void 
 redispp_subscriber_t::on_topic(std::string channel, std::string msg)

@@ -42,7 +42,7 @@ TEST(kafka_case, publish_subscribe_test) {
 				"	 <init>"
 				"     <configuration>"
 				"      <property name = \"bootstrap.servers\" value=\"127.0.0.1:29092\"/>"
-				"      <property name = \"group.id\" value=\"bricks.test.group.7\"/>"
+				"      <property name = \"group.id\" value=\"bricks.test.group.777\"/>"
 				"      <property name = \"debug\" value=\"all\"/>"
 				"     </configuration>"
 				"    </init>"
