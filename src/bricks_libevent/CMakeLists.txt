@@ -36,7 +36,13 @@ add_library(bricks_libevent SHARED ${BRICKS_LIBEVENT_API} ${BRICKS_LIBEVENT_SRC}
 # vcpkg
 #
 find_package(Libevent CONFIG REQUIRED)
+if(WIN32)
 target_link_libraries(bricks_libevent PRIVATE libevent::core libevent::extra bricks_core bricks_logger)
+endif()
+if(UNIX)
+target_link_libraries(bricks_libevent PRIVATE libevent::core libevent::extra libevent::pthreads bricks_core bricks_logger)
+endif()
+
 
 #
 # Configuration
